@@ -9,7 +9,7 @@
 
   双语机制：默认英文 —— HTML 文案本身即英文（SEO 友好、无闪烁）；
   页面尾部内联脚本内置 zh 字典，按 data-i18n* 逐 key 覆盖为中文。
-  语言来源优先级：URL ?lang=zh|en > localStorage(polytable_site_lang) > 英文。
+  语言来源优先级：URL ?lang=zh|en > localStorage(polytable_site_lang) > 浏览器语言(zh* → 中文) > 英文。
 
   TODO 上线前检查清单：
     1. 全局搜索替换 YOUR_GITHUB_NAME → 你的 GitHub 用户名/组织名；
@@ -711,11 +711,23 @@
       footLegal: "<strong>商标与免责声明：</strong>「飞书」「多维表格」及相关标识是字节跳动 / 飞书（或其关联公司）的商标或注册商标；「Airtable」是 Airtable, Inc. 的商标；NocoDB、Baserow、Teable 等名称归其各自所有者所有。PolyTable 与上述产品均无隶属、合作或背书关系。本站所称「飞书多维表格公式兼容」来自其官方公开帮助文档的独立整理（含溯源引用），仅用于描述兼容性目标，不构成任何官方认可。PolyTable 按「现状」提供，使用前请阅读仓库内 LICENSE 与 SECURITY.md。"
     };
     var LS = "polytable_site_lang";
+    /* 语言来源优先级：URL ?lang > 用户手动选择(localStorage) > 浏览器语言(zh* → 中文) > 英文。
+       备注：静态站无法读 IP 归属（需第三方查询接口，存在隐私/延迟/限额成本），浏览器语言
+       与访客 locale 高度相关（中国用户浏览器几乎均为 zh-*），是该场景的标准做法。 */
+    function detectBrowserLang() {
+      try {
+        var langs = navigator.languages || [navigator.language || ""];
+        for (var i = 0; i < langs.length; i++) {
+          if (String(langs[i] || "").toLowerCase().indexOf("zh") === 0) return "zh";
+        }
+      } catch (e) {}
+      return "en";
+    }
     function detect() {
       var q = new URLSearchParams(location.search).get("lang");
       if (q === "zh" || q === "en") return q;
       try { var s = localStorage.getItem(LS); if (s === "zh" || s === "en") return s; } catch (e) {}
-      return "en"; /* 默认语言：英文（HTML 文案即英文，无闪烁） */
+      return detectBrowserLang();
     }
     /* 首次遍历时缓存各元素英文原文：切回 en 时据此还原（EN 不设字典） */
     var MEM = {}, IID = 0;

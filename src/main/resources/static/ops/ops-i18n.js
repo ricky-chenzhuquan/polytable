@@ -1106,13 +1106,35 @@
     return v === "zh" || v === "en" ? v : "";
   }
 
+  /* 浏览器语言探测：navigator.languages 依序匹配 zh 前缀（与官网 detectBrowserLang 同逻辑）。
+     不做 IP 归属判断：静态部署无服务端，第三方 IP 查询引入隐私/延迟/限额成本，浏览器语言已足够。 */
+  function detectBrowserLang() {
+    try {
+      const langs = global.navigator && (global.navigator.languages || [global.navigator.language || ""]);
+      for (const item of (langs || [])) {
+        if (String(item || "").toLowerCase().indexOf("zh") === 0) return "zh";
+      }
+    } catch (_) { /* 探测失败按英文 */ }
+    return "en";
+  }
+
+  /* URL 一次性覆盖：?lang=zh|en（与官网一致，不写偏好，避免污染用户选择）。 */
+  function urlLang() {
+    try {
+      const q = new URLSearchParams(global.location.search).get("lang");
+      return q === "zh" || q === "en" ? q : "";
+    } catch (_) { return ""; }
+  }
+
   function resolveLang() {
+    const forced = urlLang();
+    if (forced) return forced;
     let stored = "";
     try {
       const cur = global.OpsTheme && typeof global.OpsTheme.current === "function" ? global.OpsTheme.current() : null;
       stored = normalizeLang(cur && cur.lang);
-    } catch (_) { /* OpsTheme 未就绪时按默认英文 */ }
-    return stored || "en";
+    } catch (_) { /* OpsTheme 未就绪时按浏览器语言 */ }
+    return stored || detectBrowserLang();
   }
 
   function t(key) {

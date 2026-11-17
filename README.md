@@ -108,6 +108,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWOR
 | [docs/design/formula-engine.md](docs/design/formula-engine.md) | 公式引擎设计：AST、类型化值模型、依赖图与缓存 |
 | [docs/formula-catalog.md](docs/formula-catalog.md) | 119 函数兼容目录说明与溯源 |
 | [docs/roadmap.md](docs/roadmap.md) | 已完成能力与公开路线图 |
+| [migration/README.md](migration/README.md) | 数据迁移：从旧部署迁入协作表数据 / 版本升级说明（含 SQL 脚本与校验） |
 
 ## 官网
 

@@ -13,7 +13,8 @@ COPY --from=build /build/target/polytable-*.jar app.jar
 # 所有凭据通过环境变量注入（见 README 关键环境变量表）
 ENV DB_URL=jdbc:mysql://mysql:3306/polytable?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
 EXPOSE 8080
+# 备注不用 wget/curl（temurin 新基础镜像已不再自带），bash /dev/tcp 做 TCP 探测
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s \
-  CMD wget -qO- http://127.0.0.1:8080/ops/index.html >/dev/null || exit 1
+  CMD bash -c '(exec 3<>/dev/tcp/127.0.0.1/8080) 2>/dev/null' || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

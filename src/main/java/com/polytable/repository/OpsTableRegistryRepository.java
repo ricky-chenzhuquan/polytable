@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 中文备注：用户新建表格注册表。本期 kind=filter 为剧目筛选工作表；kind=blank 预留二期空白表。
+ * 中文备注：用户新建表格注册表。kind=filter 为历史筛选工作表（兼容保留，新表一律 blank）；kind=blank 预留二期空白表。
  */
 @Repository
 public class OpsTableRegistryRepository {

@@ -19,11 +19,8 @@ jobs:
           cache: maven
 
       # 公式引擎目录覆盖率 + golden test 是核心资产，每次提交必须全绿
-      - name: Run tests
-        run: mvn -B test
-
-      - name: Package (skip tests, already run)
-        run: mvn -B package -DskipTests
+      - name: Verify (test + package)
+        run: mvn -B verify
 
       - name: Upload jar
         uses: actions/upload-artifact@v4

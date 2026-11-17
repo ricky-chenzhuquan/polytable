@@ -1,8 +1,8 @@
 /**
  * PolyTable i18n 服务：中英双语字典 + data-i18n 批量应用 + t() 动态取词。
  * 页面在 ops-theme.js 之后、sheet-canvas.js 之前加载本文件，保证脚本里的 t() 可用。
- * 语言来源：OpsTheme.current().lang > en（默认英文，与官网同一套做法：官网为 URL > localStorage > en）。
- * 中文备注：官网不探测浏览器语言——清空偏好后默认英文界面；中文用户在外观弹层点一次「中文」即持久化。
+ * 语言来源：URL ?lang= > OpsTheme.current().lang（外观弹层持久化偏好）> 浏览器语言 > en。
+ * 中文备注：与官网同一套做法——无任何偏好时按浏览器语言自动匹配（zh 前缀→中文，否则英文）。
  * HTML 静态文案默认写英文，中文进字典（与官网同一套做法，默认英文无闪烁）。
  * 切换语言：外观弹层派发 polytable-lang-change（detail.lang），本服务重新 apply 并更新 <html lang>。
  */
@@ -551,7 +551,25 @@
       "admin.syncDone": "协作账户同步完成",
       "admin.syncDoneDetail": "协作账户同步完成：{ok}/{total} 成功，{fail} 失败",
       "admin.syncDoneStat": "协作账户同步完成：{ok}/{total}",
-      "admin.opFailed": "操作失败"
+      "admin.opFailed": "操作失败",
+      // ---- P1-4 补翻（ElementUI 内置文案之外的漏翻点） ----
+      "toolbar.viewIdChipTitle": "当前 table / view",
+      "sheet.chipEditorAria": "选项编辑",
+      "sheet.chipCaretAria": "展开选项",
+      "sheet.optionMenuAria": "选项",
+      "filter.selectedN": "已选 {n} 项",
+      "table.untitledPrefix": "未命名表格",
+      "log.mine": "我的",
+      "notify.defaultTitle": "通知",
+      "toast.listStreamFailed": "列表流请求失败 ({n})",
+      "view.currentTable": "当前表",
+      "view.currentView": "当前视图",
+      "view.protect": "保护",
+      "view.protectMode.public": "公共",
+      "view.protectMode.locked": "锁定",
+      "view.protectMode.personal": "个人",
+      "toast.viewProtectSet": "已设为{m}视图（已同步到云端）",
+      "formula.editorPlaceholder": "例如：CONCATENATE(\"PRJ-\", [名称])"
     },
     en: {
       // ---- Common ----
@@ -1096,7 +1114,150 @@
       "admin.syncDone": "Agency accounts synced",
       "admin.syncDoneDetail": "Agency accounts synced: {ok}/{total} succeeded, {fail} failed",
       "admin.syncDoneStat": "Agency accounts synced: {ok}/{total}",
-      "admin.opFailed": "Operation failed"
+      "admin.opFailed": "Operation failed",
+      // ---- P1-4 additions ----
+      "toolbar.viewIdChipTitle": "Current table / view",
+      "sheet.chipEditorAria": "Option editor",
+      "sheet.chipCaretAria": "Expand options",
+      "sheet.optionMenuAria": "Options",
+      "filter.selectedN": "{n} selected",
+      "table.untitledPrefix": "Untitled table",
+      "log.mine": "Mine",
+      "notify.defaultTitle": "Notice",
+      "toast.listStreamFailed": "List stream request failed ({n})",
+      "view.currentTable": "Current table",
+      "view.currentView": "Current view",
+      "view.protect": "Protection",
+      "view.protectMode.public": "Public",
+      "view.protectMode.locked": "Locked",
+      "view.protectMode.personal": "Personal",
+      "toast.viewProtectSet": "Switched to {m} view (synced to cloud)",
+      "formula.editorPlaceholder": "e.g. CONCATENATE(\"PRJ-\", [Name])"
+    }
+  };
+
+  /* ElementUI 内置组件（日期选择器/下拉/分页/表格空态等）的英文文案。
+     vendor/element-ui.js 内置默认 locale 为中文且未导出 en 语言包，英文模式需手动切到这份 en locale。 */
+  const ELEMENT_EN_LOCALE = {
+    el: {
+      colorpicker: {
+        confirm: "OK",
+        clear: "Clear"
+      },
+      datepicker: {
+        now: "Now",
+        today: "Today",
+        cancel: "Cancel",
+        clear: "Clear",
+        confirm: "OK",
+        selectDate: "Select date",
+        selectTime: "Select time",
+        startDate: "Start date",
+        startTime: "Start time",
+        endDate: "End date",
+        endTime: "End time",
+        prevYear: "Previous year",
+        nextYear: "Next year",
+        prevMonth: "Previous month",
+        nextMonth: "Next month",
+        year: "",
+        month1: "January",
+        month2: "February",
+        month3: "March",
+        month4: "April",
+        month5: "May",
+        month6: "June",
+        month7: "July",
+        month8: "August",
+        month9: "September",
+        month10: "October",
+        month11: "November",
+        month12: "December",
+        weeks: {
+          sun: "Su",
+          mon: "Mo",
+          tue: "Tu",
+          wed: "We",
+          thu: "Th",
+          fri: "Fr",
+          sat: "Sa"
+        },
+        months: {
+          jan: "Jan",
+          feb: "Feb",
+          mar: "Mar",
+          apr: "Apr",
+          may: "May",
+          jun: "Jun",
+          jul: "Jul",
+          aug: "Aug",
+          sep: "Sep",
+          oct: "Oct",
+          nov: "Nov",
+          dec: "Dec"
+        }
+      },
+      select: {
+        loading: "Loading",
+        noMatch: "No matching data",
+        noData: "No data",
+        placeholder: "Select"
+      },
+      cascader: {
+        noMatch: "No matching data",
+        loading: "Loading",
+        placeholder: "Select",
+        noData: "No data"
+      },
+      pagination: {
+        goto: "Go to",
+        pagesize: "/page",
+        total: "Total {total}",
+        pageClassifier: ""
+      },
+      messagebox: {
+        title: "Message",
+        confirm: "OK",
+        cancel: "Cancel",
+        error: "Illegal input"
+      },
+      upload: {
+        deleteTip: "press delete to remove",
+        delete: "Delete",
+        preview: "Preview",
+        continue: "Continue"
+      },
+      table: {
+        emptyText: "No Data",
+        confirmFilter: "Confirm",
+        resetFilter: "Reset",
+        clearFilter: "All",
+        sumText: "Sum"
+      },
+      tree: {
+        emptyText: "No Data"
+      },
+      transfer: {
+        noMatch: "No matching data",
+        noData: "No data",
+        titles: ["List 1", "List 2"],
+        filterPlaceholder: "Enter keyword",
+        noCheckedFormat: "{total} items",
+        hasCheckedFormat: "{checked}/{total} checked"
+      },
+      image: {
+        error: "FAILED"
+      },
+      pageHeader: {
+        title: "Back"
+      },
+      popconfirm: {
+        confirmButtonText: "Yes",
+        cancelButtonText: "No"
+      },
+      empty: {
+        description: "No Data"
+      }
     }
   };
 
@@ -1177,6 +1338,9 @@
       scope.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
         el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
       });
+      scope.querySelectorAll("[data-i18n-data-placeholder]").forEach((el) => {
+        el.setAttribute("data-placeholder", t(el.getAttribute("data-i18n-data-placeholder")));
+      });
       scope.querySelectorAll("[data-i18n-title]").forEach((el) => {
         el.setAttribute("title", t(el.getAttribute("data-i18n-title")));
       });
@@ -1190,7 +1354,18 @@
     currentLang = normalizeLang(lang) || resolveLang();
     apply(document);
     try { document.documentElement.lang = currentLang === "en" ? "en" : "zh-CN"; } catch (_) {}
+    syncElementLocale();
     return currentLang;
+  }
+
+  /* ElementUI 内置文案跟随语言：各页面挂 window.__polytableElementLocale(lang) 钩子（本文件先于
+     vendor/element-ui.js 加载，无法直接操作 ELEMENT，故由页面在脚本就绪后接管；钩子缺失时静默跳过）。 */
+  function syncElementLocale() {
+    try {
+      if (typeof global.__polytableElementLocale === "function") {
+        global.__polytableElementLocale(currentLang);
+      }
+    } catch (_) { /* 页面钩子异常不阻断 i18n */ }
   }
 
   // 中文备注：外观弹层切换语言时派发 polytable-lang-change；本服务监听并重刷静态文案。
@@ -1202,8 +1377,12 @@
   currentLang = resolveLang();
   apply(document);
   try { document.documentElement.lang = currentLang === "en" ? "en" : "zh-CN"; } catch (_) {}
+  syncElementLocale();
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => apply(document));
+    document.addEventListener("DOMContentLoaded", () => {
+      apply(document);
+      syncElementLocale();
+    });
   }
 
   global.OpsI18n = {
@@ -1211,6 +1390,7 @@
     tf,
     apply,
     setLang,
+    elementEnLocale: ELEMENT_EN_LOCALE,
     lang() { return currentLang || (currentLang = resolveLang()); },
     has(key) { return I18N[currentLang || "zh"][key] != null || I18N.zh[key] != null; }
   };

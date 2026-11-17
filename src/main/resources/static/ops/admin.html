@@ -49,8 +49,8 @@
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
       background:
-        radial-gradient(1200px 500px at 10% -10%, #e0e7ff 0%, transparent 55%),
-        radial-gradient(900px 420px at 100% 0%, #eef2ff 0%, transparent 50%),
+        radial-gradient(1200px 500px at 10% -10%, var(--accent-soft-hover) 0%, transparent 55%),
+        radial-gradient(900px 420px at 100% 0%, var(--accent-soft) 0%, transparent 50%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -80,7 +80,7 @@
     .toolbar select,
     .login-card input {
       font: inherit; border-radius: 10px; border: 1px solid var(--line);
-      padding: 9px 12px; background: #fff;
+      padding: 9px 12px; background: var(--card);
     }
     .toolbar input { min-width: 160px; }
     .toolbar button,
@@ -99,7 +99,7 @@
     .logout-confirm-card .loc-foot button.ghost,
     .actions button.ghost,
     .chip button.ghost {
-      background: #fff; color: var(--text); border-color: var(--line);
+      background: var(--card); color: var(--text); border-color: var(--line);
     }
     .actions button.warn { background: #b45309; border-color: #b45309; color: #fff; }
     .actions button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
@@ -110,45 +110,47 @@
     #panelAccounts .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
     #panelAccounts .table-wrap th,
     #panelAccounts .table-wrap td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
-    #panelAccounts .table-wrap th { color: var(--muted); font-weight: 600; background: #fafafa; position: sticky; top: 0; }
+    #panelAccounts .table-wrap th { color: var(--muted); font-weight: 600; background: var(--panel-soft); position: sticky; top: 0; }
     .tag {
       display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px;
     }
     .tag.on { background: var(--ok-soft); color: var(--ok); }
     .tag.off { background: var(--danger-soft); color: var(--danger); }
     .tag.admin { background: var(--accent-soft); color: var(--accent); }
-    .tag.user { background: #f3f4f6; color: #374151; }
-    .tag.hq { background: #e0e7ff; color: #4338ca; }
+    .tag.user { background: var(--panel-hover); color: var(--ink); }
+    .tag.hq { background: var(--accent-soft); color: var(--accent); }
     .tag.agency { background: #ffedd5; color: #c2410c; }
     .tag.pwd { background: var(--warn-soft); color: var(--warn); }
     .actions { display: flex; flex-wrap: wrap; gap: 6px; }
     .actions button { padding: 6px 10px; font-size: 12px; }
     .login-mask {
       position: fixed; inset: 0; z-index: 800; display: none;
-      background: #fff;
+      background: var(--bg);
       align-items: center; justify-content: center; padding: 24px;
     }
     .login-mask.show { display: flex; }
     .login-card {
-      width: min(400px, 100%); background: #fff; border: 1px solid #e5e6eb;
+      width: min(400px, 100%); background: var(--card); border: 1px solid var(--line);
       border-radius: 16px; box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
       padding: 28px 28px 24px;
     }
-    .login-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 650; color: #1f2329; }
-    .login-card .hint { color: #8f959e; font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
+    .login-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 650; color: var(--ink); }
+    .login-card .hint { color: var(--hint); font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
     .field { margin-bottom: 14px; }
-    .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #646a73; }
+    .field label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
     .field input {
       width: 100%; box-sizing: border-box; height: 40px; padding: 0 12px;
-      border: 1px solid #dee0e3; border-radius: 8px; font-size: 14px; outline: none;
-      background: #fff;
+      border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;
+      background: var(--card);
     }
-    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft-hover); }
     .login-card #loginBtn {
       width: 100%; height: 40px; border: 0; border-radius: 8px;
-      background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+      background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+      /* 中文备注：主题色 DIY 渐变——顶色为主色混白，旧浏览器无 color-mix 时回退上一行纯色主色。 */
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, #ffffff) 0%, var(--accent) 100%);
     }
-    .login-card #loginBtn:hover { background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%); }
+    .login-card #loginBtn:hover { background: linear-gradient(180deg, var(--accent) 0%, var(--accent-hover) 100%); }
     .toast {
       position: fixed; right: 18px; bottom: 18px; background: #111827; color: #fff;
       padding: 10px 14px; border-radius: 10px; opacity: 0; transform: translateY(8px);
@@ -163,8 +165,8 @@
     }
     .logout-confirm-mask.show { display: flex; }
     .logout-confirm-card {
-      width: min(400px, 96vw); background: #fff; border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.2); padding: 24px 24px 18px; color: #1f2329;
+      width: min(400px, 96vw); background: var(--card); border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.2); padding: 24px 24px 18px; color: var(--ink);
     }
     .logout-confirm-card .loc-main {
       display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px;
@@ -176,10 +178,10 @@
     }
     .logout-confirm-card .loc-text { min-width: 0; flex: 1; }
     .logout-confirm-card .loc-title {
-      margin: 0; font-size: 16px; font-weight: 600; color: #1f2329; line-height: 1.4;
+      margin: 0; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.4;
     }
     .logout-confirm-card .loc-desc {
-      margin: 8px 0 0; font-size: 14px; color: #646a73; line-height: 1.5;
+      margin: 8px 0 0; font-size: 14px; color: var(--muted); line-height: 1.5;
     }
     .logout-confirm-card .loc-foot {
       display: flex; justify-content: flex-end; gap: 10px;
@@ -207,12 +209,12 @@
     .pager-wrap .el-pagination .el-pager li {
       min-width: 32px; height: 32px; line-height: 32px;
       border-radius: 4px; padding: 0; margin: 0;
-      background: #fff; color: #606266; border: none;
+      background: var(--card); color: var(--muted); border: none;
     }
     .pager-wrap .el-pagination.is-background .btn-prev,
     .pager-wrap .el-pagination.is-background .btn-next,
     .pager-wrap .el-pagination.is-background .el-pager li {
-      background: #f4f4f5; color: #606266;
+      background: var(--panel-soft); color: var(--muted);
     }
     .pager-wrap .el-pagination.is-background .el-pager li.active {
       background: var(--accent); color: #fff;
@@ -220,7 +222,7 @@
     .pager-wrap .el-pagination .el-pagination__sizes .el-input__inner,
     .pager-wrap .el-pagination .el-pagination__editor.el-input .el-input__inner {
       height: 32px; line-height: 32px; min-width: 0; border-radius: 4px;
-      padding: 0 8px; background: #fff; color: #606266; border: 1px solid #dcdfe6;
+      padding: 0 8px; background: var(--card); color: var(--muted); border: 1px solid var(--line);
     }
     .pager-wrap .el-pagination .el-pagination__total,
     .pager-wrap .el-pagination .el-pagination__jump {
@@ -233,7 +235,7 @@
     .admin-account-dialog .el-dialog__footer { padding: 10px 20px 16px; }
     .admin-account-dialog .el-form-item { margin-bottom: 16px; }
     .admin-account-dialog .el-form-item__label {
-      color: #646a73; font-weight: 500; line-height: 32px;
+      color: var(--muted); font-weight: 500; line-height: 32px;
     }
     .admin-account-dialog .form-tip {
       margin: -6px 0 4px 100px; color: var(--muted); font-size: 12px; line-height: 1.5;
@@ -256,7 +258,7 @@
     }
     .admin-tabs button {
       font: inherit; border-radius: 999px; border: 1px solid var(--line);
-      padding: 8px 16px; cursor: pointer; background: #fff; color: var(--text);
+      padding: 8px 16px; cursor: pointer; background: var(--card); color: var(--text);
     }
     .admin-tabs button.active {
       background: var(--accent); border-color: var(--accent); color: #fff;
@@ -268,7 +270,7 @@
     .group-check-grid label {
       display: inline-flex; align-items: center; gap: 6px;
       border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px;
-      font-size: 13px; cursor: pointer; background: #fafafa;
+      font-size: 13px; cursor: pointer; background: var(--panel-soft);
     }
     .group-check-grid input { margin: 0; }
     /* 中文备注：勿让页面通用 button/input 样式污染 Element 组件。 */
@@ -282,7 +284,7 @@
     }
     .assign-panel-root .el-table { font-size: 13px; }
     .assign-panel-root .el-table th.el-table__cell {
-      background: #fafafa; color: #606266; font-weight: 600;
+      background: var(--panel-soft); color: var(--muted); font-weight: 600;
     }
     .assign-panel-root .el-table .cell { line-height: 1.5; }
     .assign-panel-root .el-table th,
@@ -306,10 +308,10 @@
     .scripts-range-separator { color: var(--muted); font-size: 13px; }
     .scripts-panel-hint { min-height: 18px; margin: 2px 0 14px; color: var(--muted); font-size: 12px; }
     .scripts-panel-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .scripts-command-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fcfdfd; }
+    .scripts-command-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-soft); }
     .scripts-command-head { align-items: flex-start; margin-bottom: 12px; }
     .scripts-command-head h3 { font-size: 15px; }
-    .scripts-command-card .el-textarea__inner { min-height: 58px !important; padding: 9px 10px; color: #3730a3; background: #eef2ff; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .scripts-command-card .el-textarea__inner { min-height: 58px !important; padding: 9px 10px; color: var(--accent); background: var(--accent-soft); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
     .scripts-panel-footnote { align-items: flex-start; flex-direction: column; gap: 4px; margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
     @media (max-width: 680px) {
       .scripts-panel-intro { align-items: flex-start; flex-direction: column; }
@@ -384,14 +386,29 @@
     /* 深色主题 */
     html[data-theme="dark"] {
       --bg: #0f1420; --panel: #151b2b; --panel-soft: #1a2131; --panel-hover: #222a3d;
-      --ink: #e5e7eb; --muted: #8a94a6; --line: #2b3245;
-      --accent-soft: rgba(79, 70, 229, 0.16); --accent-soft-hover: rgba(79, 70, 229, 0.26);
-      --warn: #f87171; --ok: #34d399;
+      --card: #151b2b; --text: #e5e7eb; --ink: #e5e7eb; --muted: #8a94a6; --hint: #6b7688; --line: #2b3245;
+      /* 中文备注：ops-theme.js 以内联样式注入浅色系不透明 --accent-soft 系——深色下用 !important 压过，
+         color-mix 保证色相随主题色 DIY；旧浏览器回退上一行固定主色 rgba。 */
+      --accent-soft: rgba(79, 70, 229, 0.16) !important;
+      --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent) !important;
+      --accent-soft-hover: rgba(79, 70, 229, 0.26) !important;
+      --accent-soft-hover: color-mix(in srgb, var(--accent) 26%, transparent) !important;
+      --warn: #fbbf24; --warn-soft: rgba(251, 191, 36, 0.14);
+      --ok: #34d399; --ok-soft: rgba(52, 211, 153, 0.14);
+      --danger-soft: rgba(239, 68, 68, 0.16);
       --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.35);
       --menu-shadow: 0 1px 2px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.45);
       color-scheme: dark;
     }
-    html[data-theme="dark"] body { background: #0f1420; color: #e5e7eb; }
+    html[data-theme="dark"] body { background: var(--bg); color: var(--ink); }
+    html[data-theme="dark"] .chip, html[data-theme="dark"] .logout-confirm-card { background: var(--card); border-color: var(--line); color: var(--ink); }
+    html[data-theme="dark"] .toolbar button.ghost, html[data-theme="dark"] .actions button.ghost,
+    html[data-theme="dark"] .chip button.ghost, html[data-theme="dark"] .admin-tabs button {
+      background: var(--panel-soft); border-color: var(--line); color: var(--ink);
+    }
+    html[data-theme="dark"] .toolbar input, html[data-theme="dark"] .toolbar select, html[data-theme="dark"] .login-card input {
+      background: var(--panel-soft); border-color: var(--line); color: var(--ink);
+    }
     html[data-theme="dark"] .login-card, html[data-theme="dark"] .panel, html[data-theme="dark"] .card {
       background: #151b2b; border-color: #2b3245; color: #e5e7eb;
     }
@@ -516,9 +533,31 @@
   <script src="./admin-assign-panel.js?v=20261115a"></script>
   <script src="./admin-scripts-panel.js?v=20261115a"></script>
   <script>
-    if (window.ELEMENT && window.ELEMENT.lang) {
-      window.ELEMENT.locale(window.ELEMENT.lang.zhCN);
+    // 中文备注：ElementUI 内置组件跟随界面语言（vendor 默认内置中文；英文模式切 OpsI18n.elementEnLocale）。
+    // 英文模式下包装 ELEMENT.locale，拦截面板脚本对 zhCN 的重钉，保证内置文案稳定跟随语言。
+    let __elOriginalLocale = null;
+    function applyElementLocale(lang) {
+      try {
+        const E = window.ELEMENT;
+        if (!E || typeof E.locale !== "function") return;
+        if (!__elOriginalLocale) __elOriginalLocale = E.locale;
+        if (lang === "zh") {
+          E.locale = __elOriginalLocale;
+          const zhCN = E.lang && E.lang.zhCN;
+          if (zhCN) __elOriginalLocale(zhCN);
+        } else {
+          const en = window.OpsI18n && window.OpsI18n.elementEnLocale;
+          if (!en) return;
+          __elOriginalLocale(en);
+          E.locale = function (loc) {
+            if (loc === (E.lang && E.lang.zhCN)) return;
+            return __elOriginalLocale.apply(this, arguments);
+          };
+        }
+      } catch (_) { /* locale 切换失败不阻断主流程 */ }
     }
+    window.__polytableElementLocale = applyElementLocale;
+    applyElementLocale(window.OpsI18n ? window.OpsI18n.lang() : "");
     const T = (key, params) => (window.OpsI18n ? window.OpsI18n.tf(key, params) : key);
     const TOKEN_KEY = "ops.admin.token";
     let token = localStorage.getItem(TOKEN_KEY) || "";

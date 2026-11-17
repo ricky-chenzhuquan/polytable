@@ -73,7 +73,7 @@ MySQL：ops_sheet_row（行存 JSON）/ ops_sheet_field / ops_field_config / ops
 ## 4. 存储层
 
 - 键集分页：`WHERE table_id=? AND deleted=0 AND (sort_order > ? OR (...)) ORDER BY sort_order, create_time, row_id LIMIT n+1`。
-- 索引：`idx_ops_sheet_row_table_deleted_sort(table_id, deleted, sort_order)`；另有 delta 增量覆盖索引 `idx_sheet_row_tbl_del_updated(table_id, deleted, update_time)` 与键集分页 tiebreaker 索引 `idx_sheet_row_sort_tiebreak(table_id, deleted, sort_order, create_time, row_id)`（消除深翻页 filesort，均已固化进 `schema.sql` 与启动迁移 `SchemaMigration`）。
+- 索引：`idx_ops_sheet_row_table_deleted_sort(table_id, deleted, sort_order)`；另有 delta 增量覆盖索引 `idx_sheet_row_tbl_del_updated(table_id, deleted, update_time)` 与键集分页 tiebreaker 索引 `idx_sheet_row_sort_tiebreak(table_id, deleted, sort_order, create_time, row_id)`（消除深翻页 filesort，均已固化进启动迁移 `SchemaMigration`（源码 config/SchemaMigration.java，首次启动自动建表））。
 - 行级乐观锁：`UPDATE ... WHERE version=?`（0 行受影响 = 版本冲突，错误码 A0409）。
 - 粘贴批量：JDBC batch insert / 400 行一批软删。
 

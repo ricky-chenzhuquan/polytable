@@ -23,6 +23,7 @@ backup/
 
 # 本地环境配置（含口令时绝不提交）
 application-local.yml
+*.local.yml
 .env
 .env.local
 

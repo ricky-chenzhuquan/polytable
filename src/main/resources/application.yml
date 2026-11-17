@@ -46,7 +46,7 @@ schema:
   migration:
     enabled: ${SCHEMA_MIGRATION_ENABLED:true}
 
-# 首次启动种子：注册表为空时创建示例表（tbl_demo_projects）。
+# 首次启动种子：注册表为空时创建示例表（tbl_u_demo）。
 demo:
   seed-enabled: ${DEMO_SEED_ENABLED:true}
 

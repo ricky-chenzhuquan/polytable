@@ -54,7 +54,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWOR
 首次启动会自动建表（`ops_*` 系列表）、创建演示账户与示例表：
 
 - **演示账户**：`张三` / `李四`，默认口令 = 姓名拼音首字母 + `OPS_AUTH_PASSWORD_SUFFIX`（未设置后缀时口令即首字母 `ZS` / `LS`，仅限本地体验）
-- **示例表** `tbl_demo_projects`：含单选、多选、日期、复选框、公式列的演示数据
+- **示例表** `tbl_u_demo`：含单选、多选、日期、复选框、公式列的演示数据
 - **系统管理员**：配置 `OPS_ADMIN_USERNAME` / `OPS_ADMIN_PASSWORD` 后用 `/ops/admin.html` 管理账户与角色
 
 ### 关键环境变量

@@ -23,7 +23,7 @@ import java.util.Map;
 @ConditionalOnProperty(name = "demo.seed-enabled", havingValue = "true", matchIfMissing = true)
 public class DemoSeedInitializer implements ApplicationRunner {
 
-    public static final String DEMO_TABLE_ID = "tbl_demo_projects";
+    public static final String DEMO_TABLE_ID = "tbl_u_demo";
 
     private final OpsTableRegistryRepository registryRepository;
     private final OpsSheetFieldRepository fieldRepository;

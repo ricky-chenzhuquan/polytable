@@ -65,25 +65,25 @@ public class DemoSeedInitializer implements ApplicationRunner {
                 option("前端", "blue"), option("后端", "green"), option("文档", "gray"), option("性能", "orange")), sort++, "system");
         fieldRepository.insert(DEMO_TABLE_ID, "dueDate", "截止日期", "date", "", sort++, "system");
         fieldRepository.insert(DEMO_TABLE_ID, "delayed", "是否延期", "checkbox", "", sort++, "system");
-        // 公式列：按字段标题引用（与运行时元数据解析一致），演示级联求值。
+        // 公式列：字段引用使用 [字段标题] 方括号语法（与运行时元数据解析一致），演示级联求值。
         fieldRepository.insert(DEMO_TABLE_ID, "summary", "摘要", "formula",
-                "CONCATENATE(负责人, \" · \", 状态)", sort++, "system");
+                "CONCATENATE([负责人], \" · \", [状态])", sort++, "system");
     }
 
     private void seedRows() throws Exception {
         List<Map<String, Object>> rows = List.of(
-                row("官网首页改版", "张三", "进行中", "P0", List.of("前端", "文档"), "2026-12-10", "否"),
-                row("公式引擎性能回归", "李四", "进行中", "P1", List.of("性能", "后端"), "2026-12-15", "否"),
-                row("账户与权限体系", "张三", "未开始", "P1", List.of("后端"), "2026-12-20", "否"),
-                row("视图筛选与分组", "李四", "未开始", "P2", List.of("前端"), "2026-12-25", "否"),
-                row("实时协作稳定性", "王五", "进行中", "P0", List.of("后端", "性能"), "2026-12-08", "是"),
-                row("部署文档与镜像", "赵六", "已完成", "P2", List.of("文档"), "2026-11-30", "否"),
-                row("单元格复制粘贴", "王五", "已完成", "P1", List.of("前端"), "2026-11-25", "否"),
-                row("大表滚动优化", "李四", "已完成", "P0", List.of("性能", "前端"), "2026-11-20", "否"),
-                row("操作日志与撤销", "张三", "已取消", "P2", List.of("后端"), "2026-12-05", "否"),
-                row("示例数据导入导出", "赵六", "未开始", "P2", List.of("后端", "文档"), "2027-01-10", "否"),
-                row("多语言界面支持", "王五", "未开始", "P1", List.of("前端", "文档"), "2027-01-20", "否"),
-                row("移动端适配", "李四", "进行中", "P2", List.of("前端"), "2027-01-31", "是")
+                row("官网首页改版", "张三", "进行中", "P0", "前端、文档", "2026-12-10", "否"),
+                row("公式引擎性能回归", "李四", "进行中", "P1", "性能、后端", "2026-12-15", "否"),
+                row("账户与权限体系", "张三", "未开始", "P1", "后端", "2026-12-20", "否"),
+                row("视图筛选与分组", "李四", "未开始", "P2", "前端", "2026-12-25", "否"),
+                row("实时协作稳定性", "王五", "进行中", "P0", "后端、性能", "2026-12-08", "是"),
+                row("部署文档与镜像", "赵六", "已完成", "P2", "文档", "2026-11-30", "否"),
+                row("单元格复制粘贴", "王五", "已完成", "P1", "前端", "2026-11-25", "否"),
+                row("大表滚动优化", "李四", "已完成", "P0", "性能、前端", "2026-11-20", "否"),
+                row("操作日志与撤销", "张三", "已取消", "P2", "后端", "2026-12-05", "否"),
+                row("示例数据导入导出", "赵六", "未开始", "P2", "后端、文档", "2027-01-10", "否"),
+                row("多语言界面支持", "王五", "未开始", "P1", "前端、文档", "2027-01-20", "否"),
+                row("移动端适配", "李四", "进行中", "P2", "前端", "2027-01-31", "是")
         );
         int sort = 0;
         for (Map<String, Object> cells : rows) {
@@ -93,7 +93,7 @@ public class DemoSeedInitializer implements ApplicationRunner {
     }
 
     private Map<String, Object> row(String title, String owner, String status, String priority,
-                                    List<String> tags, String dueDate, String delayed) {
+                                    String tags, String dueDate, String delayed) {
         Map<String, Object> cells = new LinkedHashMap<>();
         cells.put("title", title);
         cells.put("owner", owner);

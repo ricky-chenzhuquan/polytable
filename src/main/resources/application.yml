@@ -1,0 +1,78 @@
+# PolyTable 配置
+# 原则：所有凭据类配置只从环境变量读取，代码与配置文件中不内置任何默认口令。
+spring:
+  application:
+    name: polytable
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/polytable?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&connectTimeout=10000&socketTimeout=60000&tcpKeepAlive=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      # 备注：中等连接池即可；过大会挤垮同机 MySQL。
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:16}
+      minimum-idle: ${DB_POOL_MIN_IDLE:4}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT_MS:5000}
+      validation-timeout: 5000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      keepalive-time: 300000
+      connection-test-query: SELECT 1
+  sql:
+    init:
+      mode: ${SQL_INIT_MODE:always}
+
+server:
+  compression:
+    # 备注：JSON 体积大时经反代公网传输明显变慢；开启 gzip。
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,application/javascript
+    min-response-size: 1024
+  tomcat:
+    threads:
+      max: ${SERVER_TOMCAT_MAX_THREADS:80}
+      min-spare: ${SERVER_TOMCAT_MIN_SPARE_THREADS:10}
+    accept-count: ${SERVER_TOMCAT_ACCEPT_COUNT:100}
+
+logging:
+  file:
+    name: ${LOG_FILE:logs/polytable.log}
+
+schedule:
+  pool-size: ${SCHEDULE_POOL_SIZE:6}
+
+# ops_* 表结构自动迁移开关；关闭后需自行执行 schema.sql。
+schema:
+  migration:
+    enabled: ${SCHEMA_MIGRATION_ENABLED:true}
+
+ops:
+  enabled: ${OPS_ENABLED:true}
+  # 可选：为所有 /api/v1/ops 请求增加共享口令（X-Access-Key），内网裸跑可留空。
+  access-key: ${OPS_ACCESS_KEY:}
+  list:
+    # 单次列表拉取的最大行数上限。
+    max-page-size: ${OPS_LIST_MAX_PAGE_SIZE:50000}
+  auth:
+    # 登录口令规则：初始口令 = 姓名拼音首字母 + 后缀；后缀必须由部署方提供，代码不内置默认值。
+    password-suffix: ${OPS_AUTH_PASSWORD_SUFFIX:}
+    # token 用该密钥做 HMAC 签名；留空则启动时生成随机密钥（重启后所有 token 失效）。
+    token-secret: ${OPS_AUTH_TOKEN_SECRET:}
+    token-ttl-hours: ${OPS_AUTH_TOKEN_TTL_HOURS:24}
+  admin:
+    # 系统管理员（/ops/admin.html），仅用于账户与角色管理。
+    username: ${OPS_ADMIN_USERNAME:admin}
+    password: ${OPS_ADMIN_PASSWORD:}
+  load-guard:
+    # 高负载降级：只降级重查询，登录/保存/协作心跳永不拦截。
+    enabled: ${OPS_LOAD_GUARD_ENABLED:true}
+    elevated-load-per-cpu: ${OPS_LOAD_GUARD_ELEVATED_PER_CPU:1.2}
+    critical-load-per-cpu: ${OPS_LOAD_GUARD_CRITICAL_PER_CPU:2.0}
+    sample-ttl-ms: ${OPS_LOAD_GUARD_SAMPLE_TTL_MS:2000}
+    heavy-permits: ${OPS_LOAD_GUARD_HEAVY_PERMITS:4}
+    heavy-wait-ms: ${OPS_LOAD_GUARD_HEAVY_WAIT_MS:5000}
+  tenant:
+    # 多租户分域（按 Host 区分），默认关闭；开启后用 OPS_TENANT_HOST_MODES=host:mode,host:mode 配置。
+    enabled: ${OPS_TENANT_ENABLED:false}
+    default-mode: ${OPS_TENANT_MODE:hq}
+    host-modes: ${OPS_TENANT_HOST_MODES:}

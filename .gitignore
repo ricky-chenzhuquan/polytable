@@ -1,0 +1,34 @@
+# 构建产物
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# 运行时数据与日志（禁止提交任何真实数据/登录态/口令）
+logs/
+data/
+*.log
+state.json
+auth-state.json
+auth-states/
+backup/
+
+# 本地环境配置（含口令时绝不提交）
+application-local.yml
+.env
+.env.local
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# Node（官网本地预览）
+node_modules/

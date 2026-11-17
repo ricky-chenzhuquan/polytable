@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>登录 · 协作台</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 24px; background: #fff;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: #1f2329;
+    }
+    .login-card {
+      width: min(400px, 100%); background: #fff; border: 1px solid #e5e6eb;
+      border-radius: 16px; box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+      padding: 28px 28px 24px;
+    }
+    .login-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 650; }
+    .login-card .hint { color: #8f959e; font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #646a73; }
+    .field input {
+      width: 100%; height: 40px; padding: 0 12px;
+      border: 1px solid #dee0e3; border-radius: 8px; font-size: 14px; outline: none;
+    }
+    .field input:focus { border-color: #3370ff; box-shadow: 0 0 0 3px rgba(51,112,255,0.12); }
+    #loginBtn {
+      width: 100%; height: 40px; margin-top: 6px; border: 0; border-radius: 8px;
+      background: #0f6b5c; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    #loginBtn:hover { background: #0c584c; }
+    #loginBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .toast {
+      position: fixed; right: 18px; bottom: 18px; background: #111827; color: #fff;
+      padding: 10px 14px; border-radius: 10px; opacity: 0; transform: translateY(8px);
+      transition: .2s; z-index: 860; max-width: 360px; font-size: 13px;
+    }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.error { background: #e03e3a; }
+  </style>
+  <script src="ops-auth.js"></script>
+  <script>
+    // 中文备注：已登录则直接进工作台，避免重复登录。
+    if (OpsAuth.getToken()) {
+      location.replace(OpsAuth.readRedirectTarget());
+    }
+  </script>
+</head>
+<body>
+  <div class="login-card">
+    <h2 id="loginTitle">登录协作台</h2>
+    <p class="hint" id="loginHint">请输入姓名与口令，登录后将进入协作表格。</p>
+    <div class="field">
+      <label for="loginName">姓名</label>
+      <input id="loginName" placeholder="姓名" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label for="loginPassword">口令</label>
+      <input id="loginPassword" type="password" placeholder="口令" autocomplete="current-password" />
+    </div>
+    <button id="loginBtn" type="button">登录</button>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let toastTimer = null;
+
+    function toast(msg, isError) {
+      const el = $("toast");
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.toggle("error", !!isError);
+      el.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
+    }
+
+    async function api(url, options = {}) {
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+      const json = await res.json();
+      if (json.code !== "00000") {
+        const err = new Error(json.msg || "请求失败");
+        err.code = json.code;
+        throw err;
+      }
+      return json.data;
+    }
+
+    async function doLogin() {
+      const displayName = $("loginName").value.trim();
+      const password = $("loginPassword").value.trim();
+      if (!displayName) return toast("请输入姓名", true);
+      if (!password) return toast("请输入口令", true);
+      const btn = $("loginBtn");
+      btn.disabled = true;
+      try {
+        const data = await api("/api/v1/ops/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ displayName, password })
+        });
+        OpsAuth.setToken(data.token);
+        OpsAuth.setDisplayName(data.displayName || displayName);
+        $("loginPassword").value = "";
+        toast(`欢迎，${data.displayName || displayName}`);
+        setTimeout(() => {
+          location.replace(OpsAuth.readRedirectTarget());
+        }, 200);
+      } catch (e) {
+        toast(e.message || String(e), true);
+        btn.disabled = false;
+      }
+    }
+
+    $("loginBtn").onclick = doLogin;
+    $("loginPassword").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        doLogin();
+      }
+    });
+
+    const savedName = OpsAuth.getDisplayName();
+    if (savedName) $("loginName").value = savedName;
+
+    const msg = OpsAuth.readLoginMessage();
+    if (msg) toast(msg, msg.includes("过期") || msg.includes("失败") || msg.includes("请先"));
+
+    (async () => {
+      try {
+        const cfg = await api("/api/v1/ops/auth/config");
+        const agency = !!cfg?.tenantEnabled && String(cfg?.tenantMode || cfg?.orgType || "").trim() === "agency";
+        const label = String(cfg?.tenantLabel || "").trim() || (agency ? "代投协作台" : "协作台");
+        document.title = `登录 · ${label}`;
+        const titleEl = $("loginTitle");
+        if (titleEl) titleEl.textContent = `登录${label}`;
+        const hintEl = $("loginHint");
+        if (hintEl && agency) {
+          hintEl.textContent = "请输入代投账号与口令，登录后将进入代投协作表格。";
+        }
+      } catch (_) {}
+    })();
+  </script>
+</body>
+</html>

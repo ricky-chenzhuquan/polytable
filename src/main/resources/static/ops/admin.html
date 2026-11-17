@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <!-- ops-static-rev:20261115a -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>协作台 · 账户管理</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css" />
+  <style>
+    :root {
+      --bg: #f3f5f8;
+      --card: #ffffff;
+      --line: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #0f766e;
+      --accent-soft: #ccfbf1;
+      --danger: #b91c1c;
+      --danger-soft: #fee2e2;
+      --ok: #15803d;
+      --ok-soft: #dcfce7;
+      --warn: #a16207;
+      --warn-soft: #fef3c7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #d1fae5 0%, transparent 55%),
+        radial-gradient(900px 420px at 100% 0%, #e0f2fe 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+    .top {
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+      margin-bottom: 20px;
+    }
+    h1 { margin: 0; font-size: 26px; letter-spacing: 0.02em; }
+    .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+      padding: 8px 12px; font-size: 13px;
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
+      padding: 16px;
+    }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-bottom: 14px;
+    }
+    .toolbar input,
+    .toolbar select,
+    .login-card input {
+      font: inherit; border-radius: 10px; border: 1px solid var(--line);
+      padding: 9px 12px; background: #fff;
+    }
+    .toolbar input { min-width: 160px; }
+    .toolbar button,
+    .login-card #loginBtn,
+    .logout-confirm-card .loc-foot button,
+    .actions button,
+    .chip button {
+      font: inherit; border-radius: 10px; border: 1px solid var(--line);
+      padding: 9px 12px; cursor: pointer;
+    }
+    .toolbar button,
+    .login-card #loginBtn {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .toolbar button.ghost,
+    .logout-confirm-card .loc-foot button.ghost,
+    .actions button.ghost,
+    .chip button.ghost {
+      background: #fff; color: var(--text); border-color: var(--line);
+    }
+    .actions button.warn { background: #b45309; border-color: #b45309; color: #fff; }
+    .actions button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .toolbar button:disabled,
+    .actions button:disabled,
+    .login-card #loginBtn:disabled,
+    .logout-confirm-card .loc-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #panelAccounts .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    #panelAccounts .table-wrap th,
+    #panelAccounts .table-wrap td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    #panelAccounts .table-wrap th { color: var(--muted); font-weight: 600; background: #fafafa; position: sticky; top: 0; }
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px;
+    }
+    .tag.on { background: var(--ok-soft); color: var(--ok); }
+    .tag.off { background: var(--danger-soft); color: var(--danger); }
+    .tag.admin { background: var(--accent-soft); color: var(--accent); }
+    .tag.user { background: #f3f4f6; color: #374151; }
+    .tag.hq { background: #dbeafe; color: #1d4ed8; }
+    .tag.agency { background: #ffedd5; color: #c2410c; }
+    .tag.pwd { background: var(--warn-soft); color: var(--warn); }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .actions button { padding: 6px 10px; font-size: 12px; }
+    .login-mask {
+      position: fixed; inset: 0; z-index: 800; display: none;
+      background: #fff;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .login-mask.show { display: flex; }
+    .login-card {
+      width: min(400px, 100%); background: #fff; border: 1px solid #e5e6eb;
+      border-radius: 16px; box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+      padding: 28px 28px 24px;
+    }
+    .login-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 650; color: #1f2329; }
+    .login-card .hint { color: #8f959e; font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #646a73; }
+    .field input {
+      width: 100%; box-sizing: border-box; height: 40px; padding: 0 12px;
+      border: 1px solid #dee0e3; border-radius: 8px; font-size: 14px; outline: none;
+      background: #fff;
+    }
+    .field input:focus { border-color: #3370ff; box-shadow: 0 0 0 3px rgba(51,112,255,0.12); }
+    .login-card #loginBtn {
+      width: 100%; height: 40px; border: 0; border-radius: 8px;
+      background: #0f6b5c; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .login-card #loginBtn:hover { background: #0c584c; }
+    .toast {
+      position: fixed; right: 18px; bottom: 18px; background: #111827; color: #fff;
+      padding: 10px 14px; border-radius: 10px; opacity: 0; transform: translateY(8px);
+      transition: .2s; z-index: 860; max-width: 360px; font-size: 13px;
+    }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.error { background: var(--danger); }
+    .logout-confirm-mask {
+      position: fixed; inset: 0; z-index: 850; display: none;
+      background: rgba(31, 35, 41, 0.45);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .logout-confirm-mask.show { display: flex; }
+    .logout-confirm-card {
+      width: min(400px, 96vw); background: #fff; border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.2); padding: 24px 24px 18px; color: #1f2329;
+    }
+    .logout-confirm-card .loc-main {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px;
+    }
+    .logout-confirm-card .loc-ico {
+      flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%;
+      background: #3370ff; color: #fff; display: inline-flex; align-items: center;
+      justify-content: center; font-size: 14px; font-weight: 700; line-height: 1; margin-top: 1px;
+    }
+    .logout-confirm-card .loc-text { min-width: 0; flex: 1; }
+    .logout-confirm-card .loc-title {
+      margin: 0; font-size: 16px; font-weight: 600; color: #1f2329; line-height: 1.4;
+    }
+    .logout-confirm-card .loc-desc {
+      margin: 8px 0 0; font-size: 14px; color: #646a73; line-height: 1.5;
+    }
+    .logout-confirm-card .loc-foot {
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .logout-confirm-card .loc-foot button {
+      min-width: 72px; padding: 7px 16px; font-size: 13px; border-radius: 6px;
+    }
+    .logout-confirm-card .loc-ok {
+      background: #f54a45; border: 1px solid #f54a45; color: #fff;
+    }
+    .logout-confirm-card .loc-ok:hover { background: #e03e3a; border-color: #e03e3a; }
+    .table-wrap { max-height: calc(100vh - 300px); overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
+    .pager-wrap {
+      display: flex; justify-content: flex-end; align-items: center;
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line);
+      width: 100%; overflow-x: auto;
+    }
+    /* 中文备注：勿让页面通用 button/input 样式污染 Element 分页。 */
+    .pager-wrap .el-pagination {
+      display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end;
+      gap: 8px; white-space: nowrap; font-weight: normal;
+    }
+    .pager-wrap .el-pagination .btn-prev,
+    .pager-wrap .el-pagination .btn-next,
+    .pager-wrap .el-pagination .el-pager li {
+      min-width: 32px; height: 32px; line-height: 32px;
+      border-radius: 4px; padding: 0; margin: 0;
+      background: #fff; color: #606266; border: none;
+    }
+    .pager-wrap .el-pagination.is-background .btn-prev,
+    .pager-wrap .el-pagination.is-background .btn-next,
+    .pager-wrap .el-pagination.is-background .el-pager li {
+      background: #f4f4f5; color: #606266;
+    }
+    .pager-wrap .el-pagination.is-background .el-pager li.active {
+      background: #409eff; color: #fff;
+    }
+    .pager-wrap .el-pagination .el-pagination__sizes .el-input__inner,
+    .pager-wrap .el-pagination .el-pagination__editor.el-input .el-input__inner {
+      height: 32px; line-height: 32px; min-width: 0; border-radius: 4px;
+      padding: 0 8px; background: #fff; color: #606266; border: 1px solid #dcdfe6;
+    }
+    .pager-wrap .el-pagination .el-pagination__total,
+    .pager-wrap .el-pagination .el-pagination__jump {
+      color: var(--muted); font-size: 13px;
+    }
+    .radio-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .filter-select { min-width: 120px; }
+    /* Element 账户弹窗 */
+    .admin-account-dialog .el-dialog__body { padding: 16px 20px 8px; }
+    .admin-account-dialog .el-dialog__footer { padding: 10px 20px 16px; }
+    .admin-account-dialog .el-form-item { margin-bottom: 16px; }
+    .admin-account-dialog .el-form-item__label {
+      color: #646a73; font-weight: 500; line-height: 32px;
+    }
+    .admin-account-dialog .form-tip {
+      margin: -6px 0 4px 100px; color: var(--muted); font-size: 12px; line-height: 1.5;
+    }
+    .admin-account-dialog .el-radio-group { display: inline-flex; vertical-align: middle; }
+    .admin-account-dialog .el-radio-button__inner {
+      padding: 8px 18px; font-size: 13px; border-radius: 0;
+    }
+    .admin-account-dialog .el-radio-button:first-child .el-radio-button__inner {
+      border-radius: 4px 0 0 4px;
+    }
+    .admin-account-dialog .el-radio-button:last-child .el-radio-button__inner {
+      border-radius: 0 4px 4px 0;
+    }
+    .admin-account-dialog .el-radio-button__orig-radio:checked + .el-radio-button__inner {
+      background-color: #409eff; border-color: #409eff; box-shadow: -1px 0 0 0 #409eff;
+    }
+    .admin-tabs {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .admin-tabs button {
+      font: inherit; border-radius: 999px; border: 1px solid var(--line);
+      padding: 8px 16px; cursor: pointer; background: #fff; color: var(--text);
+    }
+    .admin-tabs button.active {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+    }
+    .panel-hidden { display: none; }
+    .group-check-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .group-check-grid label {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px;
+      font-size: 13px; cursor: pointer; background: #fafafa;
+    }
+    .group-check-grid input { margin: 0; }
+    /* 中文备注：勿让页面通用 button/input 样式污染 Element 组件。 */
+    .assign-toolbar .el-date-editor.el-input { width: 160px; }
+    .assign-toolbar .el-select { width: 160px; }
+    .assign-toolbar .el-button { font-weight: normal; }
+    .assign-table-wrap .el-button--text { padding: 0 6px; }
+    .assign-table-wrap .el-button + .el-button { margin-left: 4px; }
+    .assign-panel-root .assign-table-wrap {
+      border: none; max-height: none; overflow: visible; border-radius: 0; background: transparent;
+    }
+    .assign-panel-root .el-table { font-size: 13px; }
+    .assign-panel-root .el-table th.el-table__cell {
+      background: #fafafa; color: #606266; font-weight: 600;
+    }
+    .assign-panel-root .el-table .cell { line-height: 1.5; }
+    .assign-panel-root .el-table th,
+    .assign-panel-root .el-table td { position: static; }
+    .admin-tabs-app { margin-bottom: 16px; }
+    .admin-tabs-app .el-button { font-weight: normal; }
+    .admin-tabs-app .el-button + .el-button { margin-left: 8px; }
+    .admin-scripts-panel h2,
+    .admin-scripts-panel h3 { margin: 0; font-weight: 650; }
+    .admin-scripts-panel h2 { font-size: 18px; }
+    .scripts-panel-intro,
+    .scripts-command-head,
+    .scripts-panel-footnote { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .scripts-panel-intro { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .scripts-panel-intro p,
+    .scripts-command-head p { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .scripts-panel-state { flex: 0 0 auto; padding: 6px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; }
+    .scripts-panel-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 16px 0 4px; }
+    .scripts-panel-filters .el-date-editor.el-input { width: 170px; }
+    .scripts-panel-filters .el-radio-group { margin-left: auto; }
+    .scripts-range-separator { color: var(--muted); font-size: 13px; }
+    .scripts-panel-hint { min-height: 18px; margin: 2px 0 14px; color: var(--muted); font-size: 12px; }
+    .scripts-panel-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .scripts-command-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fcfdfd; }
+    .scripts-command-head { align-items: flex-start; margin-bottom: 12px; }
+    .scripts-command-head h3 { font-size: 15px; }
+    .scripts-command-card .el-textarea__inner { min-height: 58px !important; padding: 9px 10px; color: #134e4a; background: #f0fdfa; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .scripts-panel-footnote { align-items: flex-start; flex-direction: column; gap: 4px; margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    @media (max-width: 680px) {
+      .scripts-panel-intro { align-items: flex-start; flex-direction: column; }
+      .scripts-panel-filters .el-radio-group { width: 100%; margin-left: 0; }
+      .scripts-panel-grid { grid-template-columns: 1fr; }
+    }
+    .assign-group-checks .el-checkbox { margin: 0 8px 8px 0; }
+    .assign-group-checks .el-checkbox.is-bordered { padding: 6px 12px; height: auto; }
+    .assign-sub-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .assign-sub-tabs .el-button { font-weight: normal; }
+    .assign-sub-tabs .el-button + .el-button { margin-left: 0; }
+    .assign-panel-root .form-tip {
+      margin: -6px 0 4px 88px; color: var(--muted); font-size: 12px; line-height: 1.5;
+    }
+    .assign-pager-wrap { margin-top: 12px; padding-top: 0; border-top: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1 id="pageTitle">账户管理</h1>
+        <div class="sub" id="pageSub">仅系统管理员可操作：账户与剪辑小组分配规则</div>
+      </div>
+      <div class="chip">
+        <span id="adminUser">未登录</span>
+        <button class="ghost" id="logoutBtn" type="button">退出</button>
+      </div>
+    </div>
+
+    <div id="adminTabsApp" class="admin-tabs-app"></div>
+
+    <div class="card" id="panelAccounts">
+      <div class="toolbar">
+        <input id="keyword" placeholder="搜索姓名 / 首字母" />
+        <select id="orgFilter" class="filter-select" title="归属筛选">
+          <option value="">全部归属</option>
+          <option value="hq">自投</option>
+          <option value="agency">代投</option>
+        </select>
+        <select id="personnelTypeFilter" class="filter-select" title="人员类型筛选">
+          <option value="">全部人员类型</option>
+          <option value="editor">剪辑师</option>
+          <option value="optimizer">优化师</option>
+          <option value="management">管理</option>
+        </select>
+        <button class="ghost" id="refreshBtn" type="button">刷新</button>
+        <button class="ghost" id="syncAgencyBtn" type="button" title="将全部代投账户推送到代投库">同步代投账户</button>
+        <button id="createBtn" type="button">新增账户</button>
+        <span style="color:var(--muted);font-size:12px" id="totalHint"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>姓名</th>
+              <th>首字母</th>
+              <th>归属</th>
+              <th>角色</th>
+              <th>人员类型</th>
+              <th>状态</th>
+              <th>口令</th>
+              <th>更新</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pager-wrap">
+        <div id="pagerApp"></div>
+      </div>
+    </div>
+
+    <div class="card panel-hidden" id="panelAssign">
+      <div id="assignPanelApp"></div>
+    </div>
+
+    <div class="card panel-hidden" id="panelScripts">
+      <div id="scriptsPanelApp"></div>
+    </div>
+  </div>
+
+  <div id="loginMask" class="login-mask show">
+    <div class="login-card">
+      <h2>系统管理员登录</h2>
+      <div class="hint" id="loginHint">请输入管理员账号和口令；普通协作台账户无法登录。</div>
+      <div class="field">
+        <label>账号</label>
+        <input id="loginName" value="" placeholder="账号" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>口令</label>
+        <input id="loginPassword" type="password" value="" placeholder="口令" autocomplete="current-password" />
+      </div>
+      <button id="loginBtn" type="button">登录</button>
+    </div>
+  </div>
+
+  <div id="logoutConfirmMask" class="logout-confirm-mask" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
+    <div class="logout-confirm-card">
+      <div class="loc-main">
+        <span class="loc-ico" aria-hidden="true">!</span>
+        <div class="loc-text">
+          <h3 class="loc-title" id="logoutConfirmTitle">确认退出登录吗？</h3>
+          <p class="loc-desc">退出后需重新登录才能继续管理账户。</p>
+        </div>
+      </div>
+      <div class="loc-foot">
+        <button type="button" class="ghost" id="logoutConfirmCancel">取消</button>
+        <button type="button" class="loc-ok" id="logoutConfirmOk">退出</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dialogApp"></div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://unpkg.com/vue@2.7.16/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+  <script src="https://unpkg.com/element-ui@2.15.14/lib/umd/locale/zh-CN.js"></script>
+  <script src="./ops-static-guard.js?v=20261115a"></script>
+  <script src="./admin-editor-group-panel.js?v=20261115a"></script>
+  <script src="./admin-assign-panel.js?v=20261115a"></script>
+  <script src="./admin-scripts-panel.js?v=20261115a"></script>
+  <script>
+    if (window.ELEMENT && window.ELEMENT.lang) {
+      window.ELEMENT.locale(window.ELEMENT.lang.zhCN);
+    }
+    const TOKEN_KEY = "ops.admin.token";
+    let token = localStorage.getItem(TOKEN_KEY) || "";
+    let accounts = [];
+    let listState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
+    let keywordTimer = null;
+    let pagerVm = null;
+    let dialogVm = null;
+    let tabsVm = null;
+    let assignPanel = null;
+    let scriptsPanel = null;
+    let assignRules = [];
+    let editGroups = [];
+    const TAB_STORAGE_KEY = "ops.admin.activeTab";
+    let activeTab = ["assign", "scripts"].includes(localStorage.getItem(TAB_STORAGE_KEY))
+      ? localStorage.getItem(TAB_STORAGE_KEY) : "accounts";
+
+    function orgTypeLabel(orgType) {
+      return orgType === "agency" ? "代投" : "自投";
+    }
+
+    function initDialog() {
+      if (dialogVm || !window.Vue) return;
+      dialogVm = new Vue({
+        el: "#dialogApp",
+        template: `
+          <el-dialog
+            :title="title"
+            :visible.sync="visible"
+            width="480px"
+            append-to-body
+            custom-class="admin-account-dialog"
+            :close-on-click-modal="false">
+            <el-form label-width="100px" size="small" @submit.native.prevent="submit">
+              <el-form-item v-if="mode === 'create'" label="姓名">
+                <el-input v-model="form.displayName" placeholder="例如：张三" clearable></el-input>
+              </el-form-item>
+              <el-form-item v-else label="姓名">
+                <el-input v-model="form.displayName" disabled></el-input>
+              </el-form-item>
+
+              <el-form-item label="归属权限">
+                <el-radio-group v-model="form.orgType" size="small">
+                  <el-radio-button label="hq">自投</el-radio-button>
+                  <el-radio-button label="agency">代投</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+
+              <el-form-item label="人员类型">
+                <el-select v-model="form.personnelType" placeholder="请选择" clearable style="width:100%">
+                  <el-option label="剪辑师" value="editor"></el-option>
+                  <el-option label="优化师" value="optimizer"></el-option>
+                  <el-option label="管理" value="management"></el-option>
+                </el-select>
+              </el-form-item>
+              <div class="form-tip">仅用于后台管理标识，不改变登录权限和数据归属。</div>
+
+              <el-form-item v-if="form.personnelType === 'editor'" label="是否安排筛剧">
+                <el-select v-model="form.screeningAssignEnabled" style="width:100%">
+                  <el-option label="是" :value="true"></el-option>
+                  <el-option label="否" :value="false"></el-option>
+                </el-select>
+              </el-form-item>
+              <div v-if="form.personnelType === 'editor'" class="form-tip">选择“否”后停止进入筛剧分配池，已分配作品会在后续批次转给其他剪辑。</div>
+
+              <el-form-item label="首字母">
+                <el-input v-model="form.initials" placeholder="例如：ZS" maxlength="16" clearable></el-input>
+              </el-form-item>
+              <div class="form-tip">大写英文字母；若使用默认口令，修改后需重新登录。</div>
+
+              <el-form-item :label="mode === 'create' ? '初始口令' : '新口令'">
+                <el-input v-model="form.password" type="password" show-password
+                  :placeholder="mode === 'create' ? '可空，空则用默认规则' : '留空则不修改，至少 6 位'"></el-input>
+              </el-form-item>
+
+              <el-form-item v-if="mode === 'create'" label="备注">
+                <el-input v-model="form.remark" placeholder="可选" clearable></el-input>
+              </el-form-item>
+
+              <el-form-item v-if="form.orgType === 'agency'" label="功能权限">
+                <el-checkbox v-model="form.promoTable">当日推广参考表</el-checkbox>
+              </el-form-item>
+              <div v-if="form.orgType === 'agency'" class="form-tip">代投默认仅可见「剧目目录」；勾选后额外开放当日推广参考表。</div>
+
+              <el-form-item v-if="mode === 'edit' && !isAdmin" label="账户状态">
+                <el-radio-group v-model="form.enabledKey" size="small">
+                  <el-radio-button label="1">启用</el-radio-button>
+                  <el-radio-button label="0">停用</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+              <div v-if="mode === 'edit' && isAdmin" class="form-tip">系统管理员账户不可在此停用。</div>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="visible = false">取消</el-button>
+              <el-button type="primary" :loading="saving" @click="submit">确定</el-button>
+            </span>
+          </el-dialog>
+        `,
+        data() {
+          return {
+            visible: false,
+            saving: false,
+            mode: "create",
+            title: "",
+            origin: null,
+            form: {
+              displayName: "",
+              initials: "",
+              orgType: "hq",
+              personnelType: "",
+              screeningAssignEnabled: false,
+              promoTable: false,
+              password: "",
+              remark: "",
+              enabledKey: "1"
+            }
+          };
+        },
+        computed: {
+          isAdmin() {
+            return this.origin && this.origin.role === "admin";
+          }
+        },
+        methods: {
+          openCreate() {
+            this.mode = "create";
+            this.title = "新增账户";
+            this.origin = null;
+            this.form = {
+              displayName: "",
+              initials: "",
+              orgType: "hq",
+              personnelType: "",
+              screeningAssignEnabled: false,
+              promoTable: false,
+              password: "",
+              remark: "",
+              enabledKey: "1"
+            };
+            this.visible = true;
+          },
+          openEdit(account) {
+            this.mode = "edit";
+            this.title = "编辑账户 · " + (account.displayName || "");
+            this.origin = account;
+            this.form = {
+              displayName: account.displayName || "",
+              initials: account.initials || "",
+              orgType: account.orgType === "agency" ? "agency" : "hq",
+              personnelType: account.personnelType || "",
+              screeningAssignEnabled: account.screeningAssignEnabled !== false,
+              promoTable: !!account.promoTable,
+              password: "",
+              remark: "",
+              enabledKey: account.enabled ? "1" : "0"
+            };
+            this.visible = true;
+          },
+          async submit() {
+            if (this.saving) return;
+            this.saving = true;
+            try {
+              if (this.mode === "create") {
+                await this.submitCreate();
+              } else {
+                await this.submitEdit();
+              }
+              this.visible = false;
+            } catch (e) {
+              toast(e.message || "保存失败", true);
+            } finally {
+              this.saving = false;
+            }
+          },
+          async submitCreate() {
+            const name = (this.form.displayName || "").trim();
+            const initials = (this.form.initials || "").trim();
+            if (!name) throw new Error("姓名不能为空");
+            if (!initials) throw new Error("首字母不能为空");
+            const created = await api("/api/v1/ops/admin/accounts/create", {
+              method: "POST",
+              body: JSON.stringify({
+                displayName: name,
+                initials: initials,
+                orgType: this.form.orgType,
+                personnelType: this.form.personnelType,
+                screeningAssignEnabled: this.form.personnelType === "editor" ? !!this.form.screeningAssignEnabled : null,
+                password: this.form.password,
+                enabled: true,
+                remark: (this.form.remark || "").trim()
+              })
+            });
+            if (this.form.orgType === "agency" && this.form.promoTable) {
+              await api("/api/v1/ops/admin/accounts/feature-flags", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, promoTable: true })
+              });
+            }
+            const hint = created && created.defaultPasswordHint;
+            let createMsg = hint && hint !== "已自定义" ? "已新增，默认口令：" + hint : "已新增";
+            const screeningSchedule = created && created.screeningAssignSchedule;
+            let createError = agencySyncFailed(created);
+            if (screeningSchedule) {
+              if (screeningSchedule.error) {
+                createMsg += "；筛剧分配任务登记失败：" + screeningSchedule.error;
+                createError = true;
+              } else if (screeningSchedule.scheduleSkipped) {
+                createMsg += "；筛剧分配未登记：" + (screeningSchedule.reason || "当前配置未运行");
+                createError = true;
+              } else if (screeningSchedule.scheduleCreateDays > 0) {
+                createMsg += "；已登记筛剧分配批次 " + screeningSchedule.scheduleCreateDays + " 个日期";
+              } else {
+                createMsg += "；当前没有待登记的筛剧批次";
+              }
+            }
+            toast(createMsg, createError);
+            await loadAccounts();
+          },
+          async submitEdit() {
+            const account = this.origin || {};
+            const name = account.displayName || "";
+            const org = account.orgType === "agency" ? "agency" : "hq";
+            const enabled = !!account.enabled;
+            const nextOrg = this.form.orgType;
+            const nextPersonnelType = this.form.personnelType || "";
+            const nextScreeningAssignEnabled = !!this.form.screeningAssignEnabled;
+            const nextInitials = (this.form.initials || "").trim();
+            const nextPassword = (this.form.password || "").trim();
+            const nextEnabled = this.form.enabledKey === "1";
+            const msgs = [];
+            let syncError = false;
+
+            if (nextOrg !== org) {
+              const data = await api("/api/v1/ops/admin/accounts/org-type", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, orgType: nextOrg })
+              });
+              if (data && data.message) msgs.push(data.message);
+              syncError = syncError || agencySyncFailed(data);
+            }
+            if (nextPersonnelType !== (account.personnelType || "")
+                || (nextPersonnelType === "editor" && nextScreeningAssignEnabled !== (account.screeningAssignEnabled !== false))) {
+              const data = await api("/api/v1/ops/admin/accounts/personnel-type", {
+                method: "POST",
+                body: JSON.stringify({
+                  displayName: name,
+                  personnelType: nextPersonnelType,
+                  screeningAssignEnabled: nextScreeningAssignEnabled
+                })
+              });
+              if (nextPersonnelType !== (account.personnelType || "")) {
+                msgs.push("人员类型已更新为" + (data.personnelTypeLabel || "未标记"));
+              }
+              if (nextPersonnelType === "editor") {
+                msgs.push("筛剧安排已更新为" + (nextScreeningAssignEnabled ? "是" : "否"));
+              }
+              const poolSync = data.screeningAssignOptionsSync || {};
+              const poolReason = poolSync.reason || poolSync.error || "";
+              if (poolSync.error || (poolSync.skipped && !poolReason.includes("options already match"))) {
+                syncError = true;
+                msgs.push("筛剧设置已保存，但分配选项未同步" + (poolReason ? "：" + poolReason : ""));
+              } else {
+                msgs.push("筛剧分配选项已同步");
+              }
+            }
+            if (nextInitials && nextInitials !== (account.initials || "")) {
+              const data = await api("/api/v1/ops/admin/accounts/initials", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, initials: nextInitials })
+              });
+              if (data && data.defaultPasswordHint && data.defaultPasswordHint !== "已自定义") {
+                msgs.push("默认口令：" + data.defaultPasswordHint);
+              } else {
+                msgs.push("首字母已更新");
+              }
+            }
+            if (nextPassword) {
+              await api("/api/v1/ops/admin/accounts/password", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, newPassword: nextPassword })
+              });
+              msgs.push("口令已更新");
+            }
+            if (!this.isAdmin && nextEnabled !== enabled) {
+              await api("/api/v1/ops/admin/accounts/enabled", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, enabled: nextEnabled })
+              });
+              msgs.push(nextEnabled ? "已启用" : "已停用");
+            }
+            const promoWas = !!account.promoTable;
+            const promoNext = nextOrg === "agency" && !!this.form.promoTable;
+            if (nextOrg === "agency" && promoNext !== promoWas) {
+              const data = await api("/api/v1/ops/admin/accounts/feature-flags", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, promoTable: promoNext })
+              });
+              if (data && data.message) msgs.push(data.message);
+              else msgs.push(promoNext ? "已开放当日推广参考表" : "已关闭当日推广参考表");
+            } else if (org === "agency" && nextOrg !== "agency" && promoWas) {
+              await api("/api/v1/ops/admin/accounts/feature-flags", {
+                method: "POST",
+                body: JSON.stringify({ displayName: name, promoTable: false })
+              });
+            }
+            toast(msgs.length ? msgs.join("；") : "未修改任何项", syncError);
+            await loadAccounts();
+          }
+        }
+      });
+    }
+
+    function initAdminTabs() {
+      if (tabsVm || !window.Vue) return;
+      tabsVm = new Vue({
+        el: "#adminTabsApp",
+        template: `
+          <div>
+            <el-button round size="small" :type="tab === 'accounts' ? 'primary' : 'default'" @click="pick('accounts')">账户管理</el-button>
+            <el-button round size="small" :type="tab === 'assign' ? 'primary' : 'default'" @click="pick('assign')">剪辑分配</el-button>
+            <el-button round size="small" :type="tab === 'scripts' ? 'primary' : 'default'" @click="pick('scripts')">采集脚本</el-button>
+          </div>
+        `,
+        data: { tab: activeTab },
+        methods: {
+          pick(name) {
+            switchTab(name);
+            this.tab = activeTab;
+          }
+        }
+      });
+    }
+
+    function ensureAssignPanel() {
+      if (assignPanel) return assignPanel;
+      if (!window.OpsAdminAssignPanel) {
+        throw new Error("admin-assign-panel.js 未加载");
+      }
+      assignPanel = window.OpsAdminAssignPanel.create({
+        api: api,
+        toast: toast,
+        Vue: window.Vue,
+        onRulesLoaded: function (rules, groups) {
+          assignRules = rules;
+          editGroups = groups;
+        }
+      });
+      return assignPanel;
+    }
+
+    function ensureScriptsPanel() {
+      if (scriptsPanel) return scriptsPanel;
+      if (!window.OpsAdminScriptsPanel) throw new Error("admin-scripts-panel.js 未加载");
+      scriptsPanel = window.OpsAdminScriptsPanel.create({ Vue: window.Vue, toast: toast });
+      return scriptsPanel;
+    }
+
+    function initPager() {
+      if (pagerVm || !window.Vue) return;
+      pagerVm = new Vue({
+        el: "#pagerApp",
+        template: `
+          <el-pagination
+            background
+            layout="total, sizes, prev, pager, next, jumper"
+            :current-page="page"
+            :page-size="pageSize"
+            :page-sizes="[20, 50, 100]"
+            :total="total"
+            @size-change="onSizeChange"
+            @current-change="onPageChange">
+          </el-pagination>
+        `,
+        data: {
+          page: listState.page,
+          pageSize: listState.pageSize,
+          total: listState.total
+        },
+        methods: {
+          onSizeChange(size) {
+            listState.pageSize = size;
+            listState.page = 1;
+            loadAccounts().catch(e => toast(e.message, true));
+          },
+          onPageChange(page) {
+            listState.page = page;
+            loadAccounts().catch(e => toast(e.message, true));
+          }
+        }
+      });
+    }
+
+    function syncPager() {
+      if (!pagerVm) return;
+      pagerVm.page = listState.page;
+      pagerVm.pageSize = listState.pageSize;
+      pagerVm.total = listState.total;
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    function toast(msg, isError = false) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.className = "toast show" + (isError ? " error" : "");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), isError ? 5200 : 2600);
+    }
+
+    function agencySyncFailed(data) {
+      return data && data.agencySyncAttempted && data.agencySyncSuccess === false;
+    }
+
+    async function api(path, options = {}) {
+      const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+      if (token) headers["X-Ops-Token"] = token;
+      // 中文备注：账户/人员类型保存后刷新必须重新读取服务端，禁止浏览器复用保存前的 GET 响应。
+      const res = await fetch(path, Object.assign({ cache: "no-store" }, options, { headers }));
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || (json.code && json.code !== "00000")) {
+        const msg = json.msg || json.message || ("请求失败 " + res.status);
+        const err = new Error(msg);
+        err.code = json.code;
+        throw err;
+      }
+      return json.data;
+    }
+
+    function showLogin() {
+      token = "";
+      localStorage.removeItem(TOKEN_KEY);
+      $("loginMask").classList.add("show");
+      $("adminUser").textContent = "未登录";
+    }
+
+    function applySession(session, nextToken) {
+      token = nextToken;
+      localStorage.setItem(TOKEN_KEY, nextToken);
+      $("adminUser").textContent = (session.displayName || "管理员") + " · 管理员";
+      $("loginMask").classList.remove("show");
+    }
+
+    async function ensureSession() {
+      try {
+        const cfg = await api("/api/v1/ops/admin/auth/config");
+        if (cfg && cfg.hint) $("loginHint").textContent = cfg.hint;
+      } catch (_) {}
+      if (!token) {
+        showLogin();
+        return false;
+      }
+      try {
+        const me = await api("/api/v1/ops/admin/auth/me");
+        applySession(me, token);
+        return true;
+      } catch (e) {
+        showLogin();
+        return false;
+      }
+    }
+
+    async function login() {
+      try {
+        const data = await api("/api/v1/ops/admin/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            displayName: $("loginName").value.trim(),
+            password: $("loginPassword").value
+          })
+        });
+        applySession(data, data.token);
+        $("loginPassword").value = "";
+        listState.page = 1;
+        await loadAccounts();
+        toast("登录成功");
+      } catch (e) {
+        toast(e.message || "登录失败", true);
+      }
+    }
+
+    function openLogoutConfirm() {
+      return new Promise((resolve) => {
+        const mask = $("logoutConfirmMask");
+        const okBtn = $("logoutConfirmOk");
+        const cancelBtn = $("logoutConfirmCancel");
+        if (!mask || !okBtn || !cancelBtn) {
+          resolve(window.confirm("确认退出登录吗？"));
+          return;
+        }
+        const finish = (ok) => {
+          mask.classList.remove("show");
+          document.removeEventListener("keydown", onKey);
+          okBtn.onclick = null;
+          cancelBtn.onclick = null;
+          mask.onclick = null;
+          resolve(!!ok);
+        };
+        const onKey = (e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            finish(false);
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            finish(true);
+          }
+        };
+        okBtn.onclick = () => finish(true);
+        cancelBtn.onclick = () => finish(false);
+        mask.onclick = (e) => { if (e.target === mask) finish(false); };
+        document.addEventListener("keydown", onKey);
+        mask.classList.add("show");
+        okBtn.focus();
+      });
+    }
+
+    async function requestLogout() {
+      const ok = await openLogoutConfirm();
+      if (!ok) return;
+      await logout();
+    }
+
+    async function logout() {
+      try { await api("/api/v1/ops/admin/auth/logout", { method: "POST", body: "{}" }); } catch (_) {}
+      showLogin();
+      toast("已退出登录");
+    }
+
+    function buildListQuery() {
+      const qs = new URLSearchParams();
+      qs.set("page", String(listState.page));
+      qs.set("pageSize", String(listState.pageSize));
+      const org = $("orgFilter").value.trim();
+      const kw = $("keyword").value.trim();
+      if (org) qs.set("orgType", org);
+      const personnelType = $("personnelTypeFilter").value.trim();
+      if (personnelType) qs.set("personnelType", personnelType);
+      if (kw) qs.set("keyword", kw);
+      return qs.toString();
+    }
+
+    function render() {
+      const colSpan = 9;
+      $("totalHint").textContent = `共 ${listState.total} 个账户`;
+      syncPager();
+      $("tbody").innerHTML = accounts.map(a => {
+        const enabled = !!a.enabled;
+        const role = a.role === "admin" ? "admin" : "user";
+        const org = a.orgType === "agency" ? "agency" : "hq";
+        const pwd = a.passwordMode === "custom" ? "自定义" : "默认规则";
+        const pwdHint = a.defaultPasswordHint || "";
+        const payload = encodeURIComponent(JSON.stringify({
+          displayName: a.displayName || "",
+          initials: a.initials || "",
+          orgType: org,
+          promoTable: !!a.promoTable,
+          personnelType: a.personnelType || "",
+          screeningAssignEnabled: a.screeningAssignEnabled,
+          enabled: enabled,
+          role: a.role || "user"
+        }));
+        return `<tr>
+          <td><strong>${escapeHtml(a.displayName || "")}</strong></td>
+          <td>${escapeHtml(a.initials || "")}</td>
+          <td><span class="tag ${org}">${escapeHtml(a.orgTypeLabel || orgTypeLabel(org))}</span></td>
+          <td><span class="tag ${role}">${role === "admin" ? "管理员" : "用户"}</span></td>
+          <td><span class="tag">${escapeHtml(a.personnelTypeLabel || "未标记")}</span></td>
+          <td><span class="tag ${enabled ? "on" : "off"}">${enabled ? "启用" : "停用"}</span></td>
+          <td><span class="tag pwd" title="${escapeAttr(pwdHint)}">${pwd}</span></td>
+          <td style="color:var(--muted);white-space:nowrap">${escapeHtml(a.updateTime || "-")}<div style="font-size:11px">${escapeHtml(a.updatedBy || "")}</div></td>
+          <td class="actions">
+            <button class="ghost" data-act="edit" data-account="${payload}">编辑</button>
+          </td>
+        </tr>`;
+      }).join("") || `<tr><td colspan="${colSpan}" style="color:var(--muted);padding:24px;text-align:center">暂无账户</td></tr>`;
+    }
+
+    async function loadAccounts() {
+      const query = new URLSearchParams(buildListQuery());
+      query.set("_ts", String(Date.now()));
+      const data = await api("/api/v1/ops/admin/accounts?" + query.toString());
+      accounts = data.accounts || [];
+      listState.page = data.page || 1;
+      listState.pageSize = data.pageSize || listState.pageSize;
+      listState.total = data.total || 0;
+      listState.totalPages = data.totalPages || 0;
+      render();
+    }
+
+    function scheduleReload() {
+      clearTimeout(keywordTimer);
+      keywordTimer = setTimeout(() => {
+        listState.page = 1;
+        loadAccounts().catch(e => toast(e.message, true));
+      }, 300);
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+    }
+    function escapeAttr(s) { return escapeHtml(s).replace(/\n/g, " "); }
+
+    async function loadAssignRules() {
+      ensureAssignPanel().ensureInit();
+      await assignPanel.loadTasks();
+    }
+
+    function switchTab(tab) {
+      activeTab = ["assign", "scripts"].includes(tab) ? tab : "accounts";
+      try { localStorage.setItem(TAB_STORAGE_KEY, activeTab); } catch (_) {}
+      if (tabsVm) tabsVm.tab = activeTab;
+      $("panelAccounts").classList.toggle("panel-hidden", activeTab !== "accounts");
+      $("panelAssign").classList.toggle("panel-hidden", activeTab !== "assign");
+      $("panelScripts").classList.toggle("panel-hidden", activeTab !== "scripts");
+      if (activeTab === "assign") {
+        try { ensureAssignPanel().ensureInit(); } catch (e) { toast(e.message, true); return; }
+        loadAssignRules().catch(e => toast(e.message, true));
+      } else if (activeTab === "scripts") {
+        try { ensureScriptsPanel(); } catch (e) { toast(e.message, true); }
+      }
+    }
+
+    function createAccount() {
+      if (!dialogVm) initDialog();
+      dialogVm.openCreate();
+    }
+
+    function editAccount(account) {
+      if (!dialogVm) initDialog();
+      dialogVm.openEdit(account);
+    }
+
+    $("loginBtn").onclick = login;
+    $("logoutBtn").onclick = requestLogout;
+    $("refreshBtn").onclick = () => loadAccounts().catch(e => toast(e.message, true));
+    $("syncAgencyBtn").onclick = async () => {
+      if (!confirm("将全部代投账户推送到代投库？（已配置 HTTP 同步时走 ad 域）")) return;
+      try {
+        const data = await api("/api/v1/ops/admin/accounts/sync-to-agency", {
+          method: "POST",
+          body: JSON.stringify({})
+        });
+        const ok = data && data.ok != null ? data.ok : (data && data.fail === 0);
+        const total = data && data.total != null ? data.total : "";
+        const fail = data && data.fail != null ? data.fail : 0;
+        if (fail > 0) {
+          toast(`代投同步完成：${ok}/${total} 成功，${fail} 失败`, true);
+        } else {
+          toast(total !== "" ? `代投同步完成：${ok}/${total}` : "代投同步完成");
+        }
+      } catch (e) {
+        toast(e.message, true);
+      }
+    };
+    $("createBtn").onclick = createAccount;
+    $("keyword").oninput = scheduleReload;
+    $("orgFilter").onchange = () => { listState.page = 1; loadAccounts().catch(e => toast(e.message, true)); };
+    $("personnelTypeFilter").onchange = () => { listState.page = 1; loadAccounts().catch(e => toast(e.message, true)); };
+    $("loginPassword").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+
+    $("tbody").addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-act]");
+      if (!btn) return;
+      if (btn.dataset.act !== "edit") return;
+      try {
+        const account = JSON.parse(decodeURIComponent(btn.dataset.account || "%7B%7D"));
+        await editAccount(account);
+      } catch (err) {
+        toast(err.message || "操作失败", true);
+      }
+    });
+
+    initAdminTabs();
+    initPager();
+    initDialog();
+    if (window.OpsStaticGuard) {
+      window.OpsStaticGuard.start({ rev: "20261115a", path: "/ops/admin.html" });
+    }
+
+    const PAGE_STALE_ABSENCE_MS = 10 * 60 * 1000;
+    let pageHiddenAt = 0;
+    let pageStaleDue = false;
+    let staleRefreshInFlight = false;
+
+    function notePageHidden() {
+      if (!pageHiddenAt) pageHiddenAt = Date.now();
+    }
+    function notePageVisibleAgain() {
+      const hiddenAt = Number(pageHiddenAt || 0);
+      if (hiddenAt && Date.now() - hiddenAt >= PAGE_STALE_ABSENCE_MS) {
+        pageStaleDue = true;
+      }
+      pageHiddenAt = 0;
+    }
+    async function refreshPageAfterStaleAbsence() {
+      if (!pageStaleDue || staleRefreshInFlight) return;
+      if (document.visibilityState === "hidden") return;
+      pageStaleDue = false;
+      staleRefreshInFlight = true;
+      try {
+        if (activeTab === "assign") await loadAssignRules();
+        else await loadAccounts();
+      } catch (e) {
+        pageStaleDue = true;
+        toast(e.message, true);
+      } finally {
+        staleRefreshInFlight = false;
+      }
+    }
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") notePageHidden();
+      else {
+        notePageVisibleAgain();
+        void refreshPageAfterStaleAbsence();
+      }
+    });
+    window.addEventListener("focus", () => {
+      if (document.visibilityState !== "visible") return;
+      notePageVisibleAgain();
+      void refreshPageAfterStaleAbsence();
+    });
+
+    (async () => {
+      if (await ensureSession()) {
+        try {
+          if (activeTab === "assign") {
+            $("panelAccounts").classList.add("panel-hidden");
+            $("panelAssign").classList.remove("panel-hidden");
+            $("panelScripts").classList.add("panel-hidden");
+            if (tabsVm) tabsVm.tab = "assign";
+            ensureAssignPanel().ensureInit();
+            await loadAssignRules();
+          } else if (activeTab === "scripts") {
+            $("panelAccounts").classList.add("panel-hidden");
+            $("panelAssign").classList.add("panel-hidden");
+            $("panelScripts").classList.remove("panel-hidden");
+            if (tabsVm) tabsVm.tab = "scripts";
+            ensureScriptsPanel();
+          } else {
+            $("panelAssign").classList.add("panel-hidden");
+            $("panelScripts").classList.add("panel-hidden");
+            await loadAccounts();
+          }
+        } catch (e) { toast(e.message, true); }
+      }
+    })();
+  </script>
+</body>
+</html>

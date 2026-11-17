@@ -19,7 +19,7 @@ public class OpsTenantFeatureService {
     /** 协作空间只读镜像：主实例临近发布（tbl_near）、ADX 排行（tbl_adx）。 */
     public static final String MIRROR_NEAR_TABLE_ID = "tbl_near";
     public static final String MIRROR_ADX_TABLE_ID = "tbl_adx";
-    /** 协作空间当日分享链参考（读主实例 + 协作账号采链）。 */
+    /** 协作空间当日分享链参考（读主实例 + 协作账号同步）。 */
     public static final String AGENCY_AS_PROMO_TABLE_ID = "tbl_agency_promo";
 
     private final OpsAccountRepository accountRepository;

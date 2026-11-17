@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <!-- ops-static-rev:20261115a -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PolyTable · 账户管理</title>
+  <title data-i18n="admin.pageTitle">PolyTable · Account management</title>
   <link rel="stylesheet" href="vendor/element-ui.css" />
+  <script src="ops-theme.js?v=20261118a"></script>
+  <script src="ops-i18n.js?v=20261118a"></script>
   <style>
     :root {
       /* PolyTable 设计 token——靛蓝主色 / 暖灰中性阶 / 柔和阴影（与 index.html 同步） */
@@ -27,6 +29,15 @@
       --warn-soft: #fef3c7;
       --shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 4px 16px rgba(17, 24, 39, 0.08);
       --radius: 8px;
+      /* 中文备注：弹层语义 token——与 index.html 同步，el-dropdown/select/popover 弹层统一取色。 */
+      --panel: #ffffff;
+      --ink: #111827;
+      --panel-soft: #f8fafc;
+      --panel-hover: #f2f4f7;
+      --accent-soft-hover: #e0e7ff;
+      --hint: #9ca3af;
+      --menu-shadow: 0 1px 2px rgba(17, 24, 39, 0.05), 0 8px 24px rgba(17, 24, 39, 0.14);
+      --radius-lg: 12px;
     }
     /* 中文备注：全局细滚动条——6px 圆角，thumb 浅灰、hover 加深（与 index.html 一致）。 */
     * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #d1d5db transparent; }
@@ -331,18 +342,80 @@
     .el-select .el-input.is-focus .el-input__inner { border-color: var(--accent); }
     .el-pagination .el-pager li.active { color: var(--accent) !important; }
     .el-loading-spinner .path { stroke: var(--accent); }
+
+    /* 中文备注：el-dropdown / el-select-dropdown / el-popover / el-picker-panel 弹层 token 对齐——
+       白底 12px 圆角 + --menu-shadow 双层柔阴影；item 卡片化 hover（--accent-soft 底 + --accent 字）。
+       入场动画沿用 Element 自带 el-zoom-in-top 过渡，勿再用 transform 动画覆盖 popper 定位。 */
+    .el-dropdown-menu,
+    .el-select-dropdown,
+    .el-popover,
+    .el-picker-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow);
+    }
+    .el-dropdown-menu { padding: 6px; }
+    .el-dropdown-menu__item {
+      border-radius: 8px; margin: 0; padding: 0 12px; line-height: 34px; font-size: 13px;
+      color: var(--ink);
+      transition: background-color .12s ease, color .12s ease;
+    }
+    .el-dropdown-menu__item:focus,
+    .el-dropdown-menu__item:not(.is-disabled):hover {
+      background-color: var(--accent-soft); color: var(--accent);
+    }
+    .el-dropdown-menu__item--divided { margin-top: 4px; border-top: 1px solid var(--line); }
+    .el-dropdown-menu__item--divided:before { margin: 0 -12px; background-color: transparent; }
+    .el-select-dropdown { padding: 6px; box-sizing: border-box; }
+    .el-select-dropdown__item {
+      border-radius: 8px; margin: 0; padding: 0 12px; height: 32px; line-height: 32px; font-size: 13px;
+      color: var(--ink);
+      transition: background-color .12s ease, color .12s ease;
+    }
+    .el-select-dropdown__item.hover,
+    .el-select-dropdown__item:hover { background-color: var(--accent-soft); color: var(--accent); }
+    .el-select-dropdown__item.selected { color: var(--accent); font-weight: 600; background-color: transparent; }
+    .el-select-dropdown__item.selected.hover { background-color: var(--accent-soft); }
+    .el-select-dropdown__item.is-disabled:hover { background-color: transparent; }
+    .el-popover { font-size: 13px; color: var(--ink); }
+    .el-picker-panel { color: var(--ink); }
+  
+    /* 深色主题 */
+    html[data-theme="dark"] {
+      --bg: #0f1420; --panel: #151b2b; --panel-soft: #1a2131; --panel-hover: #222a3d;
+      --ink: #e5e7eb; --muted: #8a94a6; --line: #2b3245;
+      --accent-soft: rgba(79, 70, 229, 0.16); --accent-soft-hover: rgba(79, 70, 229, 0.26);
+      --warn: #f87171; --ok: #34d399;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.35);
+      --menu-shadow: 0 1px 2px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.45);
+      color-scheme: dark;
+    }
+    html[data-theme="dark"] body { background: #0f1420; color: #e5e7eb; }
+    html[data-theme="dark"] .login-card, html[data-theme="dark"] .panel, html[data-theme="dark"] .card {
+      background: #151b2b; border-color: #2b3245; color: #e5e7eb;
+    }
+    html[data-theme="dark"] .el-input__inner, html[data-theme="dark"] .el-select .el-input__inner, html[data-theme="dark"] .el-textarea__inner {
+      background-color: #1a2131; border-color: #2b3245; color: #e5e7eb;
+    }
+    html[data-theme="dark"] .el-button--default { background-color: #1a2131; border-color: #2b3245; color: #e5e7eb; }
+    html[data-theme="dark"] .el-dialog { background-color: #151b2b; }
+    html[data-theme="dark"] .el-dialog__title { color: #e5e7eb; }
+    html[data-theme="dark"] .el-table { background-color: #151b2b; color: #e5e7eb; }
+    html[data-theme="dark"] .el-table tr, html[data-theme="dark"] .el-table th, html[data-theme="dark"] .el-table td { background-color: transparent; border-color: #2b3245; }
+    html[data-theme="dark"] .el-table--enable-row-hover .el-table__body tr:hover > td { background-color: #1a2131; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="top">
       <div>
-        <h1 id="pageTitle">账户管理</h1>
-        <div class="sub" id="pageSub">仅系统管理员可操作：账户与成员分组分配规则</div>
+        <h1 id="pageTitle" data-i18n="admin.title">Account management</h1>
+        <div class="sub" id="pageSub" data-i18n="admin.sub">Admin-only: accounts and member group assignment rules</div>
       </div>
       <div class="chip">
-        <span id="adminUser">未登录</span>
-        <button class="ghost" id="logoutBtn" type="button">退出</button>
+        <span id="adminUser" data-i18n="admin.notLoggedIn">Not signed in</span>
+        <button class="ghost" id="logoutBtn" type="button" data-i18n="header.logout">Log out</button>
       </div>
     </div>
 
@@ -350,36 +423,36 @@
 
     <div class="card" id="panelAccounts">
       <div class="toolbar">
-        <input id="keyword" placeholder="搜索姓名 / 首字母" />
-        <select id="orgFilter" class="filter-select" title="归属筛选">
-          <option value="">全部归属</option>
-          <option value="hq">自投</option>
-          <option value="agency">协作</option>
+        <input id="keyword" data-i18n-placeholder="admin.searchPlaceholder" placeholder="Search name / initials" />
+        <select id="orgFilter" class="filter-select" data-i18n-title="admin.orgFilterTitle" title="Filter by affiliation">
+          <option value="" data-i18n="admin.orgAll">All affiliations</option>
+          <option value="hq" data-i18n="admin.orgHq">HQ</option>
+          <option value="agency" data-i18n="admin.orgAgency">Agency</option>
         </select>
-        <select id="personnelTypeFilter" class="filter-select" title="人员类型筛选">
-          <option value="">全部人员类型</option>
-          <option value="editor">成员</option>
-          <option value="optimizer">优化师</option>
-          <option value="management">管理</option>
+        <select id="personnelTypeFilter" class="filter-select" data-i18n-title="admin.personnelFilterTitle" title="Filter by personnel type">
+          <option value="" data-i18n="admin.personnelAll">All personnel types</option>
+          <option value="editor" data-i18n="admin.personnelEditor">Member</option>
+          <option value="optimizer" data-i18n="admin.personnelOptimizer">Optimizer</option>
+          <option value="management" data-i18n="admin.personnelManagement">Manager</option>
         </select>
-        <button class="ghost" id="refreshBtn" type="button">刷新</button>
-        <button class="ghost" id="syncAgencyBtn" type="button" title="将全部协作账户同步到协作实例">同步协作账户</button>
-        <button id="createBtn" type="button">新增账户</button>
+        <button class="ghost" id="refreshBtn" type="button" data-i18n="common.refresh">Refresh</button>
+        <button class="ghost" id="syncAgencyBtn" type="button" data-i18n-title="admin.syncAgencyTitle" title="Sync all agency accounts to the agency instance" data-i18n="admin.syncAgency">Sync agency accounts</button>
+        <button id="createBtn" type="button" data-i18n="admin.createAccount">Add account</button>
         <span style="color:var(--muted);font-size:12px" id="totalHint"></span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>姓名</th>
-              <th>首字母</th>
-              <th>归属</th>
-              <th>角色</th>
-              <th>人员类型</th>
-              <th>状态</th>
-              <th>口令</th>
-              <th>更新</th>
-              <th>操作</th>
+              <th data-i18n="admin.thName">Name</th>
+              <th data-i18n="admin.thInitials">Initials</th>
+              <th data-i18n="admin.thOrg">Affiliation</th>
+              <th data-i18n="admin.thRole">Role</th>
+              <th data-i18n="admin.thPersonnel">Personnel type</th>
+              <th data-i18n="admin.thStatus">Status</th>
+              <th data-i18n="admin.thPassword">Password</th>
+              <th data-i18n="admin.thUpdated">Updated</th>
+              <th data-i18n="admin.thActions">Actions</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -401,17 +474,17 @@
 
   <div id="loginMask" class="login-mask show">
     <div class="login-card">
-      <h2>系统管理员登录</h2>
-      <div class="hint" id="loginHint">请输入管理员账号和口令；普通工作区账户无法登录。</div>
+      <h2 data-i18n="admin.loginTitle">Administrator sign-in</h2>
+      <div class="hint" id="loginHint" data-i18n="admin.loginHint">Enter the administrator account and password; regular workspace accounts cannot sign in.</div>
       <div class="field">
-        <label>账号</label>
-        <input id="loginName" value="" placeholder="账号" autocomplete="username" />
+        <label data-i18n="admin.account">Account</label>
+        <input id="loginName" value="" data-i18n-placeholder="admin.account" placeholder="Account" autocomplete="username" />
       </div>
       <div class="field">
-        <label>口令</label>
-        <input id="loginPassword" type="password" value="" placeholder="口令" autocomplete="current-password" />
+        <label data-i18n="login.password">Password</label>
+        <input id="loginPassword" type="password" value="" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password" />
       </div>
-      <button id="loginBtn" type="button">登录</button>
+      <button id="loginBtn" type="button" data-i18n="admin.loginBtn">Sign in</button>
     </div>
   </div>
 
@@ -420,13 +493,13 @@
       <div class="loc-main">
         <span class="loc-ico" aria-hidden="true">!</span>
         <div class="loc-text">
-          <h3 class="loc-title" id="logoutConfirmTitle">确认退出登录吗？</h3>
-          <p class="loc-desc">退出后需重新登录才能继续管理账户。</p>
+          <h3 class="loc-title" id="logoutConfirmTitle" data-i18n="admin.logoutConfirmTitle">Log out?</h3>
+          <p class="loc-desc" data-i18n="admin.logoutConfirmDesc">You will need to sign in again to keep managing accounts.</p>
         </div>
       </div>
       <div class="loc-foot">
-        <button type="button" class="ghost" id="logoutConfirmCancel">取消</button>
-        <button type="button" class="loc-ok" id="logoutConfirmOk">退出</button>
+        <button type="button" class="ghost" id="logoutConfirmCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="loc-ok" id="logoutConfirmOk" data-i18n="header.logout">Log out</button>
       </div>
     </div>
   </div>
@@ -446,6 +519,7 @@
     if (window.ELEMENT && window.ELEMENT.lang) {
       window.ELEMENT.locale(window.ELEMENT.lang.zhCN);
     }
+    const T = (key, params) => (window.OpsI18n ? window.OpsI18n.tf(key, params) : key);
     const TOKEN_KEY = "ops.admin.token";
     let token = localStorage.getItem(TOKEN_KEY) || "";
     let accounts = [];
@@ -463,7 +537,7 @@
       ? localStorage.getItem(TAB_STORAGE_KEY) : "accounts";
 
     function orgTypeLabel(orgType) {
-      return orgType === "agency" ? "协作" : "自投";
+      return orgType === "agency" ? T("admin.orgAgency") : T("admin.orgHq");
     }
 
     function initDialog() {
@@ -479,67 +553,67 @@
             custom-class="admin-account-dialog"
             :close-on-click-modal="false">
             <el-form label-width="100px" size="small" @submit.native.prevent="submit">
-              <el-form-item v-if="mode === 'create'" label="姓名">
-                <el-input v-model="form.displayName" placeholder="例如：陈明" clearable></el-input>
+              <el-form-item v-if="mode === 'create'" label="${T("admin.dlgName")}">
+                <el-input v-model="form.displayName" placeholder="${T("admin.dlgNamePlaceholder")}" clearable></el-input>
               </el-form-item>
-              <el-form-item v-else label="姓名">
+              <el-form-item v-else label="${T("admin.dlgName")}">
                 <el-input v-model="form.displayName" disabled></el-input>
               </el-form-item>
 
-              <el-form-item label="归属权限">
+              <el-form-item label="${T("admin.dlgOrg")}">
                 <el-radio-group v-model="form.orgType" size="small">
-                  <el-radio-button label="hq">自投</el-radio-button>
-                  <el-radio-button label="agency">协作</el-radio-button>
+                  <el-radio-button label="hq">${T("admin.orgHq")}</el-radio-button>
+                  <el-radio-button label="agency">${T("admin.orgAgency")}</el-radio-button>
                 </el-radio-group>
               </el-form-item>
 
-              <el-form-item label="人员类型">
-                <el-select v-model="form.personnelType" placeholder="请选择" clearable style="width:100%">
-                  <el-option label="成员" value="editor"></el-option>
-                  <el-option label="优化师" value="optimizer"></el-option>
-                  <el-option label="管理" value="management"></el-option>
+              <el-form-item label="${T("admin.dlgPersonnel")}">
+                <el-select v-model="form.personnelType" placeholder="${T("admin.dlgPick")}" clearable style="width:100%">
+                  <el-option label="${T("admin.personnelEditor")}" value="editor"></el-option>
+                  <el-option label="${T("admin.personnelOptimizer")}" value="optimizer"></el-option>
+                  <el-option label="${T("admin.personnelManagement")}" value="management"></el-option>
                 </el-select>
               </el-form-item>
-              <div class="form-tip">仅用于后台管理标识，不改变登录权限和数据归属。</div>
+              <div class="form-tip">${T("admin.dlgPersonnelTip")}</div>
 
-              <el-form-item v-if="form.personnelType === 'editor'" label="是否参与分配">
+              <el-form-item v-if="form.personnelType === 'editor'" label="${T("admin.dlgAssign")}">
                 <el-select v-model="form.screeningAssignEnabled" style="width:100%">
-                  <el-option label="是" :value="true"></el-option>
-                  <el-option label="否" :value="false"></el-option>
+                  <el-option label="${T("admin.dlgYes")}" :value="true"></el-option>
+                  <el-option label="${T("admin.dlgNo")}" :value="false"></el-option>
                 </el-select>
               </el-form-item>
-              <div v-if="form.personnelType === 'editor'" class="form-tip">选择“否”后停止进入分配池，已分配任务会在后续批次转给其他成员。</div>
+              <div v-if="form.personnelType === 'editor'" class="form-tip">${T("admin.dlgAssignTip")}</div>
 
-              <el-form-item label="首字母">
-                <el-input v-model="form.initials" placeholder="例如：ZS" maxlength="16" clearable></el-input>
+              <el-form-item label="${T("admin.dlgInitials")}">
+                <el-input v-model="form.initials" placeholder="${T("admin.dlgInitialsPlaceholder")}" maxlength="16" clearable></el-input>
               </el-form-item>
-              <div class="form-tip">大写英文字母；若使用默认口令，修改后需重新登录。</div>
+              <div class="form-tip">${T("admin.dlgInitialsTip")}</div>
 
-              <el-form-item :label="mode === 'create' ? '初始口令' : '新口令'">
+              <el-form-item :label="mode === 'create' ? '${T("admin.dlgInitPwd")}' : '${T("admin.dlgNewPwd")}'">
                 <el-input v-model="form.password" type="password" show-password
-                  :placeholder="mode === 'create' ? '可空，空则用默认规则' : '留空则不修改，至少 6 位'"></el-input>
+                  :placeholder="mode === 'create' ? '${T("admin.dlgPwdCreatePlaceholder")}' : '${T("admin.dlgPwdEditPlaceholder")}'"></el-input>
               </el-form-item>
 
-              <el-form-item v-if="mode === 'create'" label="备注">
-                <el-input v-model="form.remark" placeholder="可选" clearable></el-input>
+              <el-form-item v-if="mode === 'create'" label="${T("admin.dlgRemark")}">
+                <el-input v-model="form.remark" placeholder="${T("common.optional")}" clearable></el-input>
               </el-form-item>
 
-              <el-form-item v-if="form.orgType === 'agency'" label="功能权限">
-                <el-checkbox v-model="form.promoTable">当日分享参考表</el-checkbox>
+              <el-form-item v-if="form.orgType === 'agency'" label="${T("admin.dlgFeature")}">
+                <el-checkbox v-model="form.promoTable">${T("admin.dlgPromoTable")}</el-checkbox>
               </el-form-item>
-              <div v-if="form.orgType === 'agency'" class="form-tip">协作账户默认仅可见「记录目录」；勾选后额外开放当日分享参考表。</div>
+              <div v-if="form.orgType === 'agency'" class="form-tip">${T("admin.dlgPromoTip")}</div>
 
-              <el-form-item v-if="mode === 'edit' && !isAdmin" label="账户状态">
+              <el-form-item v-if="mode === 'edit' && !isAdmin" label="${T("admin.dlgStatus")}">
                 <el-radio-group v-model="form.enabledKey" size="small">
-                  <el-radio-button label="1">启用</el-radio-button>
-                  <el-radio-button label="0">停用</el-radio-button>
+                  <el-radio-button label="1">${T("admin.enabled")}</el-radio-button>
+                  <el-radio-button label="0">${T("admin.disabled")}</el-radio-button>
                 </el-radio-group>
               </el-form-item>
-              <div v-if="mode === 'edit' && isAdmin" class="form-tip">系统管理员账户不可在此停用。</div>
+              <div v-if="mode === 'edit' && isAdmin" class="form-tip">${T("admin.dlgAdminStatusTip")}</div>
             </el-form>
             <span slot="footer" class="dialog-footer">
-              <el-button @click="visible = false">取消</el-button>
-              <el-button type="primary" :loading="saving" @click="submit">确定</el-button>
+              <el-button @click="visible = false">${T("common.cancel")}</el-button>
+              <el-button type="primary" :loading="saving" @click="submit">${T("common.ok")}</el-button>
             </span>
           </el-dialog>
         `,
@@ -571,7 +645,7 @@
         methods: {
           openCreate() {
             this.mode = "create";
-            this.title = "新增账户";
+            this.title = T("admin.dlgCreate");
             this.origin = null;
             this.form = {
               displayName: "",
@@ -588,7 +662,7 @@
           },
           openEdit(account) {
             this.mode = "edit";
-            this.title = "编辑账户 · " + (account.displayName || "");
+            this.title = T("admin.dlgEdit", { n: account.displayName || "" });
             this.origin = account;
             this.form = {
               displayName: account.displayName || "",
@@ -614,7 +688,7 @@
               }
               this.visible = false;
             } catch (e) {
-              toast(e.message || "保存失败", true);
+              toast(e.message || T("admin.dlgSaveFailed"), true);
             } finally {
               this.saving = false;
             }
@@ -622,8 +696,8 @@
           async submitCreate() {
             const name = (this.form.displayName || "").trim();
             const initials = (this.form.initials || "").trim();
-            if (!name) throw new Error("姓名不能为空");
-            if (!initials) throw new Error("首字母不能为空");
+            if (!name) throw new Error(T("admin.dlgNameEmpty"));
+            if (!initials) throw new Error(T("admin.dlgInitialsEmpty"));
             const created = await api("/api/v1/ops/admin/accounts/create", {
               method: "POST",
               body: JSON.stringify({
@@ -644,7 +718,7 @@
               });
             }
             const hint = created && created.defaultPasswordHint;
-            let createMsg = hint && hint !== "已自定义" ? "已新增，默认口令：" + hint : "已新增";
+            let createMsg = hint && hint !== "已自定义" ? T("admin.createdPwdHint", { n: hint }) : T("admin.created");
             const screeningSchedule = created && created.screeningAssignSchedule;
             let createError = agencySyncFailed(created);
             if (screeningSchedule) {
@@ -718,7 +792,7 @@
               if (data && data.defaultPasswordHint && data.defaultPasswordHint !== "已自定义") {
                 msgs.push("默认口令：" + data.defaultPasswordHint);
               } else {
-                msgs.push("首字母已更新");
+                msgs.push(T("admin.initialsUpdated"));
               }
             }
             if (nextPassword) {
@@ -726,14 +800,14 @@
                 method: "POST",
                 body: JSON.stringify({ displayName: name, newPassword: nextPassword })
               });
-              msgs.push("口令已更新");
+              msgs.push(T("admin.pwdUpdated"));
             }
             if (!this.isAdmin && nextEnabled !== enabled) {
               await api("/api/v1/ops/admin/accounts/enabled", {
                 method: "POST",
                 body: JSON.stringify({ displayName: name, enabled: nextEnabled })
               });
-              msgs.push(nextEnabled ? "已启用" : "已停用");
+              msgs.push(nextEnabled ? T("admin.enabled") : T("admin.disabled"));
             }
             const promoWas = !!account.promoTable;
             const promoNext = nextOrg === "agency" && !!this.form.promoTable;
@@ -750,7 +824,7 @@
                 body: JSON.stringify({ displayName: name, promoTable: false })
               });
             }
-            toast(msgs.length ? msgs.join("；") : "未修改任何项", syncError);
+            toast(msgs.length ? msgs.join("; ") : T("admin.noChanges"), syncError);
             await loadAccounts();
           }
         }
@@ -763,9 +837,9 @@
         el: "#adminTabsApp",
         template: `
           <div>
-            <el-button round size="small" :type="tab === 'accounts' ? 'primary' : 'default'" @click="pick('accounts')">账户管理</el-button>
-            <el-button round size="small" :type="tab === 'assign' ? 'primary' : 'default'" @click="pick('assign')">任务分配</el-button>
-            <el-button round size="small" :type="tab === 'scripts' ? 'primary' : 'default'" @click="pick('scripts')">采集脚本</el-button>
+            <el-button round size="small" :type="tab === 'accounts' ? 'primary' : 'default'" @click="pick('accounts')">${T("admin.tabAccounts")}</el-button>
+            <el-button round size="small" :type="tab === 'assign' ? 'primary' : 'default'" @click="pick('assign')">${T("admin.tabAssign")}</el-button>
+            <el-button round size="small" :type="tab === 'scripts' ? 'primary' : 'default'" @click="pick('scripts')">${T("admin.tabScripts")}</el-button>
           </div>
         `,
         data: { tab: activeTab },
@@ -877,13 +951,13 @@
       token = "";
       localStorage.removeItem(TOKEN_KEY);
       $("loginMask").classList.add("show");
-      $("adminUser").textContent = "未登录";
+      $("adminUser").textContent = T("admin.notLoggedIn");
     }
 
     function applySession(session, nextToken) {
       token = nextToken;
       localStorage.setItem(TOKEN_KEY, nextToken);
-      $("adminUser").textContent = (session.displayName || "管理员") + " · 管理员";
+      $("adminUser").textContent = (session.displayName || T("admin.admin")) + T("admin.adminSuffix");
       $("loginMask").classList.remove("show");
     }
 
@@ -919,9 +993,9 @@
         $("loginPassword").value = "";
         listState.page = 1;
         await loadAccounts();
-        toast("登录成功");
+        toast(T("admin.loginOk"));
       } catch (e) {
-        toast(e.message || "登录失败", true);
+        toast(e.message || T("admin.loginFailed"), true);
       }
     }
 
@@ -969,7 +1043,7 @@
     async function logout() {
       try { await api("/api/v1/ops/admin/auth/logout", { method: "POST", body: "{}" }); } catch (_) {}
       showLogin();
-      toast("已退出登录");
+      toast(T("admin.loggedOut"));
     }
 
     function buildListQuery() {
@@ -987,13 +1061,13 @@
 
     function render() {
       const colSpan = 9;
-      $("totalHint").textContent = `共 ${listState.total} 个账户`;
+      $("totalHint").textContent = T("admin.totalHint", { n: listState.total });
       syncPager();
       $("tbody").innerHTML = accounts.map(a => {
         const enabled = !!a.enabled;
         const role = a.role === "admin" ? "admin" : "user";
         const org = a.orgType === "agency" ? "agency" : "hq";
-        const pwd = a.passwordMode === "custom" ? "自定义" : "默认规则";
+        const pwd = a.passwordMode === "custom" ? T("admin.pwdCustom") : T("admin.pwdDefault");
         const pwdHint = a.defaultPasswordHint || "";
         const payload = encodeURIComponent(JSON.stringify({
           displayName: a.displayName || "",
@@ -1009,16 +1083,16 @@
           <td><strong>${escapeHtml(a.displayName || "")}</strong></td>
           <td>${escapeHtml(a.initials || "")}</td>
           <td><span class="tag ${org}">${escapeHtml(a.orgTypeLabel || orgTypeLabel(org))}</span></td>
-          <td><span class="tag ${role}">${role === "admin" ? "管理员" : "用户"}</span></td>
-          <td><span class="tag">${escapeHtml(a.personnelTypeLabel || "未标记")}</span></td>
-          <td><span class="tag ${enabled ? "on" : "off"}">${enabled ? "启用" : "停用"}</span></td>
+          <td><span class="tag ${role}">${role === "admin" ? T("admin.roleAdmin") : T("admin.roleUser")}</span></td>
+          <td><span class="tag">${escapeHtml(a.personnelTypeLabel || T("admin.unmarked"))}</span></td>
+          <td><span class="tag ${enabled ? "on" : "off"}">${enabled ? T("admin.enabled") : T("admin.disabled")}</span></td>
           <td><span class="tag pwd" title="${escapeAttr(pwdHint)}">${pwd}</span></td>
           <td style="color:var(--muted);white-space:nowrap">${escapeHtml(a.updateTime || "-")}<div style="font-size:11px">${escapeHtml(a.updatedBy || "")}</div></td>
           <td class="actions">
-            <button class="ghost" data-act="edit" data-account="${payload}">编辑</button>
+            <button class="ghost" data-act="edit" data-account="${payload}">${T("admin.edit")}</button>
           </td>
         </tr>`;
-      }).join("") || `<tr><td colspan="${colSpan}" style="color:var(--muted);padding:24px;text-align:center">暂无账户</td></tr>`;
+      }).join("") || `<tr><td colspan="${colSpan}" style="color:var(--muted);padding:24px;text-align:center">${T("admin.noAccounts")}</td></tr>`;
     }
 
     async function loadAccounts() {
@@ -1080,7 +1154,7 @@
     $("logoutBtn").onclick = requestLogout;
     $("refreshBtn").onclick = () => loadAccounts().catch(e => toast(e.message, true));
     $("syncAgencyBtn").onclick = async () => {
-      if (!confirm("将全部协作账户同步到协作实例？（已配置 HTTP 同步时生效）")) return;
+      if (!confirm(T("admin.syncConfirm"))) return;
       try {
         const data = await api("/api/v1/ops/admin/accounts/sync-to-agency", {
           method: "POST",
@@ -1090,9 +1164,9 @@
         const total = data && data.total != null ? data.total : "";
         const fail = data && data.fail != null ? data.fail : 0;
         if (fail > 0) {
-          toast(`协作账户同步完成：${ok}/${total} 成功，${fail} 失败`, true);
+          toast(T("admin.syncDoneDetail", { ok, total, fail }), true);
         } else {
-          toast(total !== "" ? `协作账户同步完成：${ok}/${total}` : "协作账户同步完成");
+          toast(total !== "" ? T("admin.syncDoneStat", { ok, total }) : T("admin.syncDone"));
         }
       } catch (e) {
         toast(e.message, true);
@@ -1112,7 +1186,7 @@
         const account = JSON.parse(decodeURIComponent(btn.dataset.account || "%7B%7D"));
         await editAccount(account);
       } catch (err) {
-        toast(err.message || "操作失败", true);
+        toast(err.message || T("admin.opFailed"), true);
       }
     });
 

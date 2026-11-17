@@ -1285,3 +1285,49 @@ section[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }
   .hero-inner > *,
   .hero-visual { animation: none; opacity: 1; transform: none; }
 }
+
+/* ==========================================================================
+   语言切换 · 中 / EN 胶囊（i18n 双语支持新增；以上原有样式保持不变）
+   视觉语言沿用导航既有要素：玻璃底 + 品牌渐变高亮（同 badge-self）
+   ========================================================================== */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+}
+.lang-switch button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #c7cddc;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.lang-switch button:hover { color: #fff; }
+.lang-switch button.on { background: var(--grad); color: #fff; }
+.lang-switch button:focus-visible { outline: 2px solid #a5b0ff; outline-offset: 1px; }
+.lang-switch:focus-within { border-color: rgba(255, 255, 255, 0.34); }
+
+/* nav 内：与 GitHub 按钮的间距 */
+.nav-links .lang-switch { margin-left: 8px; }
+
+/* 移动端菜单内：居中、加大触控面积 */
+.menu-lang { align-self: center; margin-top: 14px; }
+.menu-lang button { padding: 8px 18px; font-size: 13px; }
+
+/* 英文品牌标签较长（Self-hosted multi-dimensional table）：
+   仅在英文下于中窄屏提前隐藏，避免吸顶导航溢出（中文仍按原 860px 断点） */
+@media (max-width: 1200px) {
+  html[lang="en"] .brand .brand-tag { display: none; }
+}

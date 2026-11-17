@@ -39,6 +39,8 @@ PolyTable 是一个**自托管的多维表格服务**，对标飞书多维表格
 | 🗂 视图与字段 | 文本 / 单选 / 多选 / 日期 / 复选框 / 公式 / 关联字段，筛选、排序、分组、多视图共享 |
 | 🔐 权限与账户 | HMAC 无状态 token、角色菜单权限、账户管理面板，口令全部由环境变量注入 |
 | 📦 轻量自托管 | 单个 Spring Boot JAR + 一个 MySQL，Docker Compose 一键启动 |
+| 🌗 深浅模式与主题 DIY | 浅色 / 深色 / 跟随系统；5 组主题色实时切换（含画布） |
+| 🌐 中英双语 | 界面默认 English、一键切换中文（含官网），语言偏好持久化 |
 
 **性能与架构细节见 [docs/architecture.md](docs/architecture.md) 与 [docs/performance.md](docs/performance.md)。**
 

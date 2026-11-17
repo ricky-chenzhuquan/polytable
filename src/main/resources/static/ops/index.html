@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -10,6 +10,8 @@
   <title>PolyTable</title>
   <link rel="icon" href="/favicon.ico" />
   <script src="./ops-auth.js?v=20261115a"></script>
+  <script src="./ops-theme.js?v=20261118a"></script>
+  <script src="./ops-i18n.js?v=20261118a"></script>
   <script>
     // 中文备注：长任务诊断——>1.5s 的主线程阻塞会打进控制台(带时长+时间),供卡死排查。
     try {
@@ -55,6 +57,16 @@
       --ok: #10b981;
       --shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 4px 16px rgba(17, 24, 39, 0.08);
       --radius: 8px;
+      /* 中文备注：弹层/菜单语义 token——为暗色模式铺路，右键菜单与筛选面板统一取色。 */
+      --panel-soft: #f8fafc;
+      --panel-hover: #f2f4f7;
+      --accent-soft-hover: #e0e7ff;
+      --accent-ring: rgba(79, 70, 229, 0.35);
+      --hint: #9ca3af;
+      --menu-shadow: 0 1px 2px rgba(17, 24, 39, 0.05), 0 8px 24px rgba(17, 24, 39, 0.14);
+      --radius-md: 10px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
       --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
       --text: 14px;
     }
@@ -65,6 +77,98 @@
     *::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
     *::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     *::-webkit-scrollbar-corner { background: transparent; }
+
+
+    /* ===== 外观设置弹层（深浅模式 / 主题色 DIY / 语言） ===== */
+    .appearance-pop {
+      position: fixed; top: 46px; right: 12px; z-index: 880; width: 264px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+      box-shadow: var(--menu-shadow); padding: 14px; display: none;
+    }
+    .appearance-pop.show { display: block; animation: menu-pop-in .12s ease-out; }
+    .appearance-pop .ap-section + .ap-section { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .appearance-pop .ap-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; letter-spacing: .04em; }
+    .appearance-pop .ap-seg { display: flex; gap: 4px; background: var(--panel-soft); border-radius: 10px; padding: 3px; }
+    .appearance-pop .ap-seg button {
+      flex: 1; height: 30px; border: 0; border-radius: 8px; background: transparent;
+      color: var(--muted); font-size: 12.5px; cursor: pointer; transition: all .12s;
+    }
+    .appearance-pop .ap-seg button:hover { color: var(--ink); }
+    .appearance-pop .ap-seg button.is-active { background: var(--accent); color: #fff; font-weight: 600; }
+    .appearance-pop .ap-accents { display: flex; gap: 10px; }
+    .appearance-pop .ap-accents button {
+      width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer;
+      padding: 0; outline-offset: 2px; transition: transform .12s;
+      background: var(--c); position: relative;
+    }
+    .appearance-pop .ap-accents button:hover { transform: scale(1.12); }
+    .appearance-pop .ap-accents button.is-active { border-color: var(--ink); }
+    .appearance-pop .ap-accents button.is-active::after {
+      content: "✓"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 13px; font-weight: 700;
+    }
+    .appearance-pop .ap-lang { display: flex; gap: 4px; background: var(--panel-soft); border-radius: 10px; padding: 3px; }
+    .appearance-pop .ap-lang button {
+      flex: 1; height: 30px; border: 0; border-radius: 8px; background: transparent;
+      color: var(--muted); font-size: 12.5px; cursor: pointer; transition: all .12s;
+    }
+    .appearance-pop .ap-lang button.is-active { background: var(--accent); color: #fff; font-weight: 600; }
+
+    /* ===== 深色主题：[data-theme="dark"] 覆盖 design token 与主要表面 ===== */
+    html[data-theme="dark"] {
+      --bg: #0f1420;
+      --panel: #151b2b;
+      --panel-soft: #1a2131;
+      --panel-hover: #222a3d;
+      --ink: #e5e7eb;
+      --muted: #8a94a6;
+      --hint: #6b7688;
+      --line: #2b3245;
+      --accent-soft: rgba(79, 70, 229, 0.16);
+      --accent-soft-hover: rgba(79, 70, 229, 0.26);
+      --warn: #f87171;
+      --warn-soft: rgba(239, 68, 68, 0.14);
+      --ok: #34d399;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.35);
+      --menu-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.45);
+      color-scheme: dark;
+    }
+    html[data-theme="dark"] body { background: var(--bg); }
+    html[data-theme="dark"] .header { background: var(--panel); border-color: var(--line); box-shadow: none; }
+    html[data-theme="dark"] .workspace { background: var(--bg); }
+    html[data-theme="dark"] .sidebar { background: var(--panel); border-color: var(--line); }
+    html[data-theme="dark"] .sidebar-group-label { color: var(--hint); }
+    html[data-theme="dark"] .sidebar-item { color: var(--ink); }
+    html[data-theme="dark"] .toolbar, html[data-theme="dark"] .table-toolbar { background: var(--panel); border-color: var(--line); }
+    html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea {
+      background: var(--panel-soft); border-color: var(--line); color: var(--ink);
+    }
+    html[data-theme="dark"] input:focus, html[data-theme="dark"] select:focus { border-color: var(--accent); }
+    html[data-theme="dark"] .dropdown-panel, html[data-theme="dark"] .col-menu-popup,
+    html[data-theme="dark"] .sheet-option-menu, html[data-theme="dark"] .fr-multi-menu,
+    html[data-theme="dark"] .view-menu-popup, html[data-theme="dark"] .sidebar-menu-popup,
+    html[data-theme="dark"] .online-dropdown { background: var(--panel); border-color: var(--line); }
+    html[data-theme="dark"] .loc-card, html[data-theme="dark"] .dialog-card, html[data-theme="dark"] .modal-card {
+      background: var(--panel); color: var(--ink);
+    }
+    html[data-theme="dark"] .toast { background: #2a3348; color: #e5e7eb; }
+    html[data-theme="dark"] .user-chip { background: var(--panel-soft); border-color: var(--line); }
+    html[data-theme="dark"] .online-more { background: var(--panel-soft); color: var(--muted); border-color: var(--line); }
+    html[data-theme="dark"] .online-dropdown { background: var(--panel); }
+    html[data-theme="dark"] .view-protect-tip { background: #2a3348; color: #e5e7eb; }
+    html[data-theme="dark"] button.secondary:hover { background: var(--panel-hover); }
+    html[data-theme="dark"] .el-input__inner, html[data-theme="dark"] .el-select .el-input__inner,
+    html[data-theme="dark"] .el-textarea__inner {
+      background-color: var(--panel-soft); border-color: var(--line); color: var(--ink);
+    }
+    html[data-theme="dark"] .el-button--default {
+      background-color: var(--panel-soft); border-color: var(--line); color: var(--ink);
+    }
+    html[data-theme="dark"] .el-dialog { background-color: var(--panel); }
+    html[data-theme="dark"] .el-dialog__title { color: var(--ink); }
+    html[data-theme="dark"] .el-pagination button, html[data-theme="dark"] .el-pager li { background: var(--panel-soft); color: var(--muted); }
+    html[data-theme="dark"] .el-pagination button:disabled, html[data-theme="dark"] .el-pager li.active { color: var(--accent); }
+
     * { box-sizing: border-box; }
     html { overscroll-behavior-x: none; }
     body {
@@ -433,7 +537,7 @@
       transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
     }
     button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    button.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    button.secondary { background: var(--panel); color: var(--ink); border: 1px solid var(--line); }
     button.secondary:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
     button.ghost { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
     button.ghost:hover:not(:disabled) { background: #e0e7ff; color: var(--accent-hover); }
@@ -599,36 +703,47 @@
       display: none; position: fixed; z-index: 90;
       min-width: 148px; max-width: min(320px, 80vw);
       max-height: min(320px, 50vh); overflow: auto;
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
-      box-shadow: 0 8px 28px rgba(17, 24, 39, 0.16); padding: 6px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow); padding: 6px;
     }
-    .sheet-option-menu.show { display: block; }
+    .sheet-option-menu.show {
+      display: block; animation: menu-pop-in .12s ease-out;
+      transform-origin: top left;
+    }
     .sheet-option-menu .so-item {
       display: flex; align-items: center; gap: 8px; width: 100%;
       border: 0; background: transparent; text-align: left;
-      padding: 6px 8px; border-radius: 8px; cursor: pointer;
+      padding: 8px; border-radius: 8px; cursor: pointer;
       font: 12px/1.3 "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
-      color: #1f2329;
+      color: var(--ink);
+      transition: background-color .12s ease, color .12s ease;
     }
     .sheet-option-menu .so-item:hover,
-    .sheet-option-menu .so-item.is-active { background: #f2f4f7; }
+    .sheet-option-menu .so-item.is-active {
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .sheet-option-menu .so-item:active {
+      background: var(--accent-soft-hover);
+    }
     .sheet-option-menu .so-tag {
       display: inline-flex; align-items: center; max-width: 100%;
       border-radius: 999px; padding: 3px 10px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .sheet-option-menu .so-check {
-      width: 14px; height: 14px; flex: 0 0 auto; margin: 0;
+      width: 14px; height: 14px; flex: 0 0 14px; margin: 0;
+      accent-color: var(--accent);
     }
     .sheet-option-menu .so-empty {
-      padding: 10px 8px; color: #8f959e; font-size: 12px; text-align: center;
+      padding: 12px 8px; color: var(--muted); font-size: 12px; text-align: center;
     }
     .sheet-option-menu .so-clear {
-      display: block; width: 100%; border: 0; background: #f5f6f7; color: #646a73;
+      display: block; width: 100%; border: 0; background: var(--panel-soft); color: var(--muted);
       border-radius: 8px; padding: 7px 8px; margin-top: 4px; cursor: pointer;
       font-size: 12px;
+      transition: background-color .12s ease, color .12s ease;
     }
-    .sheet-option-menu .so-clear:hover { background: #eef0f2; }
+    .sheet-option-menu .so-clear:hover { background: var(--panel-hover); color: var(--ink); }
     .sheet-tooltip {
       position: fixed; z-index: 400; display: none;
       max-width: min(420px, 80vw);
@@ -650,32 +765,57 @@
     .sheet-selection-stat.show { display: block; }
     .col-menu-popup {
       display: none; position: fixed; z-index: 70; min-width: 240px;
-      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-      box-shadow: var(--shadow); padding: 6px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow); padding: 6px;
     }
-    .col-menu-popup.show { display: block; }
+    .col-menu-popup.show {
+      display: block; animation: menu-pop-in .12s ease-out;
+      transform-origin: top left;
+    }
     .col-menu-popup button {
       display: flex; align-items: center; gap: 8px; width: 100%;
       background: transparent; border: 0; color: var(--ink);
       padding: 8px 10px; font-size: 13px; border-radius: 8px; text-align: left; cursor: pointer;
+      transition: background-color .12s ease, color .12s ease;
     }
-    .col-menu-popup button:hover { background: rgba(79, 70, 229, 0.08); }
+    .col-menu-popup button:hover:not(:disabled) {
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .col-menu-popup button:active:not(:disabled) { background: var(--accent-soft-hover); }
+    .col-menu-popup button:disabled { opacity: 0.45; cursor: not-allowed; }
     .col-menu-popup button .cm-icon {
-      display: inline-flex; width: 16px; height: 16px; color: var(--muted); flex: 0 0 auto;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; color: var(--muted); flex: 0 0 16px;
     }
-    .col-menu-popup .cm-sep { height: 1px; background: var(--line); margin: 4px 2px; }
+    .col-menu-popup button:hover:not(:disabled) .cm-icon { color: var(--accent); }
+    /* 中文备注：危险项（隐藏/清空/删除）hover 走 --warn-soft 底 + --warn 字，对齐 Notion/飞书菜单语义。 */
+    .col-menu-popup button[data-col-action="delete"] { color: var(--warn) !important; }
+    .col-menu-popup button[data-col-action="delete"] .cm-icon { color: var(--warn); }
+    .col-menu-popup button[data-col-action="hide"],
+    .col-menu-popup button[data-col-action="clear-col"] { color: var(--ink); }
+    .col-menu-popup button[data-col-action="hide"]:hover:not(:disabled),
+    .col-menu-popup button[data-col-action="clear-col"]:hover:not(:disabled),
+    .col-menu-popup button[data-col-action="delete"]:hover:not(:disabled) {
+      background: var(--warn-soft); color: var(--warn) !important;
+    }
+    .col-menu-popup button[data-col-action="hide"]:hover:not(:disabled) .cm-icon,
+    .col-menu-popup button[data-col-action="clear-col"]:hover:not(:disabled) .cm-icon,
+    .col-menu-popup button[data-col-action="delete"]:hover:not(:disabled) .cm-icon { color: var(--warn); }
+    .col-menu-popup .cm-sep { height: 1px; background: var(--line); margin: 4px 4px; }
     .col-menu-popup .cm-insert {
       display: flex; align-items: center; gap: 6px; width: 100%;
-      padding: 6px 10px; border-radius: 8px; cursor: pointer; user-select: none;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer; user-select: none;
+      transition: background-color .12s ease, color .12s ease;
     }
-    .col-menu-popup .cm-insert:hover { background: rgba(79, 70, 229, 0.08); }
-    .col-menu-popup .cm-insert .cm-icon { color: var(--muted); flex: 0 0 auto; }
+    .col-menu-popup .cm-insert:hover { background: var(--accent-soft); }
+    .col-menu-popup .cm-insert:hover .cm-icon { color: var(--accent); }
+    .col-menu-popup .cm-insert .cm-icon { color: var(--muted); flex: 0 0 16px; display: inline-flex; align-items: center; justify-content: center; }
     .col-menu-popup .cm-insert .cm-label { flex: 1; font-size: 13px; color: var(--ink); }
     .col-menu-popup .cm-count {
-      width: 36px; height: 24px; border: 1px solid #e5e7eb; border-radius: 4px;
-      text-align: center; font-size: 13px; color: #1f2329; background: #fff; padding: 0 4px;
+      width: 36px; height: 24px; border: 1px solid var(--line); border-radius: 4px;
+      text-align: center; font-size: 13px; color: var(--ink); background: var(--panel); padding: 0 4px;
     }
-    .col-menu-popup .cm-count:focus { outline: 2px solid rgba(79,70,229,.35); border-color: #4f46e5; }
+    .col-menu-popup .cm-count:focus { outline: 2px solid var(--accent-ring); border-color: var(--accent); }
     .row-menu-popup {
       display: none; position: fixed; z-index: 72; min-width: 220px;
       background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
@@ -1649,11 +1789,18 @@
       box-shadow: 0 1px 3px rgba(79, 70, 229, 0.32);
     }
     .view-toolbar #fieldConfigBtn .vt-icon { color: #ff8800; }
-    /* 中文备注：浮层规格——10px 圆角、1px #E5E7EB 边、统一 --shadow 软阴影。 */
+    /* 中文备注：浮层规格——12px 圆角、1px --line 边、--menu-shadow 双层柔阴影；弹出动画 120ms ease-out（opacity + scale .98→1）。 */
     .dropdown-panel, .col-menu-popup, .sheet-option-menu, .fr-multi-menu {
-      border-radius: 10px;
-      border: 1px solid #e5e7eb;
-      box-shadow: var(--shadow);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      box-shadow: var(--menu-shadow);
+    }
+    .dropdown-panel.show, .col-menu-popup.show, .sheet-option-menu.show, .fr-multi-menu.show {
+      animation: menu-pop-in .12s ease-out;
+    }
+    @keyframes menu-pop-in {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
     }
     /* 中文备注：点击打开面板时用白底描边，不用蓝底/暖色底。 */
     .view-toolbar .vt-btn.is-active {
@@ -1701,16 +1848,19 @@
       display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; margin-right: 4px;
     }
     .scope-seg {
-      display: inline-flex; align-items: center; background: #f5f6f7;
-      border: 1px solid #e5e7eb; border-radius: 8px; padding: 2px; gap: 2px;
+      /* 中文备注：日期快捷区胶囊 segmented——圆角胶囊容器，选中项主色底白字。 */
+      display: inline-flex; align-items: center; background: var(--panel-soft);
+      border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px;
     }
     .scope-seg button {
-      border: 0; background: transparent; color: #646a73; padding: 4px 10px;
-      font-size: 12px; border-radius: 6px; cursor: pointer;
+      border: 0; background: transparent; color: var(--muted); padding: 4px 12px;
+      font-size: 12px; border-radius: 999px; cursor: pointer;
+      transition: background-color .12s ease, color .12s ease;
     }
+    .scope-seg button:hover:not(.active) { color: var(--ink); background: var(--panel-hover); }
     .scope-seg button.active {
-      background: #fff; color: #4f46e5; font-weight: 600;
-      box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+      background: var(--accent); color: #fff; font-weight: 600;
+      box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35);
     }
     .promo-date-mount { display: inline-flex; flex: 0 0 232px; width: 232px; }
     .promo-date-mount .fr-date-eq-mount,
@@ -1851,8 +2001,8 @@
     .dropdown-panel {
       display: none; position: absolute; left: 0; top: calc(100% + 6px); z-index: 26;
       min-width: 220px; max-height: min(520px, 70vh); overflow: auto;
-      background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;
-      box-shadow: var(--shadow); padding: 8px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow); padding: 8px;
     }
     .dropdown-panel.show { display: block; }
     .dropdown-panel.filter-panel {
@@ -1862,25 +2012,28 @@
       top: 0;
       width: 600px;
       max-width: min(600px, calc(100vw - 16px));
-      padding: 10px;
+      padding: 16px;
       overflow: visible;
       z-index: 520;
       transform: none;
+      border-radius: var(--radius-xl);
     }
     .filter-panel .fp-title {
+      /* 中文备注：13px 主色小眉题，对齐多维表筛选面板标题质感。 */
       display: flex; align-items: center; gap: 6px;
-      font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 10px;
+      font-size: 13px; font-weight: 600; color: var(--accent);
+      letter-spacing: .02em; margin-bottom: 12px;
     }
     .filter-panel .fp-meta {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
-      padding-bottom: 10px; border-bottom: 1px solid var(--line);
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--line);
     }
     .filter-panel .fp-meta .fp-meta-item {
       display: inline-flex; align-items: center; gap: 4px;
     }
     .filter-panel .fp-meta label { width: auto; font-size: 12px; }
     .filter-panel .fp-meta input,
-    .filter-panel .fp-meta select { width: auto; min-width: 110px; padding: 4px 8px; font-size: 12px; }
+    .filter-panel .fp-meta select { width: auto; min-width: 110px; padding: 4px 8px; font-size: 12px; background: var(--panel); }
     .dropdown-panel.color-panel {
       /* 中文备注：收紧面板，避免盖住右侧表格；条件行用固定列宽，值框不再无限拉长 */
       width: min(640px, 96vw); padding: 10px;
@@ -1973,27 +2126,42 @@
     }
     .filter-rule {
       display: grid;
-      /* 中文备注：表头列加宽；日期区略收，保证同一排 */
-      grid-template-columns: 18px 176px 68px 246px 28px;
+      /* 中文备注：值列自适应防溢出；卡片化样式收敛在 .filter-panel 作用域（不影响字段编辑卡复用行）。 */
+      grid-template-columns: 18px 176px 68px minmax(180px, 1fr) 28px;
       gap: 6px;
       align-items: center;
       margin-bottom: 8px;
     }
+    /* 中文备注：筛选面板条件行卡片化——浅底 10px 圆角 + hover 主色描边；行间 10px。 */
+    .filter-panel .filter-rule {
+      margin-bottom: 10px;
+      padding: 6px 8px;
+      background: var(--panel-soft);
+      border: 1px solid transparent;
+      border-radius: 10px;
+      box-sizing: border-box;
+      transition: background-color .12s ease, border-color .12s ease;
+    }
+    .filter-panel .filter-rule:hover { border-color: var(--accent); }
     .filter-rule.no-value {
       grid-template-columns: 18px 176px 68px 28px;
     }
     .filter-rule.no-value .fr-value { display: none; }
-    .filter-rule.dragging { opacity: 0.55; background: #f5f6f7; }
-    .filter-rule.drag-over { box-shadow: inset 0 -2px 0 #4f46e5; }
+    .filter-panel .filter-rule.dragging { opacity: 0.55; background: var(--panel-hover); }
+    .filter-panel .filter-rule.drag-over { box-shadow: inset 0 -2px 0 var(--accent); }
     .fr-handle {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 18px; height: 28px; color: #8f959e; cursor: grab; user-select: none;
+      width: 18px; height: 28px; color: var(--muted); cursor: grab; user-select: none;
     }
     .fr-handle:active { cursor: grabbing; }
+    /* 中文备注：字段/运算/值三个控件统一 34px 高，卡片内垂直居中对齐（仅筛选面板）。 */
+    .filter-panel .filter-rule .field-picker-btn,
+    .filter-panel .filter-rule .choice-picker-btn,
+    .filter-panel .filter-rule .fr-multi-btn { min-height: 34px; }
     .field-picker { position: relative; min-width: 0; width: 100%; }
     .field-picker-btn {
       width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 6px;
-      background: #fff !important; border: 1px solid var(--line) !important; border-radius: 8px;
+      background: var(--panel) !important; border: 1px solid var(--line) !important; border-radius: 8px;
       padding: 5px 8px; font-size: 12px; color: var(--ink) !important; text-align: left; cursor: pointer;
       box-sizing: border-box; overflow: hidden;
     }
@@ -2001,15 +2169,15 @@
     .field-picker-btn .fr-field-ico,
     .field-picker-option .fr-field-ico {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 16px; height: 16px; flex: 0 0 auto; color: #8f959e;
+      width: 16px; height: 16px; flex: 0 0 auto; color: var(--muted);
     }
     .field-picker-btn .fr-field-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .field-picker-menu {
       /* 中文备注：下拉比触发钮更宽，禁止横向滚动，长文案省略 */
       display: none; position: absolute; left: 0; right: auto; top: calc(100% + 4px); z-index: 220;
       width: 240px; min-width: 240px; max-width: 240px;
-      background: #fff; border: 1px solid var(--line); border-radius: 10px;
-      box-shadow: var(--shadow); padding: 6px; max-height: 220px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow); padding: 6px; max-height: 220px;
       overflow-x: hidden; overflow-y: hidden;
       flex-direction: column; gap: 0; box-sizing: border-box;
     }
@@ -2040,7 +2208,7 @@
     .choice-picker { position: relative; min-width: 0; width: 100%; }
     .choice-picker-btn {
       width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 4px;
-      background: #fff !important; border: 1px solid var(--line) !important; border-radius: 8px;
+      background: var(--panel) !important; border: 1px solid var(--line) !important; border-radius: 8px;
       padding: 5px 8px; font-size: 12px; color: var(--ink) !important; text-align: left; cursor: pointer;
       box-sizing: border-box; overflow: hidden; min-height: 30px;
     }
@@ -2049,12 +2217,12 @@
     .choice-picker-label {
       flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .choice-picker-btn > span:last-child { flex: 0 0 auto; color: #8f959e; }
+    .choice-picker-btn > span:last-child { flex: 0 0 auto; color: var(--muted); }
     .choice-picker-menu {
       display: none; position: absolute; left: 0; right: auto; top: calc(100% + 4px); z-index: 230;
       width: 140px; min-width: 140px; max-width: 220px;
-      background: #fff; border: 1px solid var(--line); border-radius: 10px;
-      box-shadow: var(--shadow); padding: 6px; max-height: 220px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow); padding: 6px; max-height: 220px;
       overflow-x: hidden; overflow-y: auto;
       flex-direction: column; gap: 0; box-sizing: border-box;
     }
@@ -2078,14 +2246,20 @@
     .filter-rule > input.fr-value,
     .filter-rule > select.fr-value {
       width: 100%; min-width: 0; padding: 5px 8px; font-size: 12px;
-      background: #fff; color: var(--ink); box-sizing: border-box;
+      background: var(--panel); color: var(--ink); box-sizing: border-box;
     }
-    .filter-rule > input.fr-value[type="date"],
-    .filter-rule > input.fr-value[type="datetime-local"],
-    .filter-rule > input.fr-value[type="number"] {
-      min-height: 30px;
+    /* 中文备注：筛选面板内值控件 34px 统一高度。 */
+    .filter-panel .filter-rule > select.fr-op,
+    .filter-panel .filter-rule > input.fr-value,
+    .filter-panel .filter-rule > select.fr-value {
+      padding: 4px 10px; height: 34px; min-height: 34px;
     }
-    .filter-rule .fr-value-select { background: #fff; }
+    .filter-panel .filter-rule > input.fr-value[type="date"],
+    .filter-panel .filter-rule > input.fr-value[type="datetime-local"],
+    .filter-panel .filter-rule > input.fr-value[type="number"] {
+      min-height: 34px;
+    }
+    .filter-rule .fr-value-select { background: var(--panel); }
     .fr-date-eq.fr-value {
       display: block;
       width: 168px; min-width: 168px; max-width: 168px;
@@ -2097,9 +2271,14 @@
     .fr-date-eq-mount .el-date-editor.el-input__inner { width: 100% !important; }
     .fr-date-eq-mount .el-input__inner {
       height: 30px; line-height: 30px; font-size: 12px;
-      border-radius: 8px; border-color: var(--line); color: var(--ink);
+      border-radius: 8px; border-color: var(--line); color: var(--ink); background: var(--panel);
     }
     .fr-date-eq-mount .el-input__icon { line-height: 30px; }
+    /* 中文备注：筛选行内日期控件与字段/运算统一 34px 高（仅作用筛选面板，不动工具栏日期）。 */
+    .filter-panel .filter-rule .fr-date-eq-mount .el-input__inner {
+      height: 34px; line-height: 34px; background: var(--panel);
+    }
+    .filter-panel .filter-rule .fr-date-eq-mount .el-input__icon { line-height: 34px; }
     /* 中文备注：Element 日期整框可点，避免只能点角落日历图标。 */
     .fr-dt-editor.el-date-editor { width: 100% !important; cursor: pointer; }
     .fr-dt-editor .el-input { width: 100% !important; }
@@ -2235,7 +2414,7 @@
       justify-content: space-between;
       gap: 6px;
       box-sizing: border-box;
-      background: #fff !important;
+      background: var(--panel) !important;
       border: 1px solid var(--line) !important;
       border-radius: 8px !important;
       padding: 5px 8px !important;
@@ -2246,7 +2425,7 @@
       white-space: nowrap;
     }
     .fr-multi-btn:hover { border-color: var(--accent) !important; }
-    .fr-multi-btn > span:last-child { flex: 0 0 auto; color: #8f959e; }
+    .fr-multi-btn > span:last-child { flex: 0 0 auto; color: var(--muted); }
     .fr-multi-label {
       flex: 1 1 auto; min-width: 0;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -2262,11 +2441,11 @@
       max-height: 240px;
       overflow-x: hidden;
       overflow-y: auto;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18);
-      padding: 4px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--menu-shadow);
+      padding: 6px;
       box-sizing: border-box;
     }
     .fr-multi-menu.show { display: block; }
@@ -2282,12 +2461,13 @@
       border-radius: 6px;
       font-size: 12px;
       line-height: 1.3;
-      color: #1f2329 !important;
+      color: var(--ink) !important;
       white-space: nowrap !important;
       cursor: pointer;
       box-sizing: border-box;
+      transition: background-color .12s ease, color .12s ease;
     }
-    .fr-multi-opt:hover { background: #eef2ff; }
+    .fr-multi-opt:hover { background: var(--accent-soft); color: var(--accent) !important; }
     .fr-multi-opt input[type="checkbox"] {
       appearance: auto;
       -webkit-appearance: checkbox;
@@ -2303,7 +2483,7 @@
       background: transparent !important;
       box-shadow: none !important;
       outline: none !important;
-      accent-color: #4f46e5;
+      accent-color: var(--accent);
     }
     .fr-multi-opt > span {
       flex: 1 1 auto;
@@ -2311,24 +2491,42 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: #1f2329;
+      color: var(--ink);
     }
     .filter-rule .fr-remove {
       border: 0; background: transparent; color: var(--muted); cursor: pointer;
       width: 28px; height: 28px; border-radius: 6px; font-size: 16px; line-height: 1;
     }
+    .filter-panel .filter-rule .fr-remove { height: 34px; }
     .filter-rule .fr-remove:hover { background: var(--warn-soft); color: var(--warn); }
+    /* 中文备注：「添加条件」主色 ghost 按钮——圆角 8px，hover 加深底色。 */
     .fp-add {
       display: inline-flex; align-items: center; gap: 4px;
-      background: transparent; border: 0; color: var(--accent);
-      padding: 4px 2px; font-size: 12px; cursor: pointer;
+      background: var(--accent-soft); border: 1px solid transparent; color: var(--accent);
+      padding: 6px 12px; font-size: 12px; font-weight: 500; cursor: pointer;
+      border-radius: 8px;
+      transition: background-color .12s ease, color .12s ease;
     }
-    .fp-add:hover { text-decoration: underline; }
+    .fp-add:hover { background: var(--accent-soft-hover); color: var(--accent-hover); text-decoration: none; }
+    /* 中文备注：底部操作区固定右对齐 + 顶部 1px 分隔线；hint 在左、按钮在最右。 */
     .fp-actions {
-      display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line);
+      display: flex; flex-direction: row-reverse; justify-content: flex-start;
+      align-items: center; gap: 10px;
+      margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line);
     }
     .fp-actions .right { display: inline-flex; gap: 6px; }
+    .filter-panel .fp-hint { font-size: 12px; color: var(--muted); line-height: 32px; }
+    /* 中文备注：「清空」危险色 ghost 按钮——透明底 + warn 字，hover 走 --warn-soft 底。 */
+    .filter-panel #filterResetBtn {
+      background: transparent; border: 1px solid transparent; color: var(--warn);
+      padding: 6px 12px; border-radius: 8px; font-size: 12px;
+      transition: background-color .12s ease, color .12s ease;
+    }
+    .filter-panel #filterResetBtn:hover:not(:disabled) {
+      background: var(--warn-soft); color: var(--warn); border-color: transparent;
+    }
+    /* 中文备注：筛选面板空状态文案弱化为灰色居中。 */
+    .filter-panel .sfm-empty { color: var(--muted); font-size: 12px; text-align: center; }
     .dropdown-panel .dp-row {
       display: flex; align-items: center; gap: 6px; padding: 5px 4px;
     }
@@ -2446,7 +2644,7 @@
     .sort-field-menu .sfm-opt .sfm-ico {
       width: 16px; height: 16px; color: #8f959e; flex: 0 0 auto; display: inline-flex;
     }
-    .sort-field-menu .sfm-empty { padding: 10px 8px; color: #8f959e; font-size: 12px; text-align: center; }
+    .sort-field-menu .sfm-empty { padding: 10px 8px; color: var(--muted); font-size: 12px; text-align: center; }
     .sort-panel-foot {
       display: flex; align-items: center; justify-content: flex-end; gap: 8px;
       margin-top: 10px; padding-top: 8px; border-top: 1px solid #eef0f2;
@@ -2915,44 +3113,69 @@
             <rect x="12.8" y="12.8" width="4.8" height="4.8" rx="1.3" fill="#ffffff" opacity="0.95"/>
           </svg><span>PolyTable</span>
         </div>
-        <button type="button" class="header-recent" id="headerRecentModify" hidden aria-label="查看历史记录"></button>
+        <button type="button" class="header-recent" id="headerRecentModify" hidden data-i18n-aria="header.recentAria" aria-label="View history"></button>
       </div>
       <div id="headerLoadingStatus" class="header-loading-status" role="status" aria-live="polite" aria-hidden="true">
         <span class="header-loading-status-inner">
           <span class="header-loading-spinner" aria-hidden="true"></span>
-          <span class="header-loading-status-text" id="headerLoadingStatusText">数据加载中...</span>
+          <span class="header-loading-status-text" id="headerLoadingStatusText" data-i18n="common.dataLoading">Loading data...</span>
         </span>
       </div>
       <div class="actions">
-        <div class="online-users" id="onlineUsers" title="实时在线用户">
+        <div class="online-users" id="onlineUsers" data-i18n-title="header.onlineUsers" title="Online users">
           <div class="online-avatars" id="onlineAvatars"></div>
-          <button type="button" class="online-more" id="onlineMoreBtn" title="查看全部在线用户">▾</button>
-          <div class="online-dropdown" id="onlineDropdown" role="menu" aria-label="在线用户"></div>
+          <button type="button" class="online-more" id="onlineMoreBtn" data-i18n-title="header.viewAllOnline" title="View all online users">▾</button>
+          <div class="online-dropdown" id="onlineDropdown" role="menu" data-i18n-aria="header.onlineUsersAria" aria-label="Online users"></div>
         </div>
-        <button id="reminderBtn" class="secondary" type="button" title="提醒">
-          <span>提醒</span>
+        <button id="appearanceBtn" class="secondary" type="button" data-i18n-title="header.appearanceTitle" title="Appearance settings" aria-haspopup="dialog">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <span data-i18n="header.appearance">Appearance</span>
+        </button>
+        <div class="appearance-pop" id="appearancePop" role="dialog" data-i18n-aria="header.appearanceTitle" aria-label="Appearance settings" hidden>
+          <div class="ap-section">
+            <div class="ap-label" data-i18n="appearance.mode">Theme mode</div>
+            <div class="ap-seg" id="apModeSeg">
+              <button type="button" data-mode="light" data-i18n="appearance.light">Light</button>
+              <button type="button" data-mode="dark" data-i18n="appearance.dark">Dark</button>
+              <button type="button" data-mode="auto" data-i18n="appearance.auto">System</button>
+            </div>
+          </div>
+          <div class="ap-section">
+            <div class="ap-label" data-i18n="appearance.accent">Accent color</div>
+            <div class="ap-accents" id="apAccents"></div>
+          </div>
+          <div class="ap-section">
+            <div class="ap-label" data-i18n="appearance.lang">Language / 语言</div>
+            <div class="ap-lang" id="apLangSeg">
+              <button type="button" data-lang="zh" data-i18n="appearance.langZh">中文</button>
+              <button type="button" data-lang="en" data-i18n="appearance.langEn">English</button>
+            </div>
+          </div>
+        </div>
+        <button id="reminderBtn" class="secondary" type="button" data-i18n-title="header.reminder" title="Reminders">
+          <span data-i18n="header.reminder">Reminders</span>
           <span id="reminderHint"></span>
           <span id="reminderBadge">0</span>
         </button>
         <div class="user-chip" id="userChip" style="display:none">
           <span id="loginUser">-</span>
-          <button id="logoutBtn" class="secondary" type="button" style="padding:2px 8px">退出</button>
+          <button id="logoutBtn" class="secondary" type="button" style="padding:2px 8px" data-i18n="header.logout">Log out</button>
         </div>
       </div>
     </header>
 
     <div class="workspace">
-      <aside class="sidebar" id="sidebar" aria-label="数据表">
+      <aside class="sidebar" id="sidebar" data-i18n-aria="sidebar.tablesAria" aria-label="Tables">
         <div class="sidebar-head">
-          <button type="button" class="sidebar-add-table" id="sidebarAddTableBtn" title="新建表格" aria-label="新建表格">
+          <button type="button" class="sidebar-add-table" id="sidebarAddTableBtn" data-i18n-title="sidebar.newTable" title="New table" data-i18n-aria="sidebar.newTable" aria-label="New table">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           </button>
-          <button type="button" class="sidebar-toggle" id="sidebarToggle" title="折叠侧边栏 (⌘ + \)" aria-label="折叠侧边栏">
+          <button type="button" class="sidebar-toggle" id="sidebarToggle" data-i18n-title="sidebar.collapse" title="Collapse sidebar (⌘ + \)" data-i18n-aria="sidebar.collapseAria" aria-label="Collapse sidebar">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
           </button>
         </div>
         <div class="sidebar-list" id="sidebarList"></div>
-        <div class="sidebar-resize-handle" id="sidebarResizeHandle" title="拖拽调整侧栏宽度" aria-hidden="true"></div>
+        <div class="sidebar-resize-handle" id="sidebarResizeHandle" data-i18n-title="sidebar.resizeHint" title="Drag to resize sidebar" aria-hidden="true"></div>
       </aside>
       <div class="sidebar-menu-popup" id="sidebarMenuPopup" role="menu"></div>
       <!-- 折叠态快速切表弹层(多维表格式:白底圆角,当前表高亮) -->
@@ -2960,23 +3183,23 @@
 
       <div class="main-pane">
     <div class="agency-empty-main" id="agencyEmptyMain" hidden>
-      <div class="agency-empty-title">暂无表格</div>
-      <div class="agency-empty-desc">你还没有创建表格。点击左上角 <strong>+</strong> 新建表格。</div>
+      <div class="agency-empty-title" data-i18n="sidebar.noneTitle">No tables yet</div>
+      <div class="agency-empty-desc" data-i18n-html="sidebar.noneDesc">You haven't created any table. Click <strong>+</strong> in the top-left corner to create one.</div>
     </div>
     <div class="view-bar">
       <!-- 多维表格式折叠侧栏:整条消失,顶栏左侧接管=展开按钮+当前表名下拉(快速切表) -->
       <div class="view-bar-collapsed" id="viewBarCollapsed" hidden>
-        <button type="button" class="vb-expand-btn" id="sidebarExpandBtn" title="显示侧边栏 (⌘ + \)" aria-label="显示侧边栏">
+        <button type="button" class="vb-expand-btn" id="sidebarExpandBtn" data-i18n-title="sidebar.expand" title="Show sidebar (⌘ + \)" data-i18n-aria="sidebar.expandAria" aria-label="Show sidebar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
         </button>
-        <button type="button" class="vb-table-switcher" id="tableSwitcherBtn" title="切换数据表" aria-haspopup="menu">
+        <button type="button" class="vb-table-switcher" id="tableSwitcherBtn" data-i18n-title="sidebar.switchTable" title="Switch table" aria-haspopup="menu">
           <span class="vb-table-name" id="tableSwitcherName">-</span>
           <svg class="vb-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <span class="vb-collapsed-sep"></span>
       </div>
       <div class="view-tabs" id="viewTabs"></div>
-      <button id="addViewBtn" class="secondary" type="button" title="新建视图">+</button>
+      <button id="addViewBtn" class="secondary" type="button" data-i18n-title="sidebar.newView" title="New view">+</button>
       <div class="view-bar-spacer"></div>
       <div class="view-actions">
         <span id="viewIdChip" class="view-id-chip" title="当前 table / view">table=- · view=-</span>
@@ -2985,58 +3208,58 @@
 
     <div class="view-toolbar" id="viewToolbar">
       <div class="scope-controls">
-        <div class="scope-seg" role="group" aria-label="日期范围">
-          <button type="button" id="dateModeRangeBtn" class="active" data-date-mode="range">近三天</button>
-          <button type="button" id="dateModeRollBtn" data-date-mode="roll" style="display:none">前3后5天</button>
-          <button type="button" id="dateModeDayBtn" data-date-mode="day">指定日期</button>
+        <div class="scope-seg" role="group" data-i18n-aria="toolbar.dateRangeAria" aria-label="Date range">
+          <button type="button" id="dateModeRangeBtn" class="active" data-date-mode="range" data-i18n="toolbar.dateRange">Last 3 days</button>
+          <button type="button" id="dateModeRollBtn" data-date-mode="roll" style="display:none" data-i18n="toolbar.dateRoll">3 back / 5 fwd</button>
+          <button type="button" id="dateModeDayBtn" data-date-mode="day" data-i18n="toolbar.dateDay">Pick a date</button>
         </div>
         <div id="promoDatePickerMount" class="promo-date-mount" style="display:none">
           <div class="fr-date-eq-mount" data-fr-date-value="" data-disabled="0"></div>
         </div>
         <div id="mainDateRangeMount" class="promo-date-mount" style="display:none"></div>
         <input id="date" type="hidden" />
-        <select id="type" title="业务线">
-          <option value="all" selected>全部类型</option>
-          <option value="near">临近上线</option>
-          <option value="promo">分享链接</option>
-          <option value="adx">ADX 排行</option>
+        <select id="type" data-i18n-title="toolbar.bizLine" title="Business line">
+          <option value="all" selected data-i18n="toolbar.typeAll">All types</option>
+          <option value="near" data-i18n="toolbar.typeNear">Near release</option>
+          <option value="promo" data-i18n="toolbar.typePromo">Share links</option>
+          <option value="adx" data-i18n="toolbar.typeAdx">ADX ranking</option>
         </select>
       </div>
       <span class="vt-sep"></span>
-      <button class="vt-btn vt-btn-primary-text" id="addRowBtn" type="button" title="添加记录">
+      <button class="vt-btn vt-btn-primary-text" id="addRowBtn" type="button" data-i18n-title="toolbar.addRecord" title="Add record">
         <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        <span>添加记录</span>
+        <span data-i18n="toolbar.addRecord">Add record</span>
       </button>
       <div class="menu-wrap">
-        <button class="vt-btn" id="fieldConfigBtn" type="button" title="字段配置：控制列显隐">
+        <button class="vt-btn" id="fieldConfigBtn" type="button" data-i18n-title="toolbar.fieldConfigTitle" title="Field settings: control column visibility">
           <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span>字段配置</span>
+          <span data-i18n="toolbar.fieldConfig">Fields</span>
         </button>
-        <div id="fieldConfigPanel" class="dropdown-panel" role="dialog" aria-label="字段配置">
+        <div id="fieldConfigPanel" class="dropdown-panel" role="dialog" data-i18n-aria="toolbar.fieldConfigAria" aria-label="Field settings">
           <div id="fieldConfigList"></div>
           <div class="fc-add-wrap">
-            <button type="button" class="fc-add-btn" id="addFieldBtn">+ 新增字段</button>
+            <button type="button" class="fc-add-btn" id="addFieldBtn" data-i18n="toolbar.addField">+ Add field</button>
           </div>
         </div>
       </div>
-      <button class="vt-btn" id="globalUndoBtn" type="button" disabled title="撤回上一步（⌘Z / Ctrl+Z）：可跨表跳回；静默满5分钟后停止">
+      <button class="vt-btn" id="globalUndoBtn" type="button" disabled data-i18n-title="toolbar.undoTitle" title="Undo last step (⌘Z / Ctrl+Z): can jump across tables; stops 5 minutes after silence">
         <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg>
-        <span>撤回</span>
+        <span data-i18n="toolbar.undo">Undo</span>
       </button>
       <span class="vt-sep"></span>
       <div class="menu-wrap">
-        <button class="vt-btn" id="filterBtn" type="button" title="筛选：设置筛选条件">
+        <button class="vt-btn" id="filterBtn" type="button" data-i18n-title="toolbar.filterTitle" title="Filter: set filter conditions">
           <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-          <span id="filterBtnLabel">筛选</span>
+          <span id="filterBtnLabel" data-i18n="toolbar.filter">Filter</span>
         </button>
-        <div id="filterPanel" class="dropdown-panel filter-panel" role="dialog" aria-label="筛选">
-          <div class="fp-title">设置筛选条件</div>
+        <div id="filterPanel" class="dropdown-panel filter-panel" role="dialog" data-i18n-aria="toolbar.filterAria" aria-label="Filter">
+          <div class="fp-title" data-i18n="toolbar.filterPanelTitle">Set filter conditions</div>
           <div id="filterRules"></div>
-          <button id="filterAddBtn" class="fp-add" type="button">+ 添加条件</button>
+          <button id="filterAddBtn" class="fp-add" type="button" data-i18n="toolbar.filterAdd">+ Add condition</button>
           <div class="fp-actions">
-            <button id="filterResetBtn" class="secondary" type="button">清空</button>
+            <button id="filterResetBtn" class="secondary" type="button" data-i18n="toolbar.filterReset">Clear</button>
             <div class="right">
-              <span class="fp-hint" style="font-size:12px;color:#8f959e;line-height:32px">改完自动同步</span>
+              <span class="fp-hint" data-i18n="toolbar.filterAutoSync">Auto-sync on change</span>
             </div>
           </div>
           <input id="keyword" type="hidden" value="" />
@@ -3044,172 +3267,172 @@
       </div>
       <span class="vt-sep"></span>
       <div class="menu-wrap">
-        <button class="vt-btn" id="colorFillBtn" type="button" title="填色：按条件给单元格/整行/整列填色">
+        <button class="vt-btn" id="colorFillBtn" type="button" data-i18n-title="toolbar.colorFillTitle" title="Color: fill cells/rows/columns by condition">
           <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3l7 7-9 9H3v-7l9-9z"/><path d="M19 14c1.5 1.5 1.5 3.5 0 4.5S15 20 15 18.5 17.5 12.5 19 14z"/>
           </svg>
-          <span id="colorFillBtnLabel">填色</span>
+          <span id="colorFillBtnLabel" data-i18n="toolbar.colorFill">Color</span>
         </button>
-        <div id="colorFillPanel" class="dropdown-panel color-panel" role="dialog" aria-label="设置填色条件">
+        <div id="colorFillPanel" class="dropdown-panel color-panel" role="dialog" data-i18n-aria="toolbar.colorPanelAria" aria-label="Set color conditions">
           <div class="cp-head">
-            <div class="cp-title">设置填色条件</div>
-            <button type="button" class="cp-smart" title="智能全局配色将在后续版本提供" disabled>智能全局配色</button>
+            <div class="cp-title" data-i18n="toolbar.colorPanelTitle">Set color conditions</div>
+            <button type="button" class="cp-smart" data-i18n-title="toolbar.smartColorTitle" title="Smart global color is coming in a later release" disabled data-i18n="toolbar.smartColor">Smart global color</button>
           </div>
           <div id="colorRules"></div>
-          <button id="colorFillAddBtn" class="fp-add" type="button">+ 添加条件</button>
+          <button id="colorFillAddBtn" class="fp-add" type="button" data-i18n="toolbar.colorAdd">+ Add condition</button>
         </div>
       </div>
       <span class="vt-sep"></span>
       <div class="menu-wrap">
-        <button class="vt-btn" id="groupBtn" type="button" title="分组">
+        <button class="vt-btn" id="groupBtn" type="button" data-i18n-title="toolbar.group" title="Group">
           <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="5" rx="1.5"/>
             <rect x="3" y="11" width="18" height="4" rx="1.2"/>
             <rect x="6" y="17" width="12" height="3" rx="1"/>
           </svg>
-          <span id="groupBtnLabel">分组</span>
+          <span id="groupBtnLabel" data-i18n="toolbar.group">Group</span>
         </button>
-        <div id="groupPanel" class="dropdown-panel group-panel" role="dialog" aria-label="设置分组条件">
+        <div id="groupPanel" class="dropdown-panel group-panel" role="dialog" data-i18n-aria="toolbar.groupAria" aria-label="Set group conditions">
           <div class="group-panel-head">
             <div class="group-panel-title">
-              <span>设置分组条件</span>
-              <span class="gp-info" title="独立于排序：按字段把行归到可折叠分组里，最多三级">?</span>
+              <span data-i18n="toolbar.groupPanelTitle">Set group conditions</span>
+              <span class="gp-info" data-i18n-title="toolbar.groupInfo" title="Independent of sorting: group rows by field into collapsible groups, up to 3 levels">?</span>
             </div>
           </div>
           <div id="groupRules"></div>
           <div class="group-add-wrap">
-            <button type="button" class="group-add-btn" id="groupAddBtn">选择条件 <span>▾</span></button>
-            <div class="group-field-menu" id="groupAddMenu" role="listbox" aria-label="添加分组字段">
-              <input type="search" class="gfm-search" id="groupAddSearch" placeholder="搜索字段" />
+            <button type="button" class="group-add-btn" id="groupAddBtn" data-i18n="toolbar.groupAdd">Pick condition ▾</button>
+            <div class="group-field-menu" id="groupAddMenu" role="listbox" data-i18n-aria="toolbar.groupFieldMenuAria" aria-label="Add group field">
+              <input type="search" class="gfm-search" id="groupAddSearch" data-i18n-placeholder="toolbar.searchField" placeholder="Search fields" />
               <div class="gfm-list" id="groupAddList"></div>
             </div>
           </div>
           <div class="group-panel-foot">
-            <button type="button" class="gp-save-view" id="groupSaveAsViewBtn">另存为新视图</button>
+            <button type="button" class="gp-save-view" id="groupSaveAsViewBtn" data-i18n="toolbar.saveAsView">Save as new view</button>
           </div>
         </div>
       </div>
       <span class="vt-sep"></span>
       <div class="menu-wrap">
-        <button class="vt-btn" id="sortBtn" type="button" title="排序">
+        <button class="vt-btn" id="sortBtn" type="button" data-i18n-title="toolbar.sort" title="Sort">
           <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h13"/><path d="M3 12h9"/><path d="M3 18h5"/><path d="M17 8l3-3 3 3"/><path d="M20 5v14"/></svg>
-          <span id="sortBtnLabel">排序</span>
+          <span id="sortBtnLabel" data-i18n="toolbar.sort">Sort</span>
         </button>
-        <div id="sortPanel" class="dropdown-panel sort-panel" role="dialog" aria-label="设置排序条件">
+        <div id="sortPanel" class="dropdown-panel sort-panel" role="dialog" data-i18n-aria="toolbar.sortPanelAria" aria-label="Set sort conditions">
           <div class="sort-panel-head">
             <div class="sort-panel-title">
-              <span>设置排序条件</span>
-              <span class="sp-info" title="可添加多级排序；拖拽左侧手柄调整优先级">i</span>
+              <span data-i18n="toolbar.sortPanelTitle">Set sort conditions</span>
+              <span class="sp-info" data-i18n-title="toolbar.sortInfo" title="Multi-level sorting; drag the left handle to reorder priority">i</span>
             </div>
-            <label class="sort-auto" title="开启后调整条件立即生效">
-              <span>自动排序</span>
+            <label class="sort-auto" data-i18n-title="toolbar.autoSortTitle" title="Changes take effect immediately when enabled">
+              <span data-i18n="toolbar.autoSort">Auto apply</span>
               <input id="sortAutoToggle" type="checkbox" checked />
               <span class="sa-switch"></span>
             </label>
           </div>
           <div id="sortRules"></div>
           <div class="sort-add-wrap">
-            <button type="button" class="sort-add-btn" id="sortAddBtn">添加条件 ▾</button>
-            <div class="sort-field-menu" id="sortAddMenu" role="listbox" aria-label="添加排序字段">
-              <input type="search" class="sfm-search" id="sortAddSearch" placeholder="搜索字段" />
+            <button type="button" class="sort-add-btn" id="sortAddBtn" data-i18n="toolbar.sortAdd">Add condition ▾</button>
+            <div class="sort-field-menu" id="sortAddMenu" role="listbox" data-i18n-aria="toolbar.sortFieldMenuAria" aria-label="Add sort field">
+              <input type="search" class="sfm-search" id="sortAddSearch" data-i18n-placeholder="toolbar.searchField" placeholder="Search fields" />
               <div class="sfm-list" id="sortAddList"></div>
             </div>
           </div>
           <div class="sort-panel-foot">
-            <button type="button" id="sortApplyBtn">应用</button>
+            <button type="button" id="sortApplyBtn" data-i18n="common.apply">Apply</button>
           </div>
         </div>
       </div>
       <span class="vt-sep"></span>
       <div class="menu-wrap">
-        <button class="vt-btn" id="rowHeightBtn" type="button" title="行高">
+        <button class="vt-btn" id="rowHeightBtn" type="button" data-i18n-title="toolbar.rowHeight" title="Row height">
           <svg class="vt-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M19 4v4"/><path d="M19 16v4"/><path d="m17 6 2-2 2 2"/><path d="m17 18 2 2 2-2"/>
           </svg>
-          <span id="rowHeightBtnLabel">行高</span>
+          <span id="rowHeightBtnLabel" data-i18n="toolbar.rowHeight">Row height</span>
         </button>
-        <div id="rowHeightPanel" class="dropdown-panel row-height-panel" role="dialog" aria-label="设置行高">
-          <div class="rh-title">设置行高</div>
+        <div id="rowHeightPanel" class="dropdown-panel row-height-panel" role="dialog" data-i18n-aria="toolbar.rowHeightPanelAria" aria-label="Set row height">
+          <div class="rh-title" data-i18n="toolbar.rowHeightPanelTitle">Set row height</div>
           <div id="rowHeightOptions"></div>
         </div>
       </div>
       <span class="vt-sep"></span>
       <div class="menu-wrap">
-        <button class="vt-btn vt-icon-btn" id="findBtn" type="button" aria-label="查找">
+        <button class="vt-btn vt-icon-btn" id="findBtn" type="button" data-i18n-aria="toolbar.find" aria-label="Find">
           <svg class="vt-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6h11"/><path d="M4 10h8"/><path d="M4 14h6"/>
             <circle cx="16.5" cy="16.5" r="3.5"/><path d="m19 19 2.5 2.5"/>
           </svg>
-          <span class="vt-tip">查找</span>
+          <span class="vt-tip" data-i18n="toolbar.find">Find</span>
         </button>
       </div>
       <div class="view-bar-spacer"></div>
       <div id="linkCollectBtnMount" class="link-collect-mount"></div>
       <div class="stats">
-        <div class="stat" title="当前所选日期范围的服务端总数">总数<strong id="statTotal">0</strong></div>
-        <div class="stat" title="本页已加载累计行数" style="display:none">可见<strong id="statVisible">0</strong></div>
-        <button type="button" class="stat is-drain" id="statDrainWrap" style="display:none" title="继续加载下一批" aria-live="polite">
-          <span id="statDrainLabel">继续加载</span><strong id="statDrain">-</strong>
+        <div class="stat" data-i18n-title="toolbar.totalTitle" title="Server-side total for the selected date range"><span data-i18n="toolbar.total">Total</span><strong id="statTotal">0</strong></div>
+        <div class="stat" data-i18n-title="toolbar.visibleTitle" title="Rows loaded on this page" style="display:none"><span data-i18n="toolbar.visible">Loaded</span><strong id="statVisible">0</strong></div>
+        <button type="button" class="stat is-drain" id="statDrainWrap" style="display:none" data-i18n-title="toolbar.drainTitle" title="Load next batch" aria-live="polite">
+          <span id="statDrainLabel" data-i18n="toolbar.drain">Load more</span><strong id="statDrain">-</strong>
         </button>
       </div>
-      <div id="findPanel" class="find-panel" role="dialog" aria-label="在数据表中查找">
+      <div id="findPanel" class="find-panel" role="dialog" data-i18n-aria="toolbar.findPanelAria" aria-label="Find in table">
         <div class="find-box" id="findBox">
           <span class="find-ico" aria-hidden="true">
             <svg class="find-ico-search" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
             <span class="find-ico-spin"></span>
           </span>
-          <input id="findInput" type="search" placeholder="在数据表中查找" autocomplete="off" />
+          <input id="findInput" type="search" data-i18n-placeholder="toolbar.findPlaceholder" placeholder="Find in table" autocomplete="off" />
           <div class="find-nav">
-            <button id="findPrevBtn" type="button" title="上一个">‹</button>
+            <button id="findPrevBtn" type="button" data-i18n-title="toolbar.findPrev" title="Previous match">‹</button>
             <span id="findCount">0 / 0</span>
-            <button id="findNextBtn" type="button" title="下一个">›</button>
+            <button id="findNextBtn" type="button" data-i18n-title="toolbar.findNext" title="Next match">›</button>
           </div>
         </div>
-        <button type="button" class="find-close" id="findCloseBtn" aria-label="关闭查找">×</button>
+        <button type="button" class="find-close" id="findCloseBtn" data-i18n-aria="toolbar.findClose" aria-label="Close find">×</button>
       </div>
     </div>
 
     <div id="viewMenuPopup" class="view-menu-popup">
-      <button type="button" data-view-menu-action="rename" id="viewMenuRenameBtn">重命名</button>
-      <button type="button" data-view-menu-action="duplicate" id="viewMenuDuplicateBtn">复制视图</button>
+      <button type="button" data-view-menu-action="rename" id="viewMenuRenameBtn" data-i18n="viewmenu.rename">Rename</button>
+      <button type="button" data-view-menu-action="duplicate" id="viewMenuDuplicateBtn" data-i18n="viewmenu.duplicate">Duplicate view</button>
       <div class="vm-sub-wrap" id="viewProtectWrap">
         <button type="button" class="vm-sub-trigger" data-view-menu-action="protect-open" id="viewMenuProtectBtn">
-          <span>保护视图</span><span class="vm-caret">›</span>
+          <span data-i18n="viewmenu.protect">Protect view</span><span class="vm-caret">›</span>
         </button>
-        <div class="view-protect-submenu" id="viewProtectSubmenu" role="menu" aria-label="保护视图">
+        <div class="view-protect-submenu" id="viewProtectSubmenu" role="menu" data-i18n-aria="viewmenu.protectAria" aria-label="Protect view">
           <button type="button" data-protect-mode="public">
             <span class="vp-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
             <span class="vp-text">
-              <div class="vp-title">公共视图</div>
-              <div class="vp-desc">所有协作者可修改配置</div>
+              <div class="vp-title" data-i18n="vp.publicTitle">Public view</div>
+              <div class="vp-desc" data-i18n="vp.publicDesc">All collaborators can edit the configuration</div>
             </span>
             <span class="vp-check" data-protect-check="public"></span>
           </button>
           <button type="button" data-protect-mode="locked">
             <span class="vp-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
             <span class="vp-text">
-              <div class="vp-title">锁定视图</div>
-              <div class="vp-desc">所有人都不能修改配置</div>
+              <div class="vp-title" data-i18n="vp.lockedTitle">Locked view</div>
+              <div class="vp-desc" data-i18n="vp.lockedDesc">No one can edit the configuration</div>
             </span>
             <span class="vp-check" data-protect-check="locked"></span>
           </button>
           <button type="button" data-protect-mode="personal" id="viewProtectPersonalBtn">
             <span class="vp-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             <span class="vp-text">
-              <div class="vp-title">个人视图</div>
-              <div class="vp-desc">仅你自己可见</div>
+              <div class="vp-title" data-i18n="vp.personalTitle">Personal view</div>
+              <div class="vp-desc" data-i18n="vp.personalDesc">Visible only to you</div>
             </span>
             <span class="vp-check" data-protect-check="personal"></span>
           </button>
         </div>
       </div>
       <div class="vm-sep" id="viewMenuSep"></div>
-      <button type="button" class="danger" data-view-menu-action="delete" id="viewMenuDeleteBtn">删除视图</button>
+      <button type="button" class="danger" data-view-menu-action="delete" id="viewMenuDeleteBtn" data-i18n="viewmenu.delete">Delete view</button>
     </div>
 
     <div id="colMenuPopup" class="col-menu-popup" role="menu"></div>
     <div id="rowMenuPopup" class="row-menu-popup" role="menu"></div>
-    <div id="colFillPopup" class="col-fill-popup" role="dialog" aria-label="整列填色"></div>
+    <div id="colFillPopup" class="col-fill-popup" role="dialog" data-i18n-aria="filter.colorCellAria" aria-label="Color entire column"></div>
     <div id="sheetTooltip" class="sheet-tooltip"></div>
     <div id="sheetSelectionStat" class="sheet-selection-stat" aria-hidden="true"></div>
 
@@ -3232,7 +3455,7 @@
     </div><!-- /.workspace -->
   </div>
 
-  <button type="button" id="agencyScrollBottomBtn" class="agency-scroll-bottom-btn" title="触底" aria-label="触底">
+  <button type="button" id="agencyScrollBottomBtn" class="agency-scroll-bottom-btn" data-i18n-title="toolbar.scrollBottom" title="Bottom" data-i18n-aria="toolbar.scrollBottom" aria-label="Bottom">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M12 4v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M6 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -3246,42 +3469,42 @@
   </div>
   <div id="pasteFieldMask" class="paste-field-mask" role="dialog" aria-modal="true" aria-labelledby="pasteFieldTitle">
     <div class="paste-field-dialog">
-      <div class="paste-field-title" id="pasteFieldTitle"><span class="copy-toast-icon">i</span><span>提示</span></div>
-      <div class="paste-field-message">是否同时粘贴字段名？</div>
+      <div class="paste-field-title" id="pasteFieldTitle"><span class="copy-toast-icon">i</span><span data-i18n="paste.tip">Tip</span></div>
+      <div class="paste-field-message" data-i18n="paste.ask">Also paste field names?</div>
       <div class="paste-field-actions">
-        <button type="button" data-paste-field="no">取消</button>
-        <button type="button" class="primary" data-paste-field="yes">粘贴字段名</button>
+        <button type="button" data-paste-field="no" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="primary" data-paste-field="yes" data-i18n="paste.yes">Paste field names</button>
       </div>
     </div>
   </div>
   <div id="pasteConflictMask" class="paste-field-mask" role="dialog" aria-modal="true" aria-labelledby="pasteConflictTitle">
     <div class="paste-field-dialog">
-      <div class="paste-field-title" id="pasteConflictTitle"><span class="copy-toast-icon">!</span><span>粘贴冲突</span></div>
-      <div class="paste-field-message" id="pasteConflictMessage">与同事修改冲突，请选择处理方式</div>
+      <div class="paste-field-title" id="pasteConflictTitle"><span class="copy-toast-icon">!</span><span data-i18n="paste.conflictTitle">Paste conflict</span></div>
+      <div class="paste-field-message" id="pasteConflictMessage" data-i18n="paste.conflictMsg">Conflicts with a teammate's edits. Choose how to proceed</div>
       <div class="paste-field-actions">
-        <button type="button" data-paste-conflict="cancel">取消</button>
-        <button type="button" data-paste-conflict="refresh">刷新后重试</button>
-        <button type="button" class="primary" data-paste-conflict="overwrite">覆盖同事修改</button>
+        <button type="button" data-paste-conflict="cancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" data-paste-conflict="refresh" data-i18n="paste.refreshRetry">Refresh and retry</button>
+        <button type="button" class="primary" data-paste-conflict="overwrite" data-i18n="paste.overwrite">Overwrite teammate's edits</button>
       </div>
     </div>
   </div>
   <div id="undoToast" class="undo-toast" role="status" aria-live="polite">
     <span class="ut-ico" aria-hidden="true">i</span>
-    <span class="ut-msg" id="undoToastMsg">已删除 1 行记录</span>
-    <button type="button" class="ut-undo" id="undoToastBtn">撤销</button>
+    <span class="ut-msg" id="undoToastMsg" data-i18n="undo.deletedOne">Deleted 1 record</span>
+    <button type="button" class="ut-undo" id="undoToastBtn" data-i18n="common.undo">Undo</button>
   </div>
-  <div id="updateBanner" class="update-banner" role="button" title="点击重新加载页面"><span id="updateBannerText">系统已更新</span><b>点击更新重新加载</b></div>
-  <div id="loadingMask" class="loading-mask" aria-live="polite"><div class="loading-card">数据加载中...</div></div>
+  <div id="updateBanner" class="update-banner" role="button" data-i18n-title="update.title" title="Click to reload the page"><span id="updateBannerText" data-i18n="update.text">System updated</span><b data-i18n="update.click">Click to reload the update</b></div>
+  <div id="loadingMask" class="loading-mask" aria-live="polite"><div class="loading-card" data-i18n="common.dataLoading">Loading data...</div></div>
   <div id="viewProtectConfirmMask" class="view-protect-confirm-mask" role="dialog" aria-modal="true" aria-labelledby="viewProtectConfirmTitle">
     <div class="view-protect-confirm-card">
       <div class="vpc-head">
-        <h3 id="viewProtectConfirmTitle">锁定视图</h3>
+        <h3 id="viewProtectConfirmTitle" data-i18n="vp.lockTitle">Locked view</h3>
         <button type="button" class="vpc-close" id="viewProtectConfirmClose" aria-label="关闭">×</button>
       </div>
       <div class="vpc-body" id="viewProtectConfirmBody"></div>
       <div class="vpc-foot">
-        <button type="button" class="secondary" id="viewProtectConfirmCancel">取消</button>
-        <button type="button" class="vpc-ok" id="viewProtectConfirmOk">确认</button>
+        <button type="button" class="secondary" id="viewProtectConfirmCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="vpc-ok" id="viewProtectConfirmOk" data-i18n="common.confirm">Confirm</button>
       </div>
     </div>
   </div>
@@ -3291,13 +3514,13 @@
       <div class="loc-main">
         <span class="loc-ico" aria-hidden="true">!</span>
         <div class="loc-text">
-          <h3 class="loc-title" id="logoutConfirmTitle">确认退出登录吗？</h3>
-          <p class="loc-desc">退出登录后，你将无法收到变更、夜间与排名等提醒通知。</p>
+          <h3 class="loc-title" id="logoutConfirmTitle" data-i18n="logout.title">Log out?</h3>
+          <p class="loc-desc" data-i18n="logout.desc">After logging out you will no longer receive change, nightly and ranking reminders.</p>
         </div>
       </div>
       <div class="loc-foot">
-        <button type="button" class="secondary" id="logoutConfirmCancel">取消</button>
-        <button type="button" class="loc-ok" id="logoutConfirmOk">退出</button>
+        <button type="button" class="secondary" id="logoutConfirmCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="loc-ok" id="logoutConfirmOk" data-i18n="header.logout">Log out</button>
       </div>
     </div>
   </div>
@@ -3306,13 +3529,13 @@
       <div class="loc-main">
         <span class="loc-ico loc-warn" aria-hidden="true">!</span>
         <div class="loc-text">
-          <h3 class="loc-title" id="deleteRowConfirmTitle">操作确认</h3>
-          <p class="loc-desc" id="deleteRowConfirmDesc">该操作将删除 1 行记录，请确认是否继续？</p>
+          <h3 class="loc-title" id="deleteRowConfirmTitle" data-i18n="delrow.title">Confirm action</h3>
+          <p class="loc-desc" id="deleteRowConfirmDesc">This will delete 1 record(s). Continue?</p>
         </div>
       </div>
       <div class="loc-foot">
-        <button type="button" class="secondary" id="deleteRowConfirmCancel">取消</button>
-        <button type="button" class="loc-ok" id="deleteRowConfirmOk">删除</button>
+        <button type="button" class="secondary" id="deleteRowConfirmCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="loc-ok" id="deleteRowConfirmOk" data-i18n="common.delete">Delete</button>
       </div>
     </div>
   </div>
@@ -3321,15 +3544,15 @@
       <div class="loc-main" style="align-items:flex-start">
         <div class="loc-text" style="width:100%">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
-            <h3 class="loc-title" id="leaveTableConfirmTitle" style="margin:0">视图设置未保存</h3>
+            <h3 class="loc-title" id="leaveTableConfirmTitle" style="margin:0" data-i18n="leave.title">Unsaved view settings</h3>
             <button type="button" class="rc-close" id="leaveTableConfirmClose" aria-label="关闭" style="border:0;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:#8f959e">×</button>
           </div>
-          <p class="loc-desc" id="leaveTableConfirmDesc" style="margin:0">当前数据表存在未保存的视图设置，是否保存？</p>
+          <p class="loc-desc" id="leaveTableConfirmDesc" style="margin:0" data-i18n="leave.desc">This table has unsaved view settings. Save them?</p>
         </div>
       </div>
       <div class="loc-foot">
-        <button type="button" class="secondary" id="leaveTableConfirmDiscard">不保存</button>
-        <button type="button" class="loc-ok" id="leaveTableConfirmSave" style="background:#4f46e5;border-color:#4f46e5">保存</button>
+        <button type="button" class="secondary" id="leaveTableConfirmDiscard" data-i18n="common.dontSave">Don't save</button>
+        <button type="button" class="loc-ok" id="leaveTableConfirmSave" style="background:#4f46e5;border-color:#4f46e5" data-i18n="common.save">Save</button>
       </div>
     </div>
   </div>
@@ -3338,56 +3561,56 @@
       <div class="loc-main">
         <span class="loc-ico" aria-hidden="true">!</span>
         <div class="loc-text">
-          <h3 class="loc-title" id="deleteTableConfirmTitle">确认删除表格？</h3>
+          <h3 class="loc-title" id="deleteTableConfirmTitle" data-i18n="deltable.title">Delete table?</h3>
           <p class="loc-desc" id="deleteTableConfirmDesc"></p>
         </div>
       </div>
       <div class="loc-foot">
-        <button type="button" class="secondary" id="deleteTableConfirmCancel">取消</button>
-        <button type="button" class="loc-ok" id="deleteTableConfirmOk">删除</button>
+        <button type="button" class="secondary" id="deleteTableConfirmCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="loc-ok" id="deleteTableConfirmOk" data-i18n="common.delete">Delete</button>
       </div>
     </div>
   </div>
-  <div id="tableCreateMask" class="row-create-mask" role="dialog" aria-label="新建表格">
+  <div id="tableCreateMask" class="row-create-mask" role="dialog" data-i18n-aria="tc.aria" aria-label="New table">
     <div class="row-create-card" id="tableCreateCard">
-      <h3>新建表格</h3>
-      <div class="rc-label">表格名称</div>
-      <input class="rc-input" id="tableCreateName" maxlength="30" placeholder="未命名表格" />
-      <div class="rc-hint">独立空白表，内容与主表数据无关</div>
+      <h3 data-i18n="tc.title">New table</h3>
+      <div class="rc-label" data-i18n="tc.nameLabel">Table name</div>
+      <input class="rc-input" id="tableCreateName" maxlength="30" data-i18n-placeholder="tc.namePlaceholder" placeholder="Untitled table" />
+      <div class="rc-hint" data-i18n="tc.hint">A standalone blank table; its data is unrelated to the main tables</div>
       <div class="rc-actions">
-        <button type="button" class="rc-cancel" id="tableCreateCancel">取消</button>
-        <button type="button" class="rc-ok" id="tableCreateOk">创建</button>
+        <button type="button" class="rc-cancel" id="tableCreateCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="rc-ok" id="tableCreateOk" data-i18n="common.create">Create</button>
       </div>
     </div>
   </div>
-  <div id="rowCreateMask" class="row-create-mask" role="dialog" aria-label="新增行">
+  <div id="rowCreateMask" class="row-create-mask" role="dialog" data-i18n-aria="rc.aria" aria-label="Add row">
     <div class="row-create-card" id="rowCreateCard">
       <div class="rc-head">
-        <h3 id="rowCreateTitle">新增行</h3>
+        <h3 id="rowCreateTitle" data-i18n="rc.title">Add row</h3>
         <button type="button" class="rc-close" id="rowCreateClose" aria-label="关闭">×</button>
       </div>
       <div class="rc-body">
-        <div class="rc-hint">
-          必填<strong>名称 + 版权</strong>即可建行；上方可填完整主表字段，下方同步自定义列。时间精确到时分秒。<br>
-          去重：有 book_id 按 id；无 id 按 <strong>名称 + 版权</strong>。落库并记操作历史。
+        <div class="rc-hint" data-i18n-html="rc.hint">
+          Only <strong>Name + Copyright</strong> is required; fill full master-table fields above and custom columns below. Times are precise to the second.<br>
+          Dedup: by id when book_id exists; otherwise by <strong>Name + Copyright</strong>. Saved with operation history.
         </div>
         <div class="rc-field is-required">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h14"/></svg>
-            名称
+            <span data-i18n="rc.name">Name</span>
           </div>
           <div class="rc-fctrl">
-            <input class="rc-input" id="rowCreateName" maxlength="120" placeholder="请输入名称" autocomplete="off" />
+            <input class="rc-input" id="rowCreateName" maxlength="120" data-i18n-placeholder="rc.namePlaceholder" placeholder="Enter a name" autocomplete="off" />
           </div>
         </div>
         <div class="rc-field is-required">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m8 11 2.5 2.5L16 9"/></svg>
-            版权
+            <span data-i18n="rc.copyright">Copyright</span>
           </div>
           <div class="rc-fctrl">
             <button type="button" class="rc-pick" id="rowCreateCopyright" data-rc-field="copyrightOwner" data-rc-type="select" data-rc-value="" aria-haspopup="listbox">
-              <span class="rc-pick-ph">请选择版权</span>
+              <span class="rc-pick-ph" data-i18n="rc.copyrightPlaceholder">Select copyright</span>
             </button>
           </div>
         </div>
@@ -3397,13 +3620,13 @@
             book_id
           </div>
           <div class="rc-fctrl">
-            <input class="rc-input" id="rowCreateBookId" maxlength="64" placeholder="可选" autocomplete="off" />
+            <input class="rc-input" id="rowCreateBookId" maxlength="64" data-i18n-placeholder="common.optional" placeholder="Optional" autocomplete="off" />
           </div>
         </div>
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-            预估上线时间
+            <span data-i18n="rc.estimateTime">Estimated release</span>
           </div>
           <div class="rc-fctrl">
             <div class="rc-datetime-mount" id="rowCreateEstimateMount"></div>
@@ -3413,7 +3636,7 @@
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-            预估发布时间
+            <span data-i18n="rc.publishTime">Publish time</span>
           </div>
           <div class="rc-fctrl">
             <div class="rc-datetime-mount" id="rowCreatePublishTimeMount"></div>
@@ -3423,7 +3646,7 @@
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-            创建时间
+            <span data-i18n="rc.createTime">Created at</span>
           </div>
           <div class="rc-fctrl">
             <div class="rc-datetime-mount" id="rowCreateCreateTimeMount"></div>
@@ -3433,37 +3656,37 @@
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7"/><path d="M8 17V11"/><path d="M12 17V9"/><path d="M16 17V13"/></svg>
-            数量
+            <span data-i18n="rc.amount">Episodes</span>
           </div>
           <div class="rc-fctrl">
-            <input class="rc-input" id="rowCreateEpisodeAmount" type="text" inputmode="numeric" maxlength="8" placeholder="可选" autocomplete="off" />
+            <input class="rc-input" id="rowCreateEpisodeAmount" type="text" inputmode="numeric" maxlength="8" data-i18n-placeholder="common.optional" placeholder="Optional" autocomplete="off" />
           </div>
         </div>
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h14"/></svg>
-            描述类型
+            <span data-i18n="rc.category">Category</span>
           </div>
           <div class="rc-fctrl">
-            <input class="rc-input" id="rowCreateCategoryText" maxlength="200" placeholder="可选" autocomplete="off" />
+            <input class="rc-input" id="rowCreateCategoryText" maxlength="200" data-i18n-placeholder="common.optional" placeholder="Optional" autocomplete="off" />
           </div>
         </div>
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
-            作品ID
+            <span data-i18n="rc.workId">Work ID</span>
           </div>
           <div class="rc-fctrl">
-            <input class="rc-input" id="rowCreateWorkId" maxlength="64" placeholder="可选" autocomplete="off" />
+            <input class="rc-input" id="rowCreateWorkId" maxlength="64" data-i18n-placeholder="common.optional" placeholder="Optional" autocomplete="off" />
           </div>
         </div>
         <div class="rc-field">
           <div class="rc-fname">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
-            发布账号
+            <span data-i18n="rc.account">Publishing account</span>
           </div>
           <div class="rc-fctrl">
-            <input class="rc-input" id="rowCreatePublishAwemeUser" maxlength="64" placeholder="可选" autocomplete="off" />
+            <input class="rc-input" id="rowCreatePublishAwemeUser" maxlength="64" data-i18n-placeholder="common.optional" placeholder="Optional" autocomplete="off" />
           </div>
         </div>
         <div id="rowCreateExtraFields"></div>
@@ -3471,46 +3694,46 @@
       <div class="rc-foot">
         <label class="rc-continue">
           <input type="checkbox" id="rowCreateContinue" />
-          提交后继续添加
+          <span data-i18n="rc.continue">Keep adding after submit</span>
         </label>
         <div class="rc-actions">
-          <button type="button" class="rc-cancel" id="rowCreateCancel">取消</button>
-          <button type="button" class="rc-ok" id="rowCreateOk">提交</button>
+          <button type="button" class="rc-cancel" id="rowCreateCancel" data-i18n="common.cancel">Cancel</button>
+          <button type="button" class="rc-ok" id="rowCreateOk" data-i18n="common.submit">Submit</button>
         </div>
       </div>
       <div class="rc-submit-hint" id="rowCreateSubmitHint" hidden></div>
     </div>
   </div>
-  <div id="rowCreateOptionMenu" class="sheet-option-menu" role="listbox" aria-label="新增行选项"></div>
-  <div id="fieldCreateMask" class="row-create-mask" role="dialog" aria-label="新增字段">
+  <div id="rowCreateOptionMenu" class="sheet-option-menu" role="listbox" data-i18n-aria="rc.optionMenuAria" aria-label="Row options"></div>
+  <div id="fieldCreateMask" class="row-create-mask" role="dialog" data-i18n-aria="fieldCreate.maskAria" aria-label="Add field">
     <div class="row-create-card" id="fieldCreateCard">
-      <h3>新增字段</h3>
-      <div class="rc-label">字段标题（必填）</div>
-      <input class="rc-input" id="fieldCreateTitle" maxlength="40" placeholder="例如：跟进备注" />
-      <div class="rc-label">字段类型</div>
+      <h3 data-i18n="fieldCreate.title">Add field</h3>
+      <div class="rc-label" data-i18n="fieldCreate.titleLabel">Field title (required)</div>
+      <input class="rc-input" id="fieldCreateTitle" maxlength="40" data-i18n-placeholder="fieldCreate.titlePlaceholder" placeholder="e.g. Follow-up notes" />
+      <div class="rc-label" data-i18n="fieldCreate.typeLabel">Field type</div>
       <select class="rc-select" id="fieldCreateType">
-        <option value="text" selected>文本</option>
-        <option value="select">单选</option>
-        <option value="multi">多选</option>
-        <option value="date">日期（时分秒）</option>
-        <option value="checkbox">复选框</option>
-        <option value="formula">公式</option>
+        <option value="text" selected data-i18n="fieldEdit.type.text">Text</option>
+        <option value="select" data-i18n="fieldEdit.type.select">Single select</option>
+        <option value="multi" data-i18n="fieldEdit.type.multi">Multi select</option>
+        <option value="date" data-i18n="fieldEdit.type.date">Date (to the second)</option>
+        <option value="checkbox" data-i18n="fieldEdit.type.checkbox">Checkbox</option>
+        <option value="formula" data-i18n="fieldEdit.type.formula">Formula</option>
       </select>
       <div class="rc-submit-hint" id="fieldCreateCountHint" hidden></div>
       <div class="rc-actions">
-        <button type="button" class="rc-cancel" id="fieldCreateCancel">取消</button>
-        <button type="button" class="rc-ok" id="fieldCreateOk">确定</button>
+        <button type="button" class="rc-cancel" id="fieldCreateCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="button" class="rc-ok" id="fieldCreateOk" data-i18n="common.ok">OK</button>
       </div>
     </div>
   </div>
-  <div id="fieldEditMask" class="field-edit-mask" role="dialog" aria-label="修改字段">
+  <div id="fieldEditMask" class="field-edit-mask" role="dialog" data-i18n-aria="fieldEdit.maskAria" aria-label="Edit field">
     <div class="field-edit-card" id="fieldEditCard"></div>
   </div>
-  <div id="fieldEditTypeMenu" class="fe-type-menu-portal" aria-label="字段类型"></div>
-  <div id="formulaEditMask" class="formula-edit-mask" role="dialog" aria-label="公式编辑器">
+  <div id="fieldEditTypeMenu" class="fe-type-menu-portal" data-i18n-aria="fieldEdit.typeAria" aria-label="Field type"></div>
+  <div id="formulaEditMask" class="formula-edit-mask" role="dialog" data-i18n-aria="formula.maskAria" aria-label="Formula editor">
     <div class="formula-edit-card" id="formulaEditCard">
       <div class="fx-head">
-        <h3 class="fx-title">公式编辑器</h3>
+        <h3 class="fx-title" data-i18n="formula.title">Formula editor</h3>
         <div class="fx-head-actions">
           <button type="button" class="fx-close" id="formulaEditClose" aria-label="关闭">×</button>
         </div>
@@ -3520,18 +3743,18 @@
           <span class="fx-eq">=</span>
           <div id="formulaEditSurface" class="fx-surface" contenteditable="true" role="textbox" spellcheck="false"
             data-placeholder='例如：CONCATENATE("PRJ-", [名称])'></div>
-          <div class="fx-preview" id="formulaEditPreview">预览：-</div>
-          <button type="button" class="fx-confirm" id="formulaEditConfirm">确认</button>
+          <div class="fx-preview" id="formulaEditPreview" data-i18n="formula.preview">Preview: -</div>
+          <button type="button" class="fx-confirm" id="formulaEditConfirm" data-i18n="common.confirm">Confirm</button>
         </div>
         <div class="fx-tabs" role="tablist">
-          <button type="button" class="fx-tab is-active" data-fx-tab="fields">字段</button>
-          <button type="button" class="fx-tab" data-fx-tab="funcs">函数</button>
+          <button type="button" class="fx-tab is-active" data-fx-tab="fields" data-i18n="formula.tabFields">Fields</button>
+          <button type="button" class="fx-tab" data-fx-tab="funcs" data-i18n="formula.tabFuncs">Functions</button>
         </div>
         <div class="fx-refs">
           <div class="fx-ref-list" id="formulaFieldList"></div>
           <div class="fx-ref-detail" id="formulaFieldDetail">
-            <h4>字段引用</h4>
-            <div>点击左侧字段，插入为绿色标签（多维表格同款）。确认后按「字段名」保存。</div>
+            <h4 data-i18n="formula.refsTitle">Field references</h4>
+            <div data-i18n="formula.refsDesc">Click a field on the left to insert it as a green tag (like multi-dimensional spreadsheets). It is saved by "field name" after confirm.</div>
           </div>
         </div>
       </div>
@@ -3540,40 +3763,40 @@
   <div id="drawer" class="drawer">
     <div class="drawer-panel log-drawer-panel">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 id="logTitle" style="margin:0">操作历史</h3>
-        <button class="secondary" type="button" onclick="closeDrawer()">关闭</button>
+        <h3 id="logTitle" style="margin:0" data-i18n="log.title">Operation history</h3>
+        <button class="secondary" type="button" onclick="closeDrawer()" data-i18n="common.close">Close</button>
       </div>
       <div class="log-toolbar">
-        <div class="meta" id="logMeta">左侧选记录 · 右侧对比前后 · 仅可撤回自己的操作</div>
+        <div class="meta" id="logMeta" data-i18n="log.meta">Pick a record on the left · compare before/after on the right · only your own operations can be undone</div>
         <div class="actions">
-          <button id="logSortBtn" class="ghost" type="button">排序：最新在前</button>
-          <button id="logAddBtn" class="ghost" type="button" style="display:none">添加记录</button>
+          <button id="logSortBtn" class="ghost" type="button" data-i18n="log.sortDesc">Sort: newest first</button>
+          <button id="logAddBtn" class="ghost" type="button" style="display:none" data-i18n="toolbar.addRecord">Add record</button>
         </div>
       </div>
       <div class="log-layout">
         <div class="log-list-col">
           <div id="logList"></div>
           <div class="log-pager" id="logPager" style="display:none">
-            <button id="logPrevBtn" class="secondary" type="button">上一页</button>
-            <span class="page-info" id="logPageInfo">第 1 / 1 页</span>
-            <button id="logNextBtn" class="secondary" type="button">下一页</button>
+            <button id="logPrevBtn" class="secondary" type="button" data-i18n="common.prevPage">Previous</button>
+            <span class="page-info" id="logPageInfo">Page 1 / 1</span>
+            <button id="logNextBtn" class="secondary" type="button" data-i18n="common.nextPage">Next</button>
           </div>
         </div>
         <div class="log-detail-col" id="logDetail">
-          <div class="ld-title">变更对比</div>
-          <div class="ld-meta" id="logDetailMeta">请选择左侧一条操作记录</div>
+          <div class="ld-title" data-i18n="log.contrastTitle">Change diff</div>
+          <div class="ld-meta" id="logDetailMeta" data-i18n="log.pickOne">Select an operation record on the left</div>
           <div class="log-contrast">
             <div class="box before">
-              <div class="label">操作前</div>
-              <div class="val" id="logDetailBefore">(未选择)</div>
+              <div class="label" data-i18n="log.before">Before</div>
+              <div class="val" id="logDetailBefore" data-i18n="log.notSelected">(not selected)</div>
             </div>
             <div class="box after">
-              <div class="label">操作后</div>
-              <div class="val" id="logDetailAfter">(未选择)</div>
+              <div class="label" data-i18n="log.after">After</div>
+              <div class="val" id="logDetailAfter" data-i18n="log.notSelected">(not selected)</div>
             </div>
           </div>
           <div class="log-detail-actions">
-            <button type="button" class="undo-btn" id="logUndoBtn" disabled>撤回该操作</button>
+            <button type="button" class="undo-btn" id="logUndoBtn" disabled data-i18n="log.undoOp">Undo this operation</button>
             <span class="undo-hint" id="logUndoHint"></span>
           </div>
         </div>
@@ -3584,12 +3807,12 @@
   <div id="historyDrawer" class="drawer">
     <div class="drawer-panel history-drawer-panel">
       <div class="history-drawer-head">
-        <h3>历史记录</h3>
+        <h3 data-i18n="hist.title">History</h3>
         <button type="button" class="history-drawer-close" id="historyDrawerCloseBtn" aria-label="关闭">×</button>
       </div>
-      <div class="history-drawer-note">仅显示最近 1 天的操作</div>
+      <div class="history-drawer-note" data-i18n="hist.note">Only operations from the last 1 day are shown</div>
       <div class="history-drawer-body" id="historyDrawerBody">
-        <div class="history-loading">加载中...</div>
+        <div class="history-loading" data-i18n="common.loading">Loading...</div>
       </div>
     </div>
   </div>
@@ -3597,12 +3820,12 @@
   <div id="recordDrawer" class="drawer">
     <div class="drawer-panel record-drawer-panel">
       <div class="record-drawer-head">
-        <div class="record-drawer-title" id="recordDrawerTitle">记录详情</div>
+        <div class="record-drawer-title" id="recordDrawerTitle" data-i18n="rec.title">Record details</div>
         <button type="button" class="record-drawer-close" id="recordDrawerCloseBtn" aria-label="关闭">✕</button>
       </div>
       <div class="record-tabs">
-        <button type="button" class="record-tab active" data-record-tab="fields">字段</button>
-        <button type="button" class="record-tab" data-record-tab="logs">动态</button>
+        <button type="button" class="record-tab active" data-record-tab="fields" data-i18n="rec.tabFields">Fields</button>
+        <button type="button" class="record-tab" data-record-tab="logs" data-i18n="rec.tabLogs">Activity</button>
       </div>
       <div class="record-body" id="recordDrawerBody"></div>
     </div>
@@ -3611,27 +3834,27 @@
   <div id="reminderDrawer" class="drawer">
     <div class="drawer-panel" style="width:min(520px, 96vw)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="margin:0">提醒</h3>
-        <button class="secondary" type="button" id="reminderCloseBtn">关闭</button>
+        <h3 style="margin:0" data-i18n="rem.title">Reminders</h3>
+        <button class="secondary" type="button" id="reminderCloseBtn" data-i18n="common.close">Close</button>
       </div>
       <div class="log-toolbar">
-        <div class="meta" id="reminderMeta">含变更、夜间、热度排行；网页可查</div>
+        <div class="meta" id="reminderMeta" data-i18n="rem.meta">Change, nightly and ranking reminders; viewable on the web</div>
         <div class="actions">
-          <select id="reminderType" style="width:auto;min-width:140px;padding:4px 8px;font-size:12px" title="提醒类型">
-            <option value="" selected>全部</option>
-            <option value="new">变更提醒</option>
-            <option value="evening">夜间提醒</option>
-            <option value="rank">热度排行</option>
-            <option value="focus">重点变更提醒</option>
+          <select id="reminderType" style="width:auto;min-width:140px;padding:4px 8px;font-size:12px" data-i18n-title="rem.typeTitle" title="Reminder type">
+            <option value="" selected data-i18n="rem.typeAll">All</option>
+            <option value="new" data-i18n="rem.typeNew">Change reminders</option>
+            <option value="evening" data-i18n="rem.typeEvening">Nightly reminders</option>
+            <option value="rank" data-i18n="rem.typeRank">Ranking</option>
+            <option value="focus" data-i18n="rem.typeFocus">Key change reminders</option>
           </select>
-          <button id="reminderRefreshBtn" class="ghost" type="button">刷新</button>
+          <button id="reminderRefreshBtn" class="ghost" type="button" data-i18n="common.refresh">Refresh</button>
         </div>
       </div>
       <div id="reminderList"></div>
       <div class="log-pager" id="reminderPager" style="display:none">
-        <button id="reminderPrevBtn" class="secondary" type="button">上一页</button>
-        <span class="page-info" id="reminderPageInfo">第 1 / 1 页</span>
-        <button id="reminderNextBtn" class="secondary" type="button">下一页</button>
+        <button id="reminderPrevBtn" class="secondary" type="button" data-i18n="common.prevPage">Previous</button>
+        <span class="page-info" id="reminderPageInfo">Page 1 / 1</span>
+        <button id="reminderNextBtn" class="secondary" type="button" data-i18n="common.nextPage">Next</button>
       </div>
     </div>
   </div>
@@ -3639,8 +3862,8 @@
   <div id="rankDrawer" class="drawer">
     <div class="drawer-panel" style="width:min(720px, 96vw)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px">
-        <h3 style="margin:0" id="rankDrawerTitle">热度排行</h3>
-        <button class="secondary" type="button" id="rankCloseBtn">关闭</button>
+        <h3 style="margin:0" id="rankDrawerTitle" data-i18n="rank.title">Ranking</h3>
+        <button class="secondary" type="button" id="rankCloseBtn" data-i18n="common.close">Close</button>
       </div>
       <div class="meta" id="rankDrawerMeta" style="margin-bottom:10px"></div>
       <div id="rankDrawerBody" class="rank-drawer-body"></div>
@@ -3649,7 +3872,15 @@
 
   <div id="notifyStack" class="notify-stack" aria-live="polite"></div>
 
+  <script>if (window.OpsI18n) window.OpsI18n.apply(document);</script>
   <script>
+    // 中文备注：i18n 取词别名（tf 支持占位符；OpsI18n 未加载时回退 key）。
+    const T = (key, params) => (window.OpsI18n ? window.OpsI18n.tf(key, params) : key);
+    const opT = (op) => {
+      if (!op) return "";
+      const k = "filter.op." + op.value;
+      return (window.OpsI18n && window.OpsI18n.has(k)) ? window.OpsI18n.tf(k) : (op.label || op.value || "");
+    };
     const PROMOTION_FIELDS = [
       "iaaDefaultUrl","iaaCard2Url","iaaEpisode2Url",
       "iapPanel1","iapLink1","iapPanel2","iapLink2","iapPanel3","iapLink3",
@@ -3936,7 +4167,7 @@
         setLoading(true, waitingRecords
           ? (n > 0 ? `共 ${n} 条，正在解压并加载表格...` : "正在解压并加载表格...")
           : (waitingRows ? (n > 0 ? `共 ${n} 条，正在加载行数据...` : "正在加载行数据...")
-          : (n > 0 ? `共 ${n} 条` : "暂无数据")), { page: usePage });
+          : (n > 0 ? T("toolbar.nRecords", { n }) : T("toolbar.noData"))), { page: usePage });
       } else {
         setLoading(true, "正在统计总数...", { page: usePage });
       }
@@ -3980,8 +4211,8 @@
         headers: { ...headers() }
       });
       if (res.status === 401) {
-        showLogin("未登录或登录已过期，请重新登录");
-        throw new Error("未登录或登录已过期，请重新登录");
+        showLogin(T("toast.reloginRequired"));
+        throw new Error(T("toast.reloginRequired"));
       }
       if (!res.ok) throw new Error(`dramas records 二进制块失败 (${res.status})`);
       return res.arrayBuffer();
@@ -4071,8 +4302,8 @@
         headers: { ...headers() }
       });
       if (res.status === 401) {
-        showLogin("未登录或登录已过期，请重新登录");
-        throw new Error("未登录或登录已过期，请重新登录");
+        showLogin(T("toast.reloginRequired"));
+        throw new Error(T("toast.reloginRequired"));
       }
       if (!res.ok) throw new Error(`records 二进制块失败 (${res.status})`);
       return res.arrayBuffer();
@@ -4576,7 +4807,7 @@
     function syncColorFillBtnLabel() {
       const n = activeColorRules().length;
       const label = $("colorFillBtnLabel");
-      if (label) label.textContent = n > 0 ? `${n} 填色` : "填色";
+      if (label) label.textContent = n > 0 ? T("toolbar.colorFillN", { n }) : T("toolbar.colorFill");
     }
     function purgeColorRulesForField(fieldKey) {
       const key = String(fieldKey || "");
@@ -4696,7 +4927,7 @@
       }).length;
       const btn = $("fieldConfigBtn");
       const label = btn?.querySelector("span:not(.vt-icon)");
-      if (label) label.textContent = n > 0 ? `字段配置 · 隐藏${n}` : "字段配置";
+      if (label) label.textContent = n > 0 ? T("toolbar.fieldConfigHidden", { n }) : T("toolbar.fieldConfig");
       if (btn) {
         const panelOpen = !!$("fieldConfigPanel")?.classList.contains("show");
         btn.classList.toggle("has-config", n > 0);
@@ -4709,11 +4940,11 @@
       if (!label) return;
       const rules = effectiveSortRules();
       if (!rules.length) {
-        label.textContent = "排序";
+        label.textContent = T("toolbar.sort");
       } else {
         label.textContent = rules.length > 1
-          ? `${rules.length} 排序`
-          : `排序 · ${columnDisplayLabel(rules[0].field)}${rules[0].dir === "desc" ? "↓" : "↑"}`;
+          ? T("toolbar.sortN", { n: rules.length })
+          : T("toolbar.sortOne", { field: columnDisplayLabel(rules[0].field), arrow: rules[0].dir === "desc" ? "↓" : "↑" });
       }
       if (btn) {
         const panelOpen = !!$("sortPanel")?.classList.contains("show");
@@ -4815,7 +5046,7 @@
     }
     function sortDirLabels(kind) {
       if (kind === "number" || kind === "date" || kind === "formula") return { asc: "0 → 9", desc: "9 → 0" };
-      if (kind === "select") return { asc: "选项顺序", desc: "选项倒序" };
+      if (kind === "select") return { asc: T("sortgroup.optAsc"), desc: T("sortgroup.optDesc") };
       return { asc: "A → Z", desc: "Z → A" };
     }
     function sortFieldIconSvg(field) {
@@ -4871,7 +5102,7 @@
               <span>${escapeHtml(columnDisplayLabel(c.key))}</span>
             </button>
           `).join("")
-        : `<div class="sfm-empty">无可用字段</div>`;
+        : `<div class="sfm-empty">${T("sortgroup.noFields")}</div>`;
     }
     function openSortAddMenu() {
       const menu = $("sortAddMenu");
@@ -4925,7 +5156,7 @@
       syncPrimarySortFromRules();
       const rules = effectiveSortRules();
       if (!rules.length) {
-        box.innerHTML = `<div class="sfm-empty" style="padding:12px 4px">暂无排序条件，点击下方「添加条件」</div>`;
+        box.innerHTML = `<div class="sfm-empty" style="padding:12px 4px">${T("sortgroup.emptySort")}</div>`;
         syncSortBtnLabel();
         return;
       }
@@ -4954,7 +5185,7 @@
     }
     function moveSortRule(fromId, toId, place = "before") {
       if (!fromId || !toId || fromId === toId) return false;
-      if (!assertCanEditViewConfig("调整排序")) return false;
+      if (!assertCanEditViewConfig(T("toast.actionSort"))) return false;
       const prev = effectiveSortRules();
       const build = (p) => {
         const rules = prev.map((r) => ({ ...r }));
@@ -5086,7 +5317,7 @@
       });
     }
     function applySortRules({ reload = false } = {}) {
-      if (!assertCanEditViewConfig("调整排序")) return;
+      if (!assertCanEditViewConfig(T("toast.actionSort"))) return;
       syncPrimarySortFromRules();
       captureCurrentViewState({ markLayoutDirty: true });
       syncSortBtnLabel();
@@ -5107,7 +5338,7 @@
     }
     function maybeAutoApplySort() {
       // 中文备注：autoSort 关闭时原先不走 applySortRules，也会漏掉锁定视图权限校验。
-      if (!assertCanEditViewConfig("调整排序")) return;
+      if (!assertCanEditViewConfig(T("toast.actionSort"))) return;
       if (state.autoSort === false) {
         syncPrimarySortFromRules();
         captureCurrentViewState({ markLayoutDirty: true });
@@ -5190,8 +5421,8 @@
       const label = $("groupBtnLabel");
       const btn = $("groupBtn");
       if (label) {
-        if (!rules.length) label.textContent = "分组";
-        else label.textContent = `${rules.length} 分组`;
+        if (!rules.length) label.textContent = T("toolbar.group");
+        else label.textContent = T("toolbar.groupN", { n: rules.length });
       }
       if (btn) {
         const panelOpen = !!$("groupPanel")?.classList.contains("show");
@@ -5201,7 +5432,7 @@
       const addBtn = $("groupAddBtn");
       if (addBtn) {
         addBtn.disabled = rules.length >= MAX_GROUP_RULES;
-        addBtn.title = rules.length >= MAX_GROUP_RULES ? `最多 ${MAX_GROUP_RULES} 级分组` : "选择分组字段";
+        addBtn.title = rules.length >= MAX_GROUP_RULES ? T("toolbar.groupMaxTitle", { n: MAX_GROUP_RULES }) : T("toolbar.groupPickTitle");
       }
     }
     function groupableFieldDefs() {
@@ -5244,7 +5475,7 @@
       closeGroupFieldMenus();
       if (!willOpen) return;
       if (effectiveGroupRules().length >= MAX_GROUP_RULES) {
-        toast(`最多设置 ${MAX_GROUP_RULES} 级分组`, true);
+        toast(T("toast.groupMax", { n: MAX_GROUP_RULES }), true);
         return;
       }
       renderGroupAddMenu($("groupAddSearch")?.value || "");
@@ -5284,7 +5515,7 @@
               <span>${escapeHtml(columnDisplayLabel(c.key))}</span>
             </button>
           `).join("")
-        : `<div class="gfm-empty">无匹配字段</div>`;
+        : `<div class="gfm-empty">${T("sortgroup.noMatchFields")}</div>`;
       return menu;
     }
     function renderGroupRules() {
@@ -5302,7 +5533,7 @@
         const labels = sortDirLabels(sortFieldKind(rule.field));
         return `
           <div class="group-rule" data-group-id="${escapeAttr(rule.id)}">
-            <span class="gr-handle" data-group-drag draggable="true" title="拖拽调整分组层级">${handleSvg}</span>
+            <span class="gr-handle" data-group-drag draggable="true" title="${T("sortgroup.dragLevel")}">${handleSvg}</span>
             <div class="gr-field-wrap">
               <button type="button" class="gr-field-btn" data-open-group-field>
                 <span class="gr-field-label">${escapeHtml(columnDisplayLabel(rule.field))}</span>
@@ -5357,7 +5588,7 @@
     }
     function groupValueLabel(raw, field, preKind = null) {
       const text = String(raw ?? "").trim();
-      if (!text) return "(为空)";
+      if (!text) return T("value.emptyGroup");
       const kind = preKind != null ? preKind : sortFieldKind(field);
       if (kind === "date") return formatGroupDateLabel(text);
       return text;
@@ -5521,7 +5752,7 @@
       render();
     }
     function applyGroupRules({ sync = false } = {}) {
-      if (!assertCanEditViewConfig("调整分组")) return;
+      if (!assertCanEditViewConfig(T("toast.actionGroup"))) return;
       state.groupRules = normalizeGroupRules(state.groupRules);
       state.collapsedGroups = new Set();
       // 中文备注：分组重建展示行后旧 rowIndex 失效，清掉选区/焦点避免幽灵编辑。
@@ -5538,7 +5769,7 @@
       const rules = effectiveFilterRules();
       const n = rules.length;
       const label = $("filterBtnLabel");
-      if (label) label.textContent = n > 0 ? `${n} 筛选` : "筛选";
+      if (label) label.textContent = n > 0 ? T("toolbar.filterN", { n }) : T("toolbar.filter");
       const btn = $("filterBtn");
       if (btn) {
         const panelOpen = !!$("filterPanel")?.classList.contains("show");
@@ -5559,14 +5790,14 @@
       return true;
     }
     async function saveFilterChanges() {
-      if (!assertCanEditViewConfig("同步筛选")) return;
+      if (!assertCanEditViewConfig(T("toast.actionSyncFilter"))) return;
       const view = activeView();
       if (!view) return;
       readFilterRulesFromDom();
       $("keyword").value = keywordFromFilters();
       syncFilterBtnLabel();
       const ok = await flushViewCloudSync(view.tableId, { quiet: false });
-      if (ok) toast("已同步到云端");
+      if (ok) toast(T("toast.synced"));
     }
     async function clearFilterChanges() {
       // 中文备注：双轨草稿已移除；保留空实现避免旧调用报错。
@@ -5587,10 +5818,10 @@
       if (touched) persistViews({ syncServer: false });
     }
     const ROW_HEIGHT_PRESETS = [
-      { id: "low", label: "低", px: 36 },
-      { id: "medium", label: "中等", px: 56 },
-      { id: "high", label: "高", px: 84 },
-      { id: "xhigh", label: "超高", px: 120 }
+      { id: "low", labelKey: "rowheight.low", px: 36 },
+      { id: "medium", labelKey: "rowheight.medium", px: 56 },
+      { id: "high", labelKey: "rowheight.high", px: 84 },
+      { id: "xhigh", labelKey: "rowheight.xhigh", px: 120 }
     ];
     function normalizeRowHeight(v) {
       const id = String(v || "low");
@@ -5634,7 +5865,7 @@
       const id = currentRowHeightId();
       const preset = ROW_HEIGHT_PRESETS.find((p) => p.id === id);
       const label = $("rowHeightBtnLabel");
-      if (label) label.textContent = "行高"; // 中文备注：按钮只显示「行高」，密度在面板里选
+      if (label) label.textContent = T("toolbar.rowHeight"); // 中文备注：按钮只显示「行高」，密度在面板里选
       const btn = $("rowHeightBtn");
       if (btn) {
         const panelOpen = !!$("rowHeightPanel")?.classList.contains("show");
@@ -5655,11 +5886,11 @@
       box.innerHTML = ROW_HEIGHT_PRESETS.map((p) => `
         <button type="button" class="rh-opt ${p.id === cur ? "is-active" : ""}" data-row-height="${p.id}">
           ${icons[p.id] || icons.low}
-          <span>${p.label}</span>
+          <span>${T(p.labelKey)}</span>
         </button>`).join("");
     }
     function setRowHeightDraft(nextId) {
-      if (!assertCanEditViewConfig("调整行高")) return;
+      if (!assertCanEditViewConfig(T("toast.actionRowHeight"))) return;
       const view = activeView();
       if (!view) return;
       const next = normalizeRowHeight(nextId);
@@ -5736,7 +5967,7 @@
       if (!view) return;
       try { clearViewStyleDirty(view.tableId, view.viewId); } catch (_) {}
       const ok = await flushViewCloudSync(view.tableId, { quiet: false });
-      if (ok) toast("已同步到云端");
+      if (ok) toast(T("toast.synced"));
     }
     function clearLayoutChanges() {
       // 中文备注：双轨草稿已移除；保留空实现避免旧调用报错。
@@ -5779,7 +6010,7 @@
       } else {
         renderViewTabs();
       }
-      toast("已清除未保存的视图设置");
+      toast(T("toast.clearedUnsaved"));
       return true;
     }
     function tableHasUnsavedViewDraft(tableId) {
@@ -5923,7 +6154,7 @@
         return true;
       }
       if (blocked) {
-        toast("没有可保存的视图（当前脏草稿所在视图不可编辑）", true);
+        toast(T("toast.noSaveableView"), true);
         return false;
       }
       return true;
@@ -6360,11 +6591,11 @@
     function renderChoicePicker({ hiddenClass, value, options, disabled = false, variant = "" }) {
       const list = Array.isArray(options) ? options : [];
       const hit = list.find((o) => String(o.value) === String(value));
-      const selected = hit || list[0] || { value: "", label: "请选择" };
+      const selected = hit || list[0] || { value: "", label: T("filter.pick") };
       const currentValue = hit ? String(selected.value) : String(value ?? selected.value ?? "");
       const currentLabel = hit
         ? String(selected.label)
-        : (String(value || "") ? String(value) : String(selected.label || "请选择"));
+        : (String(value || "") ? String(value) : String(selected.label || T("filter.pick")));
       const cls = String(hiddenClass || "").split(/\s+/).filter(Boolean).map(escapeAttr).join(" ");
       return `
         <div class="choice-picker ${variant ? `is-${variant}` : ""}" data-choice-picker>
@@ -6444,7 +6675,7 @@
         }
       }
       if (kind === "number") {
-        return `<input class="fr-value" type="number" step="any" placeholder="请输入数字" value="${escapeAttr(selected[0] || rule.value || "")}" ${disabled ? "disabled" : ""} />`;
+        return `<input class="fr-value" type="number" step="any" placeholder="${T("filter.pickNumber")}" value="${escapeAttr(selected[0] || rule.value || "")}" ${disabled ? "disabled" : ""} />`;
       }
       // 中文备注：单选/多选列一律绑定选项；算子决定控件——等于/不等于=单选，包含/不包含=多选。
       if (kind === "select" || kind === "multi" || kind === "checkbox") {
@@ -6474,11 +6705,11 @@
         const values = [...new Set(list.filter(Boolean).map(String))];
         if (current && !values.includes(current)) values.unshift(current);
         return `<select class="fr-value fr-value-select" ${disabled ? "disabled" : ""}>
-          <option value="">请选择</option>
+          <option value="">${T("filter.pick")}</option>
           ${values.map((v) => `<option value="${escapeAttr(v)}" ${v === current ? "selected" : ""}>${escapeHtml(v)}</option>`).join("")}
         </select>`;
       }
-      return `<input class="fr-value" type="text" placeholder="请输入" value="${escapeAttr(selected[0] || rule.value || "")}" ${disabled ? "disabled" : ""} />`;
+      return `<input class="fr-value" type="text" placeholder="${T("filter.pickInput")}" value="${escapeAttr(selected[0] || rule.value || "")}" ${disabled ? "disabled" : ""} />`;
     }
     function normalizeCompareText(value) {
       return String(value ?? "")
@@ -6948,14 +7179,14 @@
           if (serverListMode && serverFilters.length) {
             toast(isAgencyTenant()
               ? `全窗口筛选 · 共 ${state.pager.total} 条`
-              : `全窗口筛选 · 共 ${state.pager.total} 条，已加载 ${state.rows.length}，滚到底继续加载`);
+              : T("toolbar.windowFilterInfo", { total: state.pager.total, loaded: state.rows.length }));
           }
         });
         return;
       }
       // 中文备注：本地筛选行数可能骤减，先钳滚动再画，避免去掉条件后白屏。
       if (!preview && catalogClientOnly) {
-        toast("该条件仅在已加载行内生效；全窗口请用集数/名称/版权方/预估上线日等标准列", true);
+        toast(T("toast.condLoadedOnly"), true);
       }
       if (preview) scheduleFilterPreviewCompute();
       else renderAfterLocalFilter();
@@ -7038,7 +7269,7 @@
       if (!view) return;
       view.filterRules = normalizeFilterRules(view.filterRules);
       if (!view.filterRules.length) {
-        box.innerHTML = `<div class="sfm-empty" style="padding:12px 4px">暂无筛选条件，点击下方「添加条件」</div>`;
+        box.innerHTML = `<div class="sfm-empty" style="padding:12px 4px">${T("filter.emptyRules")}</div>`;
         syncFilterBtnLabel();
         return;
       }
@@ -7049,7 +7280,7 @@
         const opPicker = renderChoicePicker({
           hiddenClass: "fr-op",
           value: rule.op,
-          options: filterOpsForField(rule.field),
+          options: filterOpsForField(rule.field).map((o) => ({ ...o, label: opT(o) })),
           variant: "op"
         });
         // 中文备注：为空/不为空不渲染值控件，避免隐藏节点仍占位、切 op 时 × 左移被误点。
@@ -7057,7 +7288,7 @@
         const kind = filterFieldKind(rule.field);
         return `
           <div class="filter-rule ${noValue ? "no-value" : ""}" data-rule-id="${escapeAttr(rule.id)}" data-field-kind="${escapeAttr(kind)}">
-            <span class="fr-handle" data-filter-drag ${canDrag ? 'draggable="true"' : ""} title="拖拽调整顺序">${handleSvg}</span>
+            <span class="fr-handle" data-filter-drag ${canDrag ? 'draggable="true"' : ""} title="${T("filter.dragOrder")}">${handleSvg}</span>
             <div class="field-picker">
               <input type="hidden" class="fr-field-key" value="${escapeAttr(rule.field)}" />
               <button type="button" class="field-picker-btn" data-open-field-picker>
@@ -7069,7 +7300,7 @@
             </div>
             ${opPicker}
             ${valueControl}
-            <button type="button" class="fr-remove" title="删除条件">×</button>
+            <button type="button" class="fr-remove" title="${T("filter.removeTitle")}">×</button>
           </div>
         `;
       }).join("");
@@ -7161,31 +7392,31 @@
       if (!view) return;
       view.colorRules = normalizeColorRules(view.colorRules);
       if (!view.colorRules.length) {
-        box.innerHTML = `<div class="sfm-empty" style="padding:12px 4px">暂无填色条件，点击下方「添加条件」</div>`;
+        box.innerHTML = `<div class="sfm-empty" style="padding:12px 4px">${T("filter.colorEmptyRules")}</div>`;
         syncColorFillBtnLabel();
         return;
       }
       box.innerHTML = view.colorRules.map((rule) => {
         const noValue = !ruleNeedsValue(rule.op);
         const scopeOptions = COLOR_RULE_SCOPES.map((s) =>
-          `<option value="${s.value}" ${s.value === rule.scope ? "selected" : ""}>${s.label}</option>`
+          `<option value="${s.value}" ${s.value === rule.scope ? "selected" : ""}>${T("filter.scope." + s.value)}</option>`
         ).join("");
         const opOptions = filterOpsForField(rule.field).map((op) =>
-          `<option value="${op.value}" ${op.value === rule.op ? "selected" : ""}>${op.label}</option>`
+          `<option value="${op.value}" ${op.value === rule.op ? "selected" : ""}>${opT(op)}</option>`
         ).join("");
         const valueControl = noValue ? "" : filterValueControl(rule, false);
         const kind = filterFieldKind(rule.field);
         const fgStored = normalizeRuleTextColor(rule.textColor);
-        const fgLabel = fgStored === COLOR_RULE_TEXT_BLACK ? "黑" : "白";
+        const fgLabel = fgStored === COLOR_RULE_TEXT_BLACK ? T("filter.textBlack") : T("filter.textWhite");
         return `
           <div class="color-rule ${noValue ? "no-value" : ""}" data-rule-id="${escapeAttr(rule.id)}" data-field-kind="${escapeAttr(kind)}" draggable="true">
-            <span class="cr-handle" title="拖拽调整优先级">⋮⋮</span>
+            <span class="cr-handle" title="${T("filter.dragPriority")}">⋮⋮</span>
             <div class="cr-swatch-wrap">
-              <button type="button" class="cr-swatch" data-open-color data-swatch="bg" data-color="${escapeAttr(rule.color)}" style="background:${escapeAttr(rule.color)}" title="背景色"></button>
+              <button type="button" class="cr-swatch" data-open-color data-swatch="bg" data-color="${escapeAttr(rule.color)}" style="background:${escapeAttr(rule.color)}" title="${T("filter.bgColor")}"></button>
               <div class="cr-color-pop" data-color-pop data-swatch="bg">
-                <div class="cr-pop-title"><span>背景色</span></div>
+                <div class="cr-pop-title"><span>${T("filter.bgColor")}</span></div>
                 <div class="cr-pop-grid">${renderColorRulePalette(rule.color)}</div>
-                <label class="cr-bold"><input class="cr-bold-input" type="checkbox" ${rule.bold ? "checked" : ""} />文字加粗</label>
+                <label class="cr-bold"><input class="cr-bold-input" type="checkbox" ${rule.bold ? "checked" : ""} />${T("filter.bold")}</label>
               </div>
             </div>
             <select class="cr-scope">${scopeOptions}</select>
@@ -7201,9 +7432,9 @@
             <select class="cr-op">${opOptions}</select>
             ${valueControl}
             <div class="cr-swatch-wrap is-fg">
-              <button type="button" class="cr-swatch is-text" data-toggle-text-color data-swatch="fg" data-color="${escapeAttr(fgStored)}" style="${textColorSwatchStyle(fgStored)}" title="字体颜色：${fgLabel}（点击切换黑/白）">A</button>
+              <button type="button" class="cr-swatch is-text" data-toggle-text-color data-swatch="fg" data-color="${escapeAttr(fgStored)}" style="${textColorSwatchStyle(fgStored)}" title="${T("filter.textColorTitle", { c: fgLabel })}">A</button>
             </div>
-            <button type="button" class="cr-remove" title="删除条件">×</button>
+            <button type="button" class="cr-remove" title="${T("filter.removeTitle")}">×</button>
           </div>
         `;
       }).join("");
@@ -8494,12 +8725,12 @@
       if (mode === "personal") return "个人";
       return "公共";
     }
-    function assertCanEditViewConfig(action = "修改视图配置") {
+    function assertCanEditViewConfig(action = T("toast.defaultAction")) {
       const view = activeView();
       if (canEditViewConfig(view)) return true;
       const mode = normalizeProtectMode(view?.protectMode, !!view?.locked);
-      if (mode === "locked") toast(`当前为锁定视图，不能${action}`, true);
-      else toast(`这是他人的个人视图，不能${action}`, true);
+      if (mode === "locked") toast(T("toast.lockedViewDeny", { action }), true);
+      else toast(T("toast.personalViewDeny", { action }), true);
       return false;
     }
 
@@ -8903,8 +9134,8 @@
       const addRowBlocked = isCatalogReadOnlyTable(currentTableId());
       if (addBtn) {
         addBtn.title = addRowBlocked
-          ? "当前表只读，无法新增行"
-          : "新增行";
+          ? T("toolbar.addRowBlocked")
+          : T("toolbar.addRowTitle");
         addBtn.disabled = addRowBlocked;
         addBtn.classList.toggle("is-disabled", addRowBlocked);
       }
@@ -8914,14 +9145,14 @@
       const active = t.tableId === activeId;
       const name = tableLabelById(t.tableId);
       const custom = !t.builtin;
-      const ownerText = custom && t.owner ? `<span class="sb-owner" title="创建人：${escapeAttr(t.owner)}">${escapeHtml(t.owner)}</span>` : "";
+      const ownerText = custom && t.owner ? `<span class="sb-owner" title="${T("sidebar.creator")}${escapeAttr(t.owner)}">${escapeHtml(t.owner)}</span>` : "";
       return `
         <div class="sidebar-item ${active ? "active" : ""}" role="button" tabindex="0" draggable="true" data-table-id="${escapeAttr(t.tableId)}" title="${escapeAttr(name)}">
-          <span class="sb-handle" data-table-drag="${escapeAttr(t.tableId)}" title="拖拽调整表顺序">${SB_HANDLE_ICON}</span>
+          <span class="sb-handle" data-table-drag="${escapeAttr(t.tableId)}" title="${T("sidebar.dragOrder")}">${SB_HANDLE_ICON}</span>
           ${TABLE_ICON}
           <span class="sb-name">${escapeHtml(name)}</span>
           ${ownerText}
-          <span class="sb-more" data-table-menu="${escapeAttr(t.tableId)}" title="更多">⋯</span>
+          <span class="sb-more" data-table-menu="${escapeAttr(t.tableId)}" title="${T("sidebar.more")}">⋯</span>
         </div>
       `;
     }
@@ -8940,8 +9171,8 @@
       const builtinItems = ordered.filter((t) => t.builtin).map((t) => renderSidebarItem(t, activeId)).join("");
       const customItems = ordered.filter((t) => !t.builtin).map((t) => renderSidebarItem(t, activeId)).join("");
       box.innerHTML = `
-        ${builtinItems ? `<div class="sidebar-group-label">系统表</div>${builtinItems}` : ""}
-        ${customItems ? `<div class="sidebar-group-label">${isAgencyTenant() ? "共享表格" : "我的表格"}</div>${customItems}` : (isAgencyTenant() ? `<div class="sidebar-empty-hint">点击上方 + 新建表格</div>` : "")}
+        ${builtinItems ? `<div class="sidebar-group-label">${T("sidebar.builtinGroup")}</div>${builtinItems}` : ""}
+        ${customItems ? `<div class="sidebar-group-label">${isAgencyTenant() ? T("sidebar.sharedTables") : T("sidebar.myTables")}</div>${customItems}` : (isAgencyTenant() ? `<div class="sidebar-empty-hint">${T("sidebar.emptyHint")}</div>` : "")}
       `;
       bindSidebarDrag();
     }
@@ -8955,7 +9186,7 @@
       if (ids.join("|") === prev) return false;
       persistTableOrder(ids);
       renderSidebar();
-      toast("表格顺序已更新");
+      toast(T("toast.tableOrderUpdated"));
       return true;
     }
     function bindSidebarDrag() {
@@ -9170,22 +9401,22 @@
       popup.innerHTML = `
         <button type="button" data-sidebar-action="rename">
           <span class="sm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
-          <span>重命名</span>
+          <span>${T("sidebar.rename")}</span>
         </button>
         ${custom && canManage ? `
         <button type="button" data-sidebar-action="delete">
           <span class="sm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></span>
-          <span>删除表格</span>
+          <span>${T("sidebar.deleteTable")}</span>
         </button>
         ` : ""}
         <div class="sm-sep"></div>
         <div class="sm-usage" data-sidebar-usage>
           <div class="sm-usage-title">
             <span class="sm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span>
-            <span>数据用量 · ${pct}%</span>
+            <span>${T("sidebar.usage", { n: pct })}</span>
           </div>
           <div class="sm-usage-bar"><i style="width:${pct}%"></i></div>
-          <div class="sm-usage-meta"><strong id="sidebarUsageCount">${used.toLocaleString("zh-CN")}</strong> / ${TABLE_USAGE_CAP.toLocaleString("zh-CN")} 行记录使用中</div>
+          <div class="sm-usage-meta"><strong id="sidebarUsageCount">${used.toLocaleString("zh-CN")}</strong> / ${TABLE_USAGE_CAP.toLocaleString("zh-CN")} ${T("sidebar.usageRows")}</div>
         </div>
       `;
       popup.classList.add("show");
@@ -9206,13 +9437,13 @@
       const def = allTableDefs().find((t) => t.tableId === tableId);
       if (!def) return;
       if (isCustomTableId(tableId) && !canManageCustomTable(tableId)) {
-        return toast("仅创建人或管理员可重命名此表格", true);
+        return toast(T("toast.renamePermDenied"), true);
       }
       const current = tableLabelById(tableId);
-      const name = prompt(isCustomTableId(tableId) ? "重命名数据表" : "重命名数据表（仅本机展示名）", current);
+      const name = prompt(isCustomTableId(tableId) ? T("toast.renamePrompt") : T("toast.renamePromptLocal"), current);
       if (name == null) return;
       const next = name.trim().slice(0, 30);
-      if (!next) return toast("名称不能为空", true);
+      if (!next) return toast(T("toast.nameEmpty"), true);
       if (isCustomTableId(tableId)) {
         try {
           const data = await api("/api/v1/ops/tables/rename", {
@@ -9229,9 +9460,9 @@
           persistTableLabels();
           renderSidebar();
           renderViewTabs();
-          toast(`已重命名为「${next}」`);
+          toast(T("toast.renamed", { n: next }));
         } catch (e) {
-          toast(e.message || "重命名失败", true);
+          toast(e.message || T("toast.renameFailed"), true);
         }
         return;
       }
@@ -9240,11 +9471,11 @@
       persistTableLabels();
       renderSidebar();
       renderViewTabs();
-      toast(`已重命名为「${next}」（${tableId} 未变）`);
+      toast(T("toast.renamedIdUnchanged", { n: next, id: tableId }));
     }
     async function deleteCustomTable(tableId) {
-      if (!isCustomTableId(tableId)) return toast("系统表不能删除", true);
-      if (!canManageCustomTable(tableId)) return toast("仅创建人或管理员可删除此表格", true);
+      if (!isCustomTableId(tableId)) return toast(T("toast.systemTableNoDelete"), true);
+      if (!canManageCustomTable(tableId)) return toast(T("toast.deletePermDenied"), true);
       const name = tableLabelById(tableId);
       const desc = isBlankTable(tableId)
         ? "将删除本表全部行列，不影响主表数据。"
@@ -9275,9 +9506,9 @@
           renderSidebar();
           renderViewTabs();
         }
-        toast(`已删除「${name}」`);
+        toast(T("toast.deleted", { n: name }));
       } catch (e) {
-        toast(e.message || "删除失败", true);
+        toast(e.message || T("toast.deleteFailed"), true);
       }
     }
     // 中文备注：新建表格本期仅暴露空白表格入口（kind=blank）；历史筛选表仍可用旧数据继续跑。
@@ -9288,7 +9519,7 @@
       return `未命名表格 ${mm}-${dd}`;
     }
     function createCustomTable() {
-      if (!getToken()) return showLogin("请先登录后再新建表格");
+      if (!getToken()) return showLogin(T("toast.loginFirstTable"));
       openTableCreateModal();
     }
     function openTableCreateModal() {
@@ -9340,9 +9571,9 @@
         renderSidebar();
         closeTableCreateModal();
         await switchTable(table.tableId);
-        toast("点底部或工具栏新增行开始填写");
+        toast(T("toast.createTableHint"));
       } catch (e) {
-        toast(e.message || "创建表格失败", true);
+        toast(e.message || T("toast.createTableFailed"), true);
       } finally {
         if (okBtn) {
           okBtn.dataset.busy = "";
@@ -10876,7 +11107,7 @@
     // 中文备注：空白表新增行=直接建空行写入 sheet_row，无需走主表新增行弹层。
     async function addBlankRow() {
       if (state._blankAddRowInFlight) return;
-      if (!getToken()) return showLogin("请先登录后再新增行");
+      if (!getToken()) return showLogin(T("toast.loginFirstRow"));
       if (!isBlankTable(currentTableId())) return;
       const tableId = currentTableId();
       state._blankAddRowInFlight = true;
@@ -10888,18 +11119,18 @@
         const row = data?.row || {};
         row.opsKey = data?.opsKey || row.opsKey;
         if (!row.opsKey) {
-          toast("新增行失败：服务端未返回行号", true);
+          toast(T("toast.addRowNoRowNo"), true);
           return;
         }
         const n = mountBlankSheetRowsLocal([row]);
         if (!n) {
-          toast("新增行失败", true);
+          toast(T("toast.addRowFailed"), true);
           return;
         }
-        toast("已新增行");
+        toast(T("toast.rowAdded"));
         void softSyncBlankSheetRows({ force: true });
       } catch (e) {
-        toast(e.message || "新增行失败", true);
+        toast(e.message || T("toast.addRowFailed"), true);
       } finally {
         state._blankAddRowInFlight = false;
       }
@@ -10927,9 +11158,9 @@
     }
     function openRowCreateModal() {
       if (isBlankTable(currentTableId())) return addBlankRow();
-      if (isCatalogReadOnlyTable(currentTableId())) return toast("当前表只读，无法新增行", true);
-      if (isAdxTableActive()) return toast("ADX 表暂不支持手动新增行", true);
-      if (!getToken()) return showLogin("请先登录后再新增行");
+      if (isCatalogReadOnlyTable(currentTableId())) return toast(T("toast.tableReadOnly"), true);
+      if (isAdxTableActive()) return toast(T("toast.adxNoManualAdd"), true);
+      if (!getToken()) return showLogin(T("toast.loginFirstRow"));
       closeRowCreateOptionMenu();
       fillRowCreateCopyrightOptions();
       $("rowCreateName").value = "";
@@ -10973,13 +11204,13 @@
       const hint = $("rowCreateSubmitHint");
       if (hint) { hint.textContent = ""; hint.hidden = true; }
       if (!seriesName) {
-        toast("请填写名称", true);
+        toast(T("toast.fillName"), true);
         $("rowCreateName")?.focus();
         return;
       }
-      if (!copyrightOwner) return toast("请选择版权", true);
+      if (!copyrightOwner) return toast(T("toast.pickCopyright"), true);
       const dramaType = createDramaTypeForManualRow();
-      if (!dramaType) return toast("当前表不支持新增行", true);
+      if (!dramaType) return toast(T("toast.tableNoAddRow"), true);
       const extras = collectRowCreateExtraValues();
       const customFields = {};
       Object.keys(state.fieldConfigs || {}).forEach((k) => {
@@ -11045,13 +11276,13 @@
           const hiddenByFilter = effectiveFilterRules().length > 0
             && !effectiveFilterRules().every((rule) => matchFilterRule(row, rule));
           if (hiddenByFilter) {
-            toast(`已新增「${seriesName}」，但被当前筛选隐藏（例如日期不等于筛选日）。清空/调整筛选后可见`, true);
+            toast(T("toast.rowHiddenByFilter", { n: seriesName }), true);
           } else {
-            toast(keepOpen ? `已新增「${seriesName}」，可继续添加` : "已新增行");
+            toast(keepOpen ? T("toast.rowAddedContinue", { n: seriesName }) : T("toast.rowAdded"));
           }
         } else {
           await loadList(true);
-          toast("已新增行");
+          toast(T("toast.rowAdded"));
         }
         if (keepOpen) {
           $("rowCreateName").value = "";
@@ -11164,7 +11395,7 @@
     }
     function openFieldCreateModal(opts = {}) {
       // 中文备注：新增字段是全员共享配置，不依赖视图锁定；仅要求已登录。
-      if (!getToken()) return showLogin("请先登录后再新增字段");
+      if (!getToken()) return showLogin(T("toast.loginFirstField"));
       state.fieldCreateInsert = {
         relativeTo: opts.relativeTo || "",
         side: opts.side === "left" || opts.side === "right" ? opts.side : ""
@@ -11250,13 +11481,13 @@
     let colInsertBusy = false;
     async function insertColumnsRelative(relativeTo, side, count) {
       if (colInsertBusy) return;
-      if (!getToken()) return showLogin("请先登录后再新增字段");
+      if (!getToken()) return showLogin(T("toast.loginFirstField"));
       const n = clampColInsertCount(count);
       const titles = defaultInsertColTitles(n);
-      if (titles.length < n) return toast("可用默认列名不足，请先重命名已有「名称」列", true);
+      if (titles.length < n) return toast(T("toast.defaultColNamesInsufficient"), true);
       const insertOpts = { relativeTo, side };
       colInsertBusy = true;
-      toast(`正在插入 ${n} 列…`);
+      toast(T("toast.insertingCols", { n }));
       const createdKeys = [];
       try {
         for (let i = 0; i < n; i++) {
@@ -11270,8 +11501,8 @@
         if (isBlankTable(currentTableId())) rebuildColorStyleCache();
         bumpDataGen();
         sheetApi?.refresh?.();
-        const sideLabel = side === "left" ? "向左" : "向右";
-        toast(`已${sideLabel}插入 ${n} 列（${titles[0]}${n > 1 ? `…${titles[n - 1]}` : ""}）`);
+        const sideLabel = side === "left" ? T("toast.insertedLeft") : T("toast.insertedRight");
+        toast(T("toast.insertedCols", { side: sideLabel, n, first: titles[0], last: n > 1 ? `…${titles[n - 1]}` : "" }));
         const lastKey = createdKeys[createdKeys.length - 1];
         if (lastKey) {
           try { sheetApi?.ensureCellVisible?.(0, lastKey); } catch (_) {}
@@ -11296,9 +11527,9 @@
       if (okBtn?.dataset.busy === "1") return;
       const title = String($("fieldCreateTitle")?.value || "").trim();
       let fieldType = String($("fieldCreateType")?.value || "text").trim().toLowerCase();
-      if (!title) return toast("请填写字段标题", true);
+      if (!title) return toast(T("toast.fillFieldTitle"), true);
       if (!["text", "select", "multi", "date", "checkbox", "formula"].includes(fieldType)) fieldType = "text";
-      if (!getToken()) return showLogin("请先登录后再新增字段");
+      if (!getToken()) return showLogin(T("toast.loginFirstField"));
       const insertOpts = { ...(state.fieldCreateInsert || {}) };
       if (okBtn) {
         okBtn.dataset.busy = "1";
@@ -12483,7 +12714,7 @@
           return;
         }
         if (urlTableId && urlTableId.startsWith("tbl_u_")) {
-          toast("表格不存在或已删除", true);
+          toast(T("toast.tableNotFound"), true);
         }
         state.activeTableId = fallback.tableId;
         state.views = (state.views || []).filter((v) => v.tableId !== blockedId || v.tableId === fallback.tableId);
@@ -13316,13 +13547,13 @@
       mask.innerHTML = `
         <div class="view-protect-confirm-card">
           <div class="vpc-head">
-            <h3 id="viewProtectConfirmTitle">锁定视图</h3>
+            <h3 id="viewProtectConfirmTitle" data-i18n="vp.lockTitle">Locked view</h3>
             <button type="button" class="vpc-close" id="viewProtectConfirmClose" aria-label="关闭">×</button>
           </div>
           <div class="vpc-body" id="viewProtectConfirmBody"></div>
           <div class="vpc-foot">
-            <button type="button" class="secondary" id="viewProtectConfirmCancel">取消</button>
-            <button type="button" class="vpc-ok" id="viewProtectConfirmOk">确认</button>
+            <button type="button" class="secondary" id="viewProtectConfirmCancel" data-i18n="common.cancel">Cancel</button>
+            <button type="button" class="vpc-ok" id="viewProtectConfirmOk" data-i18n="common.confirm">Confirm</button>
           </div>
         </div>`;
       document.body.appendChild(mask);
@@ -13465,7 +13696,7 @@
       const view = currentTableViewById(viewId);
       if (!view) return;
       if (!canRenameView(view)) {
-        toast("无法重命名该视图", true);
+        toast(T("toast.viewRenameDenied"), true);
         return;
       }
       closeViewMenu();
@@ -13495,7 +13726,7 @@
         finished = true;
         let next = commit ? String(input.value || "").trim() : original;
         if (commit && !next) {
-          toast("名称不能为空", true);
+          toast(T("toast.nameEmpty"), true);
           next = original;
         }
         const name = (commit ? next : original).slice(0, 20) || original;
@@ -13519,10 +13750,10 @@
               target.name = original;
               persistViews();
               renderViewTabs();
-              toast("重命名未同步到云端，已恢复原名称", true);
+              toast(T("toast.renameSyncFailed"), true);
               return;
             }
-            toast(`已重命名为「${name}」（已同步到云端）`);
+            toast(T("toast.renamedSynced", { n: name }));
             if (state.viewTabsRenderPending) renderViewTabs();
             return;
           } else if (!name) {
@@ -13855,7 +14086,8 @@
       return "text";
     }
     function fieldTypeLabelOf(typeId) {
-      return FIELD_TYPE_OPTIONS.find((t) => t.id === typeId)?.label || "文本";
+      const def = FIELD_TYPE_OPTIONS.find((t) => t.id === typeId);
+      return def ? T("fieldEdit.type." + def.id) : T("fieldEdit.type.text");
     }
     function fieldTypeIcon(typeId) {
       if (typeId === "select") return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m8 11 2.5 2.5L16 9"/></svg>';
@@ -14289,7 +14521,7 @@
           <div style="margin-top:8px">点击左侧字段插入到公式中；可用 <code>&</code> 与文本拼接。</div>
           <div class="fx-eg">"aweme://playlet?playlet_id=" & [${escapeHtml(columnDisplayLabel(col.key))}]</div>`;
       } else {
-        detail.innerHTML = `<h4>字段引用</h4><div>点击左侧字段，插入为绿色标签。</div>`;
+        detail.innerHTML = `<h4>${T("formula.refsTitle")}</h4><div>${T("formula.refsDescShort")}</div>`;
       }
     }
     function openFormulaEditor() {
@@ -14652,10 +14884,10 @@
       return ["regular", "advanced"].map((group) => {
         const items = FIELD_TYPE_OPTIONS.filter((t) => t.group === group);
         if (!items.length) return "";
-        const head = `<div class="fe-type-group-label">${escapeHtml(FIELD_TYPE_GROUP_LABELS[group])}</div>`;
+        const head = `<div class="fe-type-group-label">${T(group === "advanced" ? "fieldEdit.typeGroupAdvanced" : "fieldEdit.typeGroupRegular")}</div>`;
         const body = items.map((t) => `
           <button type="button" class="fe-type-item ${t.id === typeId ? "is-active" : ""}" data-fe-action="pick-type" data-type="${t.id}">
-            ${fieldTypeIcon(t.id)}<span>${escapeHtml(t.label)}</span>
+            ${fieldTypeIcon(t.id)}<span>${T("fieldEdit.type." + t.id)}</span>
             ${t.id === typeId ? '<span class="fe-check">✓</span>' : ""}
           </button>`).join("");
         return head + body;
@@ -14801,17 +15033,17 @@
       const optionsHtml = showOptions
         ? `
           <div class="fe-section-head">
-            <div class="fe-section-title">选项内容</div>
+            <div class="fe-section-title">${T("fieldEdit.options")}</div>
           </div>
           <div class="fe-options-box">
             ${(draft.options || []).map((opt, idx) => `
               <div class="fe-opt-row" data-opt-index="${idx}">
                 <button type="button" class="fe-color-btn" data-fe-action="toggle-color" data-opt-index="${idx}"
                   style="background:${escapeAttr(opt.color || FIELD_OPTION_COLOR_PALETTE[idx % FIELD_OPTION_COLOR_PALETTE.length])}"
-                  title="选择背景色"></button>
+                  title="${T("fieldEdit.optColor")}"></button>
                 <input class="fe-opt-input" data-opt-index="${idx}" maxlength="64"
-                  placeholder="请输入选项" value="${escapeAttr(opt.value || "")}" />
-                <button type="button" class="fe-opt-del" data-fe-action="remove-opt" data-opt-index="${idx}" title="删除选项">×</button>
+                  placeholder="${T("fieldEdit.optPlaceholder")}" value="${escapeAttr(opt.value || "")}" />
+                <button type="button" class="fe-opt-del" data-fe-action="remove-opt" data-opt-index="${idx}" title="${T("fieldEdit.optDelete")}">×</button>
                 ${draft.colorPickerIndex === idx ? `
                   <div class="fe-color-pop show">
                     <div class="fe-color-grid">
@@ -14822,7 +15054,7 @@
                     </div>
                   </div>` : ""}
               </div>`).join("")}
-            <button type="button" class="fe-add-btn" data-fe-action="add-opt">+ 添加选项</button>
+            <button type="button" class="fe-add-btn" data-fe-action="add-opt">${T("fieldEdit.optAdd")}</button>
           </div>
         `
         : "";
@@ -14833,47 +15065,47 @@
       } else if (typeId === "select" || typeId === "multi") {
         const opts = (draft.options || []).filter((o) => String(o.value || "").trim());
         defaultHtml = `
-          <div class="fe-label">默认值</div>
+          <div class="fe-label">${T("fieldEdit.defaultValue")}</div>
           <select class="fe-default-select" id="fieldEditDefault">
-            <option value="">请选择选项</option>
+            <option value="">${T("fieldEdit.pickOption")}</option>
             ${opts.map((o) => `<option value="${escapeAttr(o.value)}" ${draft.defaultValue === o.value ? "selected" : ""}>${escapeHtml(o.value)}</option>`).join("")}
           </select>`;
       } else if (typeId === "checkbox") {
         defaultHtml = `
-          <div class="fe-label">默认值</div>
+          <div class="fe-label">${T("fieldEdit.defaultValue")}</div>
           <select class="fe-default-select" id="fieldEditDefault">
-            <option value="">未勾选</option>
-            <option value="是" ${draft.defaultValue === "是" || draft.defaultValue === "true" || draft.defaultValue === "1" ? "selected" : ""}>勾选</option>
+            <option value="">${T("fieldEdit.unchecked")}</option>
+            <option value="是" ${draft.defaultValue === "是" || draft.defaultValue === "true" || draft.defaultValue === "1" ? "selected" : ""}>${T("fieldEdit.checked")}</option>
           </select>`;
       } else if (typeId === "date") {
         const dt = normalizeEstimateDateTimeForApi(draft.defaultValue || "");
         defaultHtml = `
-          <div class="fe-label">默认值（精确到时分秒）</div>
+          <div class="fe-label">${T("fieldEdit.defaultValuePrecise")}</div>
           <div class="fe-datetime-mount" id="fieldEditDefaultMount" data-rc-value="${escapeAttr(dt)}"></div>
           <input type="hidden" id="fieldEditDefault" value="${escapeAttr(dt)}" />`;
       } else if (typeId === "formula") {
         const fx = String(draft.defaultValue || "").trim();
         defaultHtml = `
           <div class="fe-section-head">
-            <div class="fe-section-title">公式内容</div>
+            <div class="fe-section-title">${T("fieldEdit.formulaContent")}</div>
           </div>
           <button type="button" class="fe-formula-box" data-fe-action="edit-formula">
             <span class="fe-fx-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
-            编辑公式
+            ${T("fieldEdit.editFormula")}
           </button>
-          ${fx ? `<div class="fe-formula-preview">=${formulaDisplayHtml(fx)}<div data-formula-server-preview style="margin-top:6px;color:#646a73">首行预览：计算中…</div></div>` : ""}`;
+          ${fx ? `<div class="fe-formula-preview">=${formulaDisplayHtml(fx)}<div data-formula-server-preview style="margin-top:6px;color:#646a73">${T("fieldEdit.firstRowPreview")}</div></div>` : ""}`;
       } else {
         defaultHtml = `
-          <div class="fe-label">默认值</div>
+          <div class="fe-label">${T("fieldEdit.defaultValue")}</div>
           <input class="fe-default-input" id="fieldEditDefault" maxlength="255" placeholder="请输入默认值" value="${escapeAttr(draft.defaultValue || "")}" />`;
       }
       const lookupHtml = (typeId === "lookup")
         ? renderLookupFieldEditHtml(draft)
         : "";
       card.innerHTML = `
-        <div class="fe-label">标题</div>
+        <div class="fe-label">${T("fieldEdit.title")}</div>
         <input class="fe-title-input" id="fieldEditTitle" maxlength="40" value="${escapeAttr(draft.title)}" />
-        <div class="fe-label">字段类型</div>
+        <div class="fe-label">${T("fieldEdit.type")}</div>
         <div class="fe-type-wrap">
           <button type="button" class="fe-type" data-fe-action="toggle-type">
             ${fieldTypeIcon(typeId)}<span>${escapeHtml(typeLabel)}</span>
@@ -14883,12 +15115,12 @@
         ${lookupHtml}
         ${optionsHtml}
         ${defaultHtml}
-        <p class="fe-hint">点「确定」后类型与选项会保存到服务端，其他登录用户刷新即可看到。${isBlankTable(currentTableId()) ? "空白表字段仅本表生效。" : "字段配置四表共享。"}删除选项只改下拉定义，已填单元格会保留，同名选项可再加回来。</p>
+        <p class="fe-hint">${T("fieldEdit.hint", { tail: isBlankTable(currentTableId()) ? T("fieldEdit.hintBlank") : T("fieldEdit.hintShared") })}</p>
         <div class="fe-actions ${draft.isCustom ? "has-delete" : ""}">
-          ${draft.isCustom ? `<button type="button" class="fe-delete" data-fe-action="delete" ${draft.saving ? "disabled" : ""}>删除字段</button>` : "<span></span>"}
+          ${draft.isCustom ? `<button type="button" class="fe-delete" data-fe-action="delete" ${draft.saving ? "disabled" : ""}>${T("fieldEdit.deleteField")}</button>` : "<span></span>"}
           <div class="fe-right">
-            <button type="button" class="fe-cancel" data-fe-action="cancel">取消</button>
-            <button type="button" class="fe-ok" data-fe-action="ok" ${draft.saving ? "disabled" : ""}>${draft.saving ? "保存中…" : "确定"}</button>
+            <button type="button" class="fe-cancel" data-fe-action="cancel">${T("common.cancel")}</button>
+            <button type="button" class="fe-ok" data-fe-action="ok" ${draft.saving ? "disabled" : ""}>${draft.saving ? T("fieldEdit.saving") : T("common.ok")}</button>
           </div>
         </div>
       `;
@@ -14899,9 +15131,9 @@
         if (preview) preview.dataset.previewToken = token;
         requestFormulaPreview(formulaPreviewExpr, formulaPreviewSampleRow(), draft.key || "").then((value) => {
           if (!preview?.isConnected || preview.dataset.previewToken !== token) return;
-          preview.innerHTML = `首行预览：<strong style="color:#4f46e5">${escapeHtml(value === "" ? "(空)" : value)}</strong>`;
+          preview.innerHTML = `${T("fieldEdit.firstRowValue")}<strong style="color:#4f46e5">${escapeHtml(value === "" ? T("value.emptyCell") : value)}</strong>`;
         }).catch(() => {
-          if (preview?.isConnected && preview.dataset.previewToken === token) preview.textContent = "首行预览：暂不可用";
+          if (preview?.isConnected && preview.dataset.previewToken === token) preview.textContent = T("fieldEdit.firstRowUnavailable");
         });
       }
       positionFieldEditInSheet();
@@ -14932,7 +15164,7 @@
         key, label: state.fieldConfigs[key].fieldTitle || key, type: state.fieldConfigs[key].fieldType || "text", custom: true
       } : null);
       if (!def) return;
-      if (key === "actions" || key === "seriesName") return toast("该列不支持修改字段类型", true);
+      if (key === "actions" || key === "seriesName") return toast(T("fieldEdit.noTypeChange"), true);
       let anchorRect = null;
       const anchor = opts?.anchor;
       if (anchor && typeof anchor.getBoundingClientRect === "function") {
@@ -15039,7 +15271,7 @@
       if (!view.columnLabels || typeof view.columnLabels !== "object") view.columnLabels = {};
       const def = COLUMN_DEFS.find((c) => c.key === key);
       const next = String(nextTitle || "").trim().slice(0, 40);
-      if (!next) return toast("名称不能为空", true);
+      if (!next) return toast(T("toast.nameEmpty"), true);
       if (def && next === def.label) delete view.columnLabels[key];
       else view.columnLabels[key] = next;
       // 中文备注：自定义列 + 内置选项列标题同步到 fieldConfigs，保存后不被 COLUMN_DEFS 默认值盖回。
@@ -15065,7 +15297,7 @@
       if (!draft || draft.saving) return;
       syncFieldEditDraftFromDom();
       const title = String(draft.title || "").trim();
-      if (!title) return toast("名称不能为空", true);
+      if (!title) return toast(T("toast.nameEmpty"), true);
       const fieldType = draft.fieldType || "text";
       let options = [];
       if (fieldType === "select" || fieldType === "multi") {
@@ -15457,23 +15689,23 @@
       popup.innerHTML = `
         <div class="rm-insert" data-row-action="insert-above">
           <span class="rm-icon">${ROW_MENU_ICONS.up}</span>
-          <span class="rm-label">向上插入</span>
+          <span class="rm-label">${T("rowMenu.insertAbove")}</span>
           <input class="rm-count" type="number" min="1" max="50" value="1" data-rm-count="above" onclick="event.stopPropagation()" />
-          <span class="rm-label" style="flex:0">行</span>
+          <span class="rm-label" style="flex:0">${T("rowMenu.rowUnit")}</span>
         </div>
         <div class="rm-insert" data-row-action="insert-below">
           <span class="rm-icon">${ROW_MENU_ICONS.down}</span>
-          <span class="rm-label">向下插入</span>
+          <span class="rm-label">${T("rowMenu.insertBelow")}</span>
           <input class="rm-count" type="number" min="1" max="50" value="1" data-rm-count="below" onclick="event.stopPropagation()" />
-          <span class="rm-label" style="flex:0">行</span>
+          <span class="rm-label" style="flex:0">${T("rowMenu.rowUnit")}</span>
         </div>
         <div class="rm-sep"></div>
         <button type="button" class="rm-item" data-row-action="history">
-          <span class="rm-icon">${ROW_MENU_ICONS.history}</span><span>查看记录历史</span>
+          <span class="rm-icon">${ROW_MENU_ICONS.history}</span><span>${T("rowMenu.history")}</span>
         </button>
         <div class="rm-sep"></div>
         <button type="button" class="rm-item rm-danger" data-row-action="delete">
-          <span class="rm-icon">${ROW_MENU_ICONS.trash}</span><span>删除记录</span>
+          <span class="rm-icon">${ROW_MENU_ICONS.trash}</span><span>${T("rowMenu.delete")}</span>
         </button>
       `;
       popup._rowRef = row;
@@ -15498,10 +15730,10 @@
         const cancelBtn = $("deleteRowConfirmCancel");
         const descEl = $("deleteRowConfirmDesc");
         if (!mask || !okBtn || !cancelBtn) {
-          resolve(window.confirm(`该操作将删除 ${count} 行记录，请确认是否继续？`));
+          resolve(window.confirm(T("delrow.desc", { n: count })));
           return;
         }
-        if (descEl) descEl.textContent = `该操作将删除 ${count} 行记录，请确认是否继续？`;
+        if (descEl) descEl.textContent = T("delrow.desc", { n: count });
         const finish = (ok) => {
           mask.classList.remove("show");
           document.removeEventListener("keydown", onKey);
@@ -15545,7 +15777,7 @@
         const fn = _undoToastAction;
         hideUndoToast();
         if (fn) {
-          try { await fn(); } catch (e) { toast(e.message || "撤销失败", true); }
+          try { await fn(); } catch (e) { toast(e.message || T("undo.failed"), true); }
         }
       };
       el.classList.add("show");
@@ -15591,9 +15823,9 @@
       return row;
     }
     async function insertRowsRelative(anchorRow, position, count) {
-      if (!getToken()) return showLogin("请先登录后再新增行");
+      if (!getToken()) return showLogin(T("toast.loginFirstRow"));
       const want = Math.max(1, Math.min(50, Number(count) || 1));
-      if (isAdxTableActive()) return toast("ADX 表暂不支持手动新增行", true);
+      if (isAdxTableActive()) return toast(T("toast.adxNoManualAdd"), true);
       const created = [];
       try {
         for (let i = 0; i < want; i++) {
@@ -15603,7 +15835,7 @@
           if (row?.opsKey) created.push(row);
         }
       } catch (e) {
-        toast(e.message || "插入行失败", true);
+        toast(e.message || T("toast.insertRowFailed"), true);
         return;
       }
       if (!created.length) return toast("插入行失败", true);
@@ -15627,7 +15859,7 @@
     }
     async function deleteRowWithUndo(row) {
       if (!row || row.__group || row.__groupSpacer) return;
-      if (!getToken()) return showLogin("请先登录后再删除");
+      if (!getToken()) return showLogin(T("toast.loginFirstDelete"));
       const ok = await openDeleteRowConfirm(1);
       if (!ok) return;
       const tableId = currentTableId();
@@ -15655,7 +15887,7 @@
           }
         }
       } catch (e) {
-        toast(e.message || "删除失败", true);
+        toast(e.message || T("toast.deleteFailed"), true);
         return;
       }
       if (idx >= 0) {
@@ -15710,7 +15942,7 @@
           requestAnimationFrame(() => sheetApi?.refresh?.());
           toast("已撤销删除");
         } catch (e) {
-          toast(e.message || "撤销失败", true);
+          toast(e.message || T("undo.failed"), true);
         }
       });
     }
@@ -15759,40 +15991,40 @@
         : !!(state.fieldConfigs?.[key]?.isCustom || String(key).startsWith("custom_"));
       popup.innerHTML = `
         <button type="button" data-col-action="rename" ${canRename ? "" : "disabled"}>
-          <span class="cm-icon">${COL_MENU_ICONS.rename}</span><span>修改字段/列</span>
+          <span class="cm-icon">${COL_MENU_ICONS.rename}</span><span>${T("colMenu.rename")}</span>
         </button>
         <button type="button" data-col-action="fill">
-          <span class="cm-icon">${COL_MENU_ICONS.fill}</span><span>整列填色</span>
+          <span class="cm-icon">${COL_MENU_ICONS.fill}</span><span>${T("colMenu.fill")}</span>
         </button>
         <button type="button" data-col-action="hide">
-          <span class="cm-icon">${COL_MENU_ICONS.hide}</span><span>隐藏字段</span>
+          <span class="cm-icon">${COL_MENU_ICONS.hide}</span><span>${T("colMenu.hide")}</span>
         </button>
         <button type="button" data-col-action="clear-col">
-          <span class="cm-icon">${COL_MENU_ICONS.hide}</span><span>清空整列</span>
+          <span class="cm-icon">${COL_MENU_ICONS.hide}</span><span>${T("colMenu.clear")}</span>
         </button>
         ${canDelete ? `
         <button type="button" data-col-action="delete" style="color:#f54a45">
-          <span class="cm-icon">${COL_MENU_ICONS.hide}</span><span>删除字段</span>
+          <span class="cm-icon">${COL_MENU_ICONS.hide}</span><span>${T("colMenu.delete")}</span>
         </button>` : ""}
         <div class="cm-sep"></div>
         <div class="cm-insert" data-col-action="insert-left">
           <span class="cm-icon">${COL_MENU_ICONS.insertLeft}</span>
-          <span class="cm-label">向左插入字段/列</span>
+          <span class="cm-label">${T("colMenu.insertLeft")}</span>
           <input class="cm-count" type="number" min="1" max="${COL_INSERT_MAX}" value="1" data-cm-count="left" onclick="event.stopPropagation()" />
-          <span class="cm-label" style="flex:0">列</span>
+          <span class="cm-label" style="flex:0">${T("colMenu.colUnit")}</span>
         </div>
         <div class="cm-insert" data-col-action="insert-right">
           <span class="cm-icon">${COL_MENU_ICONS.insertRight}</span>
-          <span class="cm-label">向右插入字段/列</span>
+          <span class="cm-label">${T("colMenu.insertRight")}</span>
           <input class="cm-count" type="number" min="1" max="${COL_INSERT_MAX}" value="1" data-cm-count="right" onclick="event.stopPropagation()" />
-          <span class="cm-label" style="flex:0">列</span>
+          <span class="cm-label" style="flex:0">${T("colMenu.colUnit")}</span>
         </div>
         <div class="cm-sep"></div>
         <button type="button" data-col-action="asc">
-          <span class="cm-icon">${COL_MENU_ICONS.asc}</span><span>按 A 到 Z 排序</span>
+          <span class="cm-icon">${COL_MENU_ICONS.asc}</span><span>${T("colMenu.sortAZ")}</span>
         </button>
         <button type="button" data-col-action="desc">
-          <span class="cm-icon">${COL_MENU_ICONS.desc}</span><span>按 Z 到 A 排序</span>
+          <span class="cm-icon">${COL_MENU_ICONS.desc}</span><span>${T("colMenu.sortZA")}</span>
         </button>
       `;
       popup.classList.add("show");
@@ -15825,7 +16057,7 @@
       return sortFieldIconSvg(col?.key);
     }
     function reorderColumnsInView(fromKey, toKey, place = "before") {
-      if (!assertCanEditViewConfig("调整字段顺序")) return false;
+      if (!assertCanEditViewConfig(T("toast.actionFieldOrder"))) return false;
       if (!fromKey || !toKey || fromKey === toKey) return false;
       if (isActionsColumnKey(fromKey) || isActionsColumnKey(toKey)) return false;
       const view = activeView();
@@ -15863,7 +16095,7 @@
       return true;
     }
     function commitFieldOrderFromDom(listEl, { toastOnChange = true } = {}) {
-      if (!listEl || !assertCanEditViewConfig("调整字段顺序")) return false;
+      if (!listEl || !assertCanEditViewConfig(T("toast.actionFieldOrder"))) return false;
       const view = activeView();
       if (!view) return false;
       const type = view.type || currentTableType() || "all";
@@ -15880,7 +16112,7 @@
       persistViews();
       scheduleViewCloudSync(view.tableId);
       applyColumnVisibility();
-      if (toastOnChange) toast("字段顺序已更新");
+      if (toastOnChange) toast(T("toast.fieldOrderUpdated"));
       return true;
     }
     function bindFieldConfigDrag() {
@@ -16806,10 +17038,10 @@
         const titleEl = $("deleteTableConfirmTitle");
         const descEl = $("deleteTableConfirmDesc");
         if (!mask || !okBtn || !cancelBtn) {
-          resolve(window.confirm(`确认删除表格「${name}」？\n${desc}`));
+          resolve(window.confirm(T("deltable.titleN", { n: name }) + "\n" + desc));
           return;
         }
-        if (titleEl) titleEl.textContent = `确认删除表格「${name}」？`;
+        if (titleEl) titleEl.textContent = T("deltable.titleN", { n: name });
         if (descEl) descEl.textContent = desc;
         const finish = (ok) => {
           mask.classList.remove("show");
@@ -16858,7 +17090,7 @@
       renderReminderBadge();
       renderOnlineUsers();
       render();
-      showLogin("已退出登录");
+      showLogin(T("toast.logout"));
     }
     function normalizeCopyrightOwner(value) {
       // 中文备注：已填版权原样保留（选项删除不清空）；空串表示清空。新非法值由服务端纠正。
@@ -17251,10 +17483,10 @@
       if (drainWrap) {
         drainWrap.style.display = showProgress ? "" : "none";
         drainWrap.disabled = draining || loadingPage || !canLoadMore;
-        drainWrap.title = loadingPage || draining ? "正在加载下一批，当前表格仍可使用" : "继续加载下一批";
+        drainWrap.title = loadingPage || draining ? T("toolbar.drainLoadingTitle") : T("toolbar.drainTitle");
         drainWrap.setAttribute("aria-label", loadingPage || draining ? "正在加载下一批" : "加载下一批数据");
       }
-      if (drainLabel) drainLabel.textContent = loadingPage || draining ? "正在加载" : "继续加载";
+      if (drainLabel) drainLabel.textContent = loadingPage || draining ? T("toolbar.loading") : T("toolbar.drain");
       if (drainEl && showProgress) {
         drainEl.textContent = total > 0 ? `${loaded}/${total}` : String(loaded);
       }
@@ -19113,7 +19345,7 @@
       }
       const operator = currentOperator();
       if (!operator || !getToken()) {
-        showLogin("请先登录后再编辑");
+        showLogin(T("toast.loginFirstEdit"));
         return;
       }
       const d = { ...currentDraft(row) };
@@ -19130,7 +19362,7 @@
       }
       const nextSeriesName = String(d.seriesName ?? row.seriesName ?? "").trim();
       if (!nextSeriesName) {
-        toast("名称不能为空", true);
+        toast(T("toast.nameEmpty"), true);
         return;
       }
       const payload = buildDramaSavePayload(row, d, operator);
@@ -19273,7 +19505,7 @@
       }
       const next = value == null ? "" : String(value);
       if (field === "seriesName" && !String(next).trim()) {
-        toast("名称不能为空", true);
+        toast(T("toast.nameEmpty"), true);
         sheetApi?.scheduleDraw?.();
         return;
       }
@@ -19411,7 +19643,7 @@
       if (keepSelectedId == null) state.logs.selectedId = null;
       const tableId = currentTableId();
       $("logTitle").textContent = `操作历史 · ${row.seriesName || row.col_a || bookId}`;
-      $("logSortBtn").textContent = state.logs.sort === "desc" ? "排序：最新在前" : "排序：最早在前";
+      $("logSortBtn").textContent = state.logs.sort === "desc" ? T("log.sortDesc") : T("log.sortAsc");
       const logAddBtn = $("logAddBtn");
       if (logAddBtn) logAddBtn.style.display = isBlankTable(tableId) ? "" : "none";
       $("logList").innerHTML = `<div class="empty">加载中...</div>`;
@@ -19479,7 +19711,7 @@
         return;
       }
       $("logPager").style.display = "flex";
-      $("logPageInfo").textContent = `第 ${state.logs.page} / ${totalPages} 页（共 ${state.logs.total} 条）`;
+      $("logPageInfo").textContent = T("log.page", { p: state.logs.page, t: totalPages, n: state.logs.total });
       $("logPrevBtn").disabled = state.logs.page <= 1;
       $("logNextBtn").disabled = state.logs.page >= totalPages;
     }
@@ -19584,28 +19816,28 @@
       const btn = $("logUndoBtn");
       const hint = $("logUndoHint");
       if (!item) {
-        if (meta) meta.textContent = "请选择左侧一条操作记录";
-        if (beforeEl) beforeEl.textContent = "(未选择)";
-        if (afterEl) afterEl.textContent = "(未选择)";
+        if (meta) meta.textContent = T("log.pickOne");
+        if (beforeEl) beforeEl.textContent = T("log.notSelected");
+        if (afterEl) afterEl.textContent = T("log.notSelected");
         if (btn) btn.disabled = true;
         if (hint) hint.textContent = "";
         return;
       }
       if (meta) {
-        meta.textContent = `${item.operator || "未知"} · ${item.createTime || "-"} · 「${item.fieldName || "字段"}」`;
+        meta.textContent = `${item.operator || T("log.unknown")} · ${item.createTime || "-"} · 「${item.fieldName || T("log.field")}」`;
       }
-      if (beforeEl) beforeEl.textContent = item.beforeDisplay || "(空)";
-      if (afterEl) afterEl.textContent = item.afterDisplay || "(空)";
+      if (beforeEl) beforeEl.textContent = item.beforeDisplay || T("value.emptyCell");
+      if (afterEl) afterEl.textContent = item.afterDisplay || T("value.emptyCell");
       const can = !!item.canUndo && !state.logs.undoing;
       if (btn) {
         btn.disabled = !can;
-        btn.textContent = item.canUndo ? "撤回该操作" : "不可撤回";
+        btn.textContent = item.canUndo ? T("log.undoOp") : T("log.undoDenied");
       }
       if (hint) {
         if (item.canUndo) {
-          hint.textContent = "撤回后将恢复为左侧「操作前」的值";
+          hint.textContent = T("log.undoHint");
         } else {
-          hint.textContent = item.undoBlockReason || (item.mine ? "该类型不支持撤回" : "只能撤回自己的操作");
+          hint.textContent = item.undoBlockReason || (item.mine ? T("log.undoUnsupported") : T("log.undoNotMine"));
         }
       }
     }
@@ -19971,7 +20203,7 @@
     async function loadWorkspaceActivity() {
       if (state.historyDrawer.loading) return;
       const body = $("historyDrawerBody");
-      if (body) body.innerHTML = '<div class="history-loading">加载中...</div>';
+      if (body) body.innerHTML = '<div class="history-loading">' + T("common.loading") + '</div>';
       state.historyDrawer.loading = true;
       try {
         const data = await api("/api/v1/ops/workspace/activity?limit=80");
@@ -20271,7 +20503,7 @@
         return;
       }
       if (!currentOperator() || !getToken()) {
-        showLogin("请先登录后再撤回");
+        showLogin(T("toast.loginFirstUndo"));
         return;
       }
       if (isTextEditingTarget(document.activeElement) || isSheetEditingBusy()) {
@@ -20423,7 +20655,7 @@
         return;
       }
       if (!currentOperator() || !getToken()) {
-        showLogin("请先登录后再重做");
+        showLogin(T("toast.loginFirstRedo"));
         return;
       }
       if (isTextEditingTarget(document.activeElement) || isSheetEditingBusy()) {
@@ -20488,16 +20720,16 @@
           body: JSON.stringify({ logId: Number(id) })
         });
         const c = data.contrast || {};
-        toast(data.message || "已撤回");
+        toast(data.message || T("toast.undone"));
         // 中文备注：立刻抬本地 version/字段，避免「撤回后再保存」仍带旧 version 报冲突。
         patchRowAfterUndo(row, item, data);
         removeGlobalUndoByLogId(id);
         // 中文备注：右侧立刻展示本次撤回的前后对比（撤回前=日志新值，撤回后=恢复值）。
         if ($("logDetailMeta")) {
-          $("logDetailMeta").textContent = `已撤回 · ${data.fieldName || item.fieldName || ""}`;
+          $("logDetailMeta").textContent = T("log.undone", { n: data.fieldName || item.fieldName || "" });
         }
-        if ($("logDetailBefore")) $("logDetailBefore").textContent = c.beforeDisplay || item.afterDisplay || "(空)";
-        if ($("logDetailAfter")) $("logDetailAfter").textContent = c.afterDisplay || item.beforeDisplay || "(空)";
+        if ($("logDetailBefore")) $("logDetailBefore").textContent = c.beforeDisplay || item.afterDisplay || T("value.emptyCell");
+        if ($("logDetailAfter")) $("logDetailAfter").textContent = c.afterDisplay || item.beforeDisplay || T("value.emptyCell");
         try {
           await loadList(false);
         } catch (_) {}
@@ -20607,7 +20839,7 @@
       const h = Number(hour);
       if (!Number.isFinite(h) || h < 0 || h > 23) return;
       if (!getToken()) {
-        showLogin("请先登录后查看排行");
+        showLogin(T("toast.loginFirstRank"));
         return;
       }
       const drawer = $("rankDrawer");
@@ -21325,7 +21557,7 @@
         return;
       }
       $("reminderPager").style.display = "flex";
-      $("reminderPageInfo").textContent = `第 ${state.reminders.page} / ${totalPages} 页 · 共 ${state.reminders.total} 条`;
+      $("reminderPageInfo").textContent = T("log.page", { p: state.reminders.page, t: totalPages, n: state.reminders.total || 0 });
       $("reminderPrevBtn").disabled = state.reminders.page <= 1;
       $("reminderNextBtn").disabled = state.reminders.page >= totalPages;
     }
@@ -21690,7 +21922,7 @@
           getCellStyle: (row, colKey) => getConditionalCellStyle(row, colKey),
           onColumnResize: (key, width) => setColumnWidth(key, width),
           onColumnReorder: (fromKey, toKey, place) => {
-            if (reorderColumnsInView(fromKey, toKey, place)) toast("字段顺序已更新");
+            if (reorderColumnsInView(fromKey, toKey, place)) toast(T("toast.fieldOrderUpdated"));
           },
           columnLabel: (key) => columnDisplayLabel(key),
           getOptions: (optionsKey) => {
@@ -23000,7 +23232,7 @@
         }
         // 中文备注：字段配置允许在锁定视图打开（可看列、可新增全员字段）；隐藏/拖拽仍受 canEditViewConfig 限制。
         if (open && d.panel === "fieldConfigPanel" && !getToken()) {
-          showLogin("请先登录后再打开字段配置");
+          showLogin(T("toast.loginFirstFieldConfig"));
           return;
         }
         closeAllDropdowns(d.panel);
@@ -24357,5 +24589,103 @@
       };
     }
   </script>
+<script>
+  // 中文备注：切换语言后重刷静态文案与打开中的面板（菜单/抽屉下次打开自动用新语言）。
+  (function () {
+    const rerender = () => {
+      if (!window.OpsI18n) return;
+      window.OpsI18n.apply(document);
+      try { renderSidebar(); } catch (_) {}
+      try { renderViewTabs(); } catch (_) {}
+      try { syncFieldConfigBtnLabel(); syncFilterBtnLabel(); syncColorFillBtnLabel(); syncGroupBtnLabel(); syncSortBtnLabel(); syncRowHeightBtnLabel(); } catch (_) {}
+      try { renderRowHeightOptions(); } catch (_) {}
+      if (document.getElementById("filterPanel")?.classList.contains("show")) { try { renderFilterRules(); } catch (_) {} }
+      if (document.getElementById("colorFillPanel")?.classList.contains("show")) { try { renderColorRules(); } catch (_) {} }
+      if (document.getElementById("sortPanel")?.classList.contains("show")) { try { renderSortRules(); } catch (_) {} }
+      if (document.getElementById("groupPanel")?.classList.contains("show")) { try { renderGroupRules(); } catch (_) {} }
+    };
+    document.addEventListener("polytable-lang-change", rerender);
+    if (document.readyState !== "loading") rerender();
+  })();
+</script>
 </body>
+
+<script>
+  // 外观设置弹层：深浅模式 / 主题色 DIY / 语言（语言分发 polytable-lang-change 事件给 i18n 层）。
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const btn = $("appearanceBtn");
+    const pop = $("appearancePop");
+    if (!btn || !pop || !window.OpsTheme) return;
+    let closeTimer = null;
+
+    function syncUi() {
+      const cur = window.OpsTheme.current();
+      document.querySelectorAll("#apModeSeg button").forEach((b) => {
+        b.classList.toggle("is-active", b.dataset.mode === cur.modeSetting);
+      });
+      document.querySelectorAll("#apAccents button").forEach((b) => {
+        b.classList.toggle("is-active", b.dataset.accent === cur.accent);
+      });
+      const resolvedLang = (window.OpsI18n && window.OpsI18n.lang()) || cur.lang || "zh";
+      document.querySelectorAll("#apLangSeg button").forEach((b) => {
+        b.classList.toggle("is-active", b.dataset.lang === resolvedLang);
+      });
+    }
+
+    function renderAccents() {
+      const box = $("apAccents");
+      if (!box || box.dataset.ready === "1") return;
+      box.innerHTML = window.OpsTheme.accents.map((a) => {
+        const label = T("appearance.accent." + a.id);
+        return `<button type="button" data-accent="${a.id}" title="${label}" style="--c:${a.color}" aria-label="${label}"></button>`;
+      }).join("");
+      box.dataset.ready = "1";
+    }
+
+    function openPop() {
+      renderAccents();
+      syncUi();
+      pop.hidden = false;
+      requestAnimationFrame(() => pop.classList.add("show"));
+    }
+    function closePop() {
+      pop.classList.remove("show");
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => { pop.hidden = true; }, 140);
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (pop.hidden) openPop(); else closePop();
+    });
+    pop.addEventListener("click", (e) => e.stopPropagation());
+    document.addEventListener("click", () => { if (!pop.hidden) closePop(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) closePop(); });
+
+    $("apModeSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-mode]");
+      if (b) { window.OpsTheme.setMode(b.dataset.mode); syncUi(); }
+    });
+    $("apAccents").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-accent]");
+      if (b) { window.OpsTheme.setAccent(b.dataset.accent); syncUi(); }
+    });
+    $("apLangSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-lang]");
+      if (!b) return;
+      const lang = window.OpsTheme.setLang(b.dataset.lang);
+      document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+      try { document.dispatchEvent(new CustomEvent("polytable-lang-change", { detail: { lang } })); } catch (_) {}
+      syncUi();
+    });
+    document.addEventListener("polytable-theme-change", syncUi);
+    document.addEventListener("polytable-lang-change", () => {
+      const box = document.getElementById("apAccents");
+      if (box) box.dataset.ready = "";
+      renderAccents();
+      syncUi();
+    });
+  })();
+</script>
 </html>

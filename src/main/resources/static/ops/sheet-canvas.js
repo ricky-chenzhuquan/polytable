@@ -4,6 +4,8 @@
  */
 (function (global) {
   const OPS_SHEET_CANVAS_REV = "20261115a";
+  // 中文备注：i18n 取词别名（ops-i18n.js 在本文件之前加载；未就绪时回退 key）。
+  const T = (key, params) => (global.OpsI18n ? global.OpsI18n.tf(key, params) : key);
   // 中文备注：主流多维表格实测行高 30px(紧凑档)/表头 30px。
   const DEFAULT_ROW_H = 30;
   const HEADER_H = 30;
@@ -58,6 +60,77 @@
     groupSpacer: "#fcfcfc",
     groupPage: "#fcfcfc"
   };
+
+  // 中文备注：画布深浅主题预设——浅色即上面的初始值；深色覆盖中性阶，
+  // 主色系（focus/select/range/find/headerSelected）由 accent 实时换算，跟随用户 DIY。
+  const THEME_PRESETS = {
+    dark: {
+      grid: "#2b3040",
+      gridStrong: "#3a4051",
+      headerBg: "#1a2030",
+      headerHot: "#212839",
+      headerText: "#e5e7eb",
+      cornerBg: "#1a2030",
+      rowIndexBg: "#141926",
+      text: "#e5e7eb",
+      subtle: "#cbd5e1",
+      muted: "#8a94a6",
+      white: "#111726",
+      hover: "#1d2434",
+      dirty: "#2a2417",
+      freezeShadow: "rgba(0,0,0,0.4)",
+      headerIcon: "#7c8698",
+      headerMenu: "#8a94a6",
+      groupBg: "#1a2030",
+      groupBgHover: "#212839",
+      groupBgL1: "#1a2030",
+      groupBgL1Hover: "#212839",
+      groupBgL2: "#1a2030",
+      groupBgL2Hover: "#212839",
+      groupText: "#e5e7eb",
+      groupMuted: "#8a94a6",
+      groupLine: "#39404f",
+      groupLineSoft: "#2b3040",
+      groupCardBorder: "#39404f",
+      groupInnerBorder: "#2b3040",
+      groupSpacer: "#141926",
+      groupPage: "#141926"
+    }
+  };
+
+  function hexToRgba(hex, alpha) {
+    const m = /^#([0-9a-fA-F]{6})$/.exec(String(hex || "").trim());
+    if (!m) return hex;
+    const n = parseInt(m[1], 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+  }
+
+  function applyCanvasTheme(mode, accentHex) {
+    const preset = mode === "dark" ? THEME_PRESETS.dark : null;
+    if (preset) {
+      for (const key of Object.keys(preset)) COLORS[key] = preset[key];
+    } else {
+      // 浅色：恢复初始中性阶（LIGHT_BASELINE 快照），避免深→浅切换残留深色值。
+      for (const key of Object.keys(LIGHT_BASELINE)) COLORS[key] = LIGHT_BASELINE[key];
+    }
+    const accent = String(accentHex || "#4f46e5").trim() || "#4f46e5";
+    COLORS.focus = accent;
+    COLORS.select = accent;
+    COLORS.headerSelectedText = accent;
+    COLORS.rangeBorder = accent;
+    COLORS.rangeHandle = accent;
+    COLORS.findStroke = accent;
+    COLORS.headerSelectedBg = hexToRgba(accent, 0.08);
+    COLORS.rangeFill = hexToRgba(accent, 0.12);
+    COLORS.find = hexToRgba(accent, 0.14);
+    COLORS.findActive = hexToRgba(accent, 0.22);
+    COLORS.resizeLine = hexToRgba(accent, 0.55);
+    try { if (typeof scheduleDraw === "function") scheduleDraw(); } catch (_) { /* 画布未初始化时忽略 */ }
+  }
+
+  // 中文备注：浅色基线快照——applyCanvasTheme 首次执行前把当前默认值固化，供深→浅还原。
+  const LIGHT_BASELINE = {};
+  for (const key of Object.keys(COLORS)) LIGHT_BASELINE[key] = COLORS[key];
   // 中文备注：一级分组白卡片左右边距。
   const GROUP_CARD_PAD = 10;
 
@@ -412,7 +485,7 @@
       if (isActionColumn(col)) {
         // 中文备注：操作列要放下「操作历史」按钮，不能只按两字表头「操作」估宽。
         ctx.font = '11px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-        const btnNeed = ctx.measureText("操作历史").width + CELL_PAD_X * 2 + 28;
+        const btnNeed = ctx.measureText(T("canvas.actionHistory")).width + CELL_PAD_X * 2 + 28;
         maxW = Math.max(maxW, btnNeed);
       }
       if (col.type === "checkbox") maxW = Math.max(maxW, 88);
@@ -436,7 +509,7 @@
       let minW = ctx.measureText(label).width + headerChrome;
       if (isActionColumn(col)) {
         ctx.font = '11px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-        minW = Math.max(minW, ctx.measureText("操作历史").width + CELL_PAD_X * 2 + 28);
+        minW = Math.max(minW, ctx.measureText(T("canvas.actionHistory")).width + CELL_PAD_X * 2 + 28);
       }
       return clampColW(minW);
     }
@@ -653,8 +726,8 @@
         return;
       }
       selectionStatEl.textContent = stats.approx
-        ? `已选 ${stats.dataRows} 行 × ${stats.colSpan} 列`
-        : `计数: ${stats.count}`;
+        ? T("canvas.selectedStat", { rows: stats.dataRows, cols: stats.colSpan })
+        : T("canvas.countStat", { n: stats.count });
       selectionStatEl.classList.add("show");
       selectionStatEl.setAttribute("aria-hidden", "false");
       selectionStatEl.style.visibility = "hidden";
@@ -1737,7 +1810,7 @@
 
     function cellText(row, col) {
       if (!row || !col || isGroupRow(row) || isGroupSpacer(row)) return "";
-      if (isActionColumn(col)) return "操作历史";
+      if (isActionColumn(col)) return T("canvas.actionHistory");
       if (col.type === "formula") {
         // 中文备注：公式列只读展示，由页面 hooks 按当前行字段求值。
         try {
@@ -2488,8 +2561,8 @@
       ctx.stroke();
       ctx.lineWidth = 1;
 
-      const label = String(row.label || "(为空)");
-      const countText = `${Number(row.count) || 0} 条记录`;
+      const label = String(row.label || T("value.emptyGroup"));
+      const countText = T("canvas.nRecords", { n: Number(row.count) || 0 });
       const maxLabelW = Math.max(80, viewportW - textX - countW - rightPad);
       const field = String(row.field || "").trim();
       const col = hooks().getColumnDef?.(field) || hooks().getColumns?.()?.find((c) => c.key === field);
@@ -2559,7 +2632,7 @@
       if (isActionColumn(col)) {
         // 中文备注：按钮随列宽变宽，保证「操作历史」四字完整可见。
         const btnH = 22;
-        const label = "操作历史";
+        const label = T("canvas.actionHistory");
         ctx.font = '11px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
         const textW = ctx.measureText(label).width + 16;
         const btnW = Math.max(textW, Math.min(Math.max(0, w - CELL_PAD_X * 2), 120));
@@ -2581,7 +2654,7 @@
         }
         if (dirty) {
           drawRoundRect(screenX + w - 48, rowY + (rowH() - 16) / 2, 42, 16, 8, "#fff3e0", "");
-          drawText("未保存", screenX + w - 48, rowY + (rowH() - 16) / 2, 42, 16, { align: "center", color: "#e08a00", size: 10, pad: 0 });
+          drawText(T("canvas.unsaved"), screenX + w - 48, rowY + (rowH() - 16) / 2, 42, 16, { align: "center", color: "#e08a00", size: 10, pad: 0 });
         }
       } else if (cellType === "checkbox") {
         const checked = isCheckboxOn(cellText(row, col));
@@ -3323,7 +3396,7 @@
       if (!row || !col) return;
       const text = String(cellText(row, col) ?? "");
       const el = ensureFormulaPeek();
-      el.textContent = text || "(空)";
+      el.textContent = text || T("value.emptyCell");
       const L = layout();
       const meta = [...L.freezeMeta, ...L.scrollMeta].find((m) => m.col.key === col.key);
       const w = Math.max(140, meta ? meta.w : (hit.w || 160));
@@ -3383,7 +3456,7 @@
       selected.forEach((v) => { if (v && !list.includes(v)) list.unshift(v); });
       const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
       if (!list.length) {
-        optionMenu.innerHTML = `<div class="so-empty">暂无选项</div>`;
+        optionMenu.innerHTML = `<div class="so-empty">${T("so.empty")}</div>`;
       } else if (col.type === "multi") {
         optionMenu.innerHTML = list.map((opt) => {
           const color = hooks().getOptionColor?.(col.key, opt) || "#eef1f5";
@@ -3392,7 +3465,7 @@
             <input class="so-check" type="checkbox" ${on ? "checked" : ""} tabindex="-1" />
             <span class="so-tag" style="background:${esc(color)}">${esc(opt)}</span>
           </button>`;
-        }).join("") + `<button type="button" class="so-clear" data-done="1">完成</button>`;
+        }).join("") + `<button type="button" class="so-clear" data-done="1">${T("so.done")}</button>`;
       } else {
         optionMenu.innerHTML = list.map((opt) => {
           const color = hooks().getOptionColor?.(col.key, opt) || "#eef1f5";
@@ -3400,7 +3473,7 @@
           return `<button type="button" class="so-item ${on ? "is-active" : ""}" data-opt="${esc(opt)}">
             <span class="so-tag" style="background:${esc(color)}">${esc(opt)}</span>
           </button>`;
-        }).join("") + `<button type="button" class="so-clear" data-clear="1">清空</button>`;
+        }).join("") + `<button type="button" class="so-clear" data-clear="1">${T("so.clear")}</button>`;
       }
       const vr = viewport.getBoundingClientRect();
       const ed = sheet.editing;
@@ -5293,5 +5366,13 @@
     };
   }
 
-  global.OpsSheet = { createSheet, ROW_H: DEFAULT_ROW_H, HEADER_H, ROW_INDEX_W, CANVAS_REV: OPS_SHEET_CANVAS_REV };
+  // 中文备注：启动时按 OpsTheme（ops-theme.js）当前设置着色；此后由 OpsCanvasTheme.apply 响应切换。
+  try {
+    if (global.OpsTheme && typeof global.OpsTheme.current === "function") {
+      const t = global.OpsTheme.current();
+      applyCanvasTheme(t.mode, t.accentHex);
+    }
+  } catch (_) { /* 主题服务缺失时保持内置浅色 */ }
+  global.OpsCanvasTheme = { apply: applyCanvasTheme };
+  global.OpsSheet = { createSheet, ROW_H: DEFAULT_ROW_H, HEADER_H, ROW_INDEX_W, CANVAS_REV: OPS_SHEET_CANVAS_REV, applyTheme: applyCanvasTheme };
 })(window);

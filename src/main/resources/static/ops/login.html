@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>登录 · PolyTable</title>
+  <title data-i18n="login.pageTitle">Sign in · PolyTable</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <style>
     :root {
@@ -80,12 +80,12 @@
     .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14); }
     #loginBtn {
       width: 100%; height: 44px; margin-top: 8px; border: 0; border-radius: var(--radius);
-      background: linear-gradient(135deg, var(--accent), #6d28d9); color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-grad-to, #6d28d9)); color: #fff;
       font-size: 14.5px; font-weight: 600; cursor: pointer; letter-spacing: 1px;
       box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
       transition: background .15s, transform .1s, box-shadow .15s;
     }
-    #loginBtn:hover { background: linear-gradient(135deg, var(--accent-hover), #5b21b6); box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4); }
+    #loginBtn:hover { background: linear-gradient(135deg, var(--accent-hover), var(--accent-grad-to, #5b21b6)); box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4); }
     #loginBtn:active { transform: translateY(1px); }
     #loginBtn:disabled { opacity: .6; cursor: not-allowed; }
     .login-foot { margin-top: 26px; font-size: 12px; color: #9ca3af; text-align: center; }
@@ -107,11 +107,22 @@
         font-size: 19px; font-weight: 700;
       }
     }
+    html[data-theme="dark"] .form-pane { background: #0f1420; }
+    html[data-theme="dark"] .login-card h2 { color: #e5e7eb; }
+    html[data-theme="dark"] .login-card .hint { color: #8a94a6; }
+    html[data-theme="dark"] .field label { color: #cbd5e1; }
+    html[data-theme="dark"] .field input { background: #1a2131; border-color: #2b3245; color: #e5e7eb; }
+    html[data-theme="dark"] .field input::placeholder { color: #6b7688; }
+    html[data-theme="dark"] .login-foot { color: #6b7688; }
+    html[data-theme="dark"] .login-foot a { color: #a5b4fc; }
+    html[data-theme="dark"] .login-foot code { color: #a5b4fc; }
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; }
     }
   </style>
   <script src="ops-auth.js"></script>
+  <script src="ops-theme.js?v=20261118a"></script>
+  <script src="ops-i18n.js?v=20261118a"></script>
   <script>
     // 中文备注：已登录则直接进工作区，避免重复登录。
     if (OpsAuth.getToken()) {
@@ -137,21 +148,21 @@
       <span class="word">PolyTable</span>
     </div>
     <div class="brand-hero">
-      <h1>把多维表格<br />装进<em>你自己的服务器</em></h1>
-      <p>开源自托管的协作表格：Canvas 大表引擎、119 个飞书兼容公式、实时协作，一个 JAR 加一个 MySQL 即可部署。</p>
+      <h1 data-i18n-html="login.heroTitle">Multi-dimensional spreadsheets,<br />on <em>your own server</em></h1>
+      <p data-i18n="login.heroDesc">Open-source self-hosted collaborative spreadsheets: a Canvas big-table engine, 119 Feishu-compatible formulas, realtime collaboration — deploy with one JAR plus one MySQL.</p>
     </div>
     <ul class="brand-points">
       <li>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
-        十万行级数据，滚动依旧顺滑
+        <span data-i18n="login.point1">100k-row datasets stay smooth while scrolling</span>
       </li>
       <li>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 8l7-5 7 5M5 21l7-5 7 5"/></svg>
-        单元格级实时推送，多人协作不丢字
+        <span data-i18n="login.point2">Cell-level realtime push; multi-user editing never loses a keystroke</span>
       </li>
       <li>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-        口令全走环境变量，数据不出内网
+        <span data-i18n="login.point3">Credentials live in environment variables; data never leaves your intranet</span>
       </li>
     </ul>
     <div class="brand-foot">MIT License · Self-hosted Bitable</div>
@@ -173,26 +184,27 @@
       <span>PolyTable</span>
     </div>
     <section class="login-card">
-      <h2 id="loginTitle">登录 PolyTable</h2>
-      <p class="hint" id="loginHint">请输入姓名与口令，登录后将进入表格工作区。</p>
+      <h2 id="loginTitle" data-i18n="login.title">Sign in to PolyTable</h2>
+      <p class="hint" id="loginHint" data-i18n="login.hint">Enter your name and password to enter the workspace.</p>
       <div class="field">
-        <label for="loginName">姓名</label>
-        <input id="loginName" placeholder="姓名" autocomplete="username" />
+        <label for="loginName" data-i18n="login.name">Name</label>
+        <input id="loginName" data-i18n-placeholder="login.name" placeholder="Name" autocomplete="username" />
       </div>
       <div class="field">
-        <label for="loginPassword">口令</label>
-        <input id="loginPassword" type="password" placeholder="口令" autocomplete="current-password" />
+        <label for="loginPassword" data-i18n="login.password">Password</label>
+        <input id="loginPassword" type="password" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password" />
       </div>
-      <button id="loginBtn" type="button">登 录</button>
-      <p class="login-foot">
-        首次部署？初始口令 = 姓名拼音首字母 + <code>OPS_AUTH_PASSWORD_SUFFIX</code><br />
-        <a href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">GitHub</a> · 文档 · Issues
+      <button id="loginBtn" type="button" data-i18n="login.btn">Sign in</button>
+      <p class="login-foot" data-i18n-html="login.footHtml">
+        First deployment? Initial password = pinyin initials of your name + <code>OPS_AUTH_PASSWORD_SUFFIX</code><br />
+        <a href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">GitHub</a> · Docs · Issues
       </p>
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script>
     const $ = (id) => document.getElementById(id);
+    const T = (key, params) => (window.OpsI18n ? window.OpsI18n.tf(key, params) : key);
     let toastTimer = null;
 
     function toast(msg, isError) {
@@ -215,7 +227,7 @@
       });
       const json = await res.json();
       if (json.code !== "00000") {
-        const err = new Error(json.msg || "请求失败");
+        const err = new Error(json.msg || T("login.failed"));
         err.code = json.code;
         throw err;
       }
@@ -225,8 +237,8 @@
     async function doLogin() {
       const displayName = $("loginName").value.trim();
       const password = $("loginPassword").value.trim();
-      if (!displayName) return toast("请输入姓名", true);
-      if (!password) return toast("请输入口令", true);
+      if (!displayName) return toast(T("login.fillName"), true);
+      if (!password) return toast(T("login.fillPassword"), true);
       const btn = $("loginBtn");
       btn.disabled = true;
       try {
@@ -237,7 +249,7 @@
         OpsAuth.setToken(data.token);
         OpsAuth.setDisplayName(data.displayName || displayName);
         $("loginPassword").value = "";
-        toast(`欢迎，${data.displayName || displayName}`);
+        toast(T("login.welcome", { n: data.displayName || displayName }));
         setTimeout(() => {
           location.replace(OpsAuth.readRedirectTarget());
         }, 200);
@@ -259,7 +271,7 @@
     if (savedName) $("loginName").value = savedName;
 
     const msg = OpsAuth.readLoginMessage();
-    if (msg) toast(msg, msg.includes("过期") || msg.includes("失败") || msg.includes("请先"));
+    if (msg) toast(msg, msg.includes("过期") || msg.includes("失败") || msg.includes("请先") || msg.includes("expired") || msg.includes("failed") || msg.includes("log in"));
 
     (async () => {
       try {
@@ -268,7 +280,7 @@
         // 中文备注：主标题保持品牌名；租户语境只落在提示行。
         const hintEl = $("loginHint");
         if (hintEl && agency) {
-          hintEl.textContent = "请输入协作账户与口令，登录后将进入协作空间。";
+          hintEl.textContent = T("login.agencyHint");
         }
       } catch (_) {}
     })();

@@ -1,5 +1,5 @@
 /**
- * 协作台日期相对项：筛选、工具栏快捷、resolveDateFilterRange 共用 token。
+ * 工作区日期相对项：筛选、工具栏快捷、resolveDateFilterRange 共用 token。
  * 须在 fr-date-eq-picker / fr-toolbar-date-picker 之前加载。
  */
 (function (global) {

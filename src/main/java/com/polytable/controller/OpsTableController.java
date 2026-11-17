@@ -370,7 +370,7 @@ public class OpsTableController {
     }
 
     private List<String> effectiveOptions(String fieldKey, OpsAuthService.Session session) {
-        // 中文备注：协作台下拉仍读字段配置/选项表，与后台人员名单分离。
+        // 中文备注：工作区下拉仍读字段配置/选项表，与后台人员名单分离。
         List<String> fromConfig = optionsFromFieldConfig(fieldKey);
         List<String> all;
         if (fromConfig != null) {

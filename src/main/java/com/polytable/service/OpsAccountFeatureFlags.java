@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** 协作台账户功能权限（Admin 勾选）。 */
+/** 工作区账户功能权限（Admin 勾选）。 */
 public final class OpsAccountFeatureFlags {
 
     public static final String PROMO_TABLE = "promoTable";

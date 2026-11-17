@@ -180,7 +180,7 @@ public class SchemaMigration {
     }
 
     private void createOpsAccountIfNotExists() {
-        // 中文备注：协作台登录账户；password_hash 空则走「首字母+后缀」默认口令。
+        // 中文备注：工作区登录账户；password_hash 空则走「首字母+后缀」默认口令。
         jdbcTemplate.execute("""
                 CREATE TABLE IF NOT EXISTS ops_account (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,

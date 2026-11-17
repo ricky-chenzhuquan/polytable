@@ -14,33 +14,34 @@
   const HEADER_PAD_X = 12;
   const CELL_PAD_X = 12;
   const COLORS = {
-    grid: "#e1e3e6",
-    gridStrong: "#cfd3d7",
-    headerBg: "#f7f8fa",
-    headerHot: "#eef0f2",
-    headerText: "#1f2329",
-    headerSelectedBg: "rgba(20, 86, 240, 0.08)",
-    headerSelectedText: "#1456f0",
-    cornerBg: "#f7f8fa",
-    rowIndexBg: "#ffffff",
-    text: "#1f2329",
-    subtle: "#51565d",
-    muted: "#8f959e",
+    // 中文备注：主题色——靛蓝主色 / 暖灰中性阶（与 index.html 设计 token 同步）。
+    grid: "#e8eaee",
+    gridStrong: "#d8dbe1",
+    headerBg: "#f9fafb",
+    headerHot: "#f1f3f6",
+    headerText: "#111827",
+    headerSelectedBg: "rgba(79, 70, 229, 0.08)",
+    headerSelectedText: "#4f46e5",
+    cornerBg: "#f9fafb",
+    rowIndexBg: "#fbfcfd",
+    text: "#111827",
+    subtle: "#4b5563",
+    muted: "#9ca3af",
     white: "#ffffff",
-    hover: "#f5f6f7",
-    dirty: "#fff8ec",
-    focus: "#1456f0",
-    select: "#1456f0",
-    rangeFill: "rgba(20,86,240,0.14)",
-    rangeBorder: "#1456f0",
-    rangeHandle: "#1456f0",
-    find: "rgba(20,86,240,0.14)",
-    findActive: "rgba(20,86,240,0.22)",
-    findStroke: "#1456f0",
+    hover: "#f8fafc",
+    dirty: "#fffbeb",
+    focus: "#4f46e5",
+    select: "#4f46e5",
+    rangeFill: "rgba(79,70,229,0.12)",
+    rangeBorder: "#4f46e5",
+    rangeHandle: "#4f46e5",
+    find: "rgba(79,70,229,0.14)",
+    findActive: "rgba(79,70,229,0.22)",
+    findStroke: "#4f46e5",
     freezeShadow: "rgba(31,35,41,0.06)",
     headerIcon: "#a2a8b0",
     headerMenu: "#8f959e",
-    resizeLine: "rgba(20,86,240,0.55)",
+    resizeLine: "rgba(79,70,229,0.55)",
     groupBg: "#f5f6f7",
     groupBgHover: "#eef0f3",
     groupBgL1: "#f5f6f7",
@@ -1968,7 +1969,7 @@
     function drawHeaderSyncSpinner(cx, cy) {
       const start = (performance.now() / 1000) * 6;
       ctx.save();
-      ctx.strokeStyle = "#409eff";
+      ctx.strokeStyle = "#4f46e5";
       ctx.lineWidth = 1.8;
       ctx.lineCap = "round";
       ctx.beginPath();
@@ -2587,11 +2588,11 @@
         const size = 14;
         const bx = screenX + CELL_PAD_X;
         const by = rowY + (rowH() - size) / 2;
-        ctx.strokeStyle = checked ? "#3370ff" : COLORS.gridStrong;
+        ctx.strokeStyle = checked ? "#4f46e5" : COLORS.gridStrong;
         ctx.lineWidth = 1.5;
         ctx.strokeRect(bx + 0.5, by + 0.5, size - 1, size - 1);
         if (checked) {
-          fillRect(bx, by, size, size, "#3370ff");
+          fillRect(bx, by, size, size, "#4f46e5");
           ctx.strokeStyle = "#fff";
           ctx.beginPath();
           ctx.moveTo(bx + 3, by + 7);
@@ -2670,7 +2671,7 @@
       for (const peer of peers) {
         if (!peer?.sel) continue;
         if (!peer.sel.rowSet.has(rowOps) || !peer.sel.colSet.has(col.key)) continue;
-        ctx.fillStyle = "rgba(20,86,240,0.10)";
+        ctx.fillStyle = "rgba(79,70,229,0.10)";
         ctx.fillRect(screenX, rowY, w, rowH());
       }
       const hits = peers.filter((p) => {
@@ -2681,7 +2682,7 @@
       });
       if (!hits.length) return;
       hits.slice(0, 2).forEach((peer, idx) => {
-        const color = peer.color || "#3370ff";
+        const color = peer.color || "#4f46e5";
         ctx.strokeStyle = color;
         ctx.lineWidth = peer.mode === "edit" ? 2.5 : 2;
         ctx.strokeRect(screenX + 1.5 + idx, rowY + 1.5 + idx, w - 3 - idx * 2, rowH() - 3 - idx * 2);
@@ -2906,7 +2907,7 @@
             ctx.beginPath();
             ctx.arc(cx, cy, 11, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = COLORS.headerSelectedText || "#1456f0";
+            ctx.strokeStyle = COLORS.headerSelectedText || "#4f46e5";
             ctx.lineWidth = 1.4;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
@@ -3011,7 +3012,7 @@
       if (sheet.colDragging && Number.isFinite(sheet.colDragging.lineX)) {
         const lineX = sheet.colDragging.lineX;
         // 中文备注：拖列时只强调表头插入位置，使用多维表格式低饱和蓝色指示线。
-        ctx.strokeStyle = "#3370ff";
+        ctx.strokeStyle = "#4f46e5";
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(lineX + 0.5, 0);
@@ -3330,9 +3331,9 @@
       const vr = viewport.getBoundingClientRect();
       const left = vr.left + hit.screenX;
       const top = vr.top + hit.screenY;
-      el.style.cssText = `position:fixed;z-index:310;background:#fff;border:2px solid #1456f0;border-radius:6px;
+      el.style.cssText = `position:fixed;z-index:310;background:#fff;border:2px solid #4f46e5;border-radius:6px;
         padding:8px 10px;font-size:13px;line-height:1.55;color:#1f2329;word-break:break-all;white-space:pre-wrap;
-        overflow:auto;box-sizing:border-box;left:${left}px;top:${top}px;width:${w}px;height:${rh * 3}px;box-shadow:0 4px 14px rgba(31,35,41,0.12);`;
+        overflow:auto;box-sizing:border-box;left:${left}px;top:${top}px;width:${w}px;height:${rh * 3}px;box-shadow:0 4px 14px rgba(17,24,39,0.12);`;
       // 底部越界翻到单元格上方
       requestAnimationFrame(() => {
         const h = el.offsetHeight || rh * 3;

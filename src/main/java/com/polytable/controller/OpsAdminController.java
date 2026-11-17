@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 中文备注：协作台账户管理，仅系统管理员可登录操作。
+ * 中文备注：PolyTable 账户管理，仅系统管理员可登录操作。
  */
 @RestController
 @RequestMapping("/api/v1/ops/admin")

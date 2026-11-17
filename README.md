@@ -2,16 +2,30 @@
 
 **自托管多维表格（Bitable）· Self-hosted multi-dimensional table**
 
-> 把「飞书多维表格」式的协作表格装进你自己的服务器：Canvas 渲染的十万行级大表、
-> 119 个飞书兼容公式函数、SSE 实时协作、MySQL 存储，一个 Spring Boot JAR 即可部署。
-
 <div align="center">
+
+<!-- TODO(仓库名确认后替换 YOUR_GITHUB_NAME) -->
+[![CI](https://github.com/YOUR_GITHUB_NAME/polytable/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_NAME/polytable/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-4f46e5.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17-4f46e5.svg)](https://adoptium.net/)
+
+<img src="docs/imgs/screenshot-main.png" alt="PolyTable 工作台界面" width="860" />
 
 **Canvas 大表引擎** · **飞书兼容公式** · **实时协作** · **轻量自托管**
 
 </div>
 
-> TODO(开源发布前)：补充badge（CI / License / Java 版本）与界面截图（放 `docs/imgs/`）。
+> 把「飞书多维表格」式的协作表格装进你自己的服务器：Canvas 渲染的十万行级大表、
+> 119 个飞书兼容公式函数、SSE 实时协作、MySQL 存储，一个 Spring Boot JAR 即可部署。
+
+<details>
+<summary>更多界面截图</summary>
+
+| 登录 | 工作台 |
+|---|---|
+| ![登录页](docs/imgs/screenshot-login.png) | ![工作台](docs/imgs/screenshot-main.png) |
+
+</details>
 
 ## 它是什么
 
@@ -53,7 +67,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWOR
 
 首次启动会自动建表（`ops_*` 系列表）、创建演示账户与示例表：
 
-- **演示账户**：`张三` / `李四`，默认口令 = 姓名拼音首字母 + `OPS_AUTH_PASSWORD_SUFFIX`（未设置后缀时口令即首字母 `ZS` / `LS`，仅限本地体验）
+- **演示账户**：`陈明` / `林芳`，默认口令 = 姓名拼音首字母 + `OPS_AUTH_PASSWORD_SUFFIX`（未设置后缀时口令即首字母 `CM` / `LF`，仅限本地体验）
 - **示例表** `tbl_u_demo`：含单选、多选、日期、复选框、公式列的演示数据
 - **系统管理员**：配置 `OPS_ADMIN_USERNAME` / `OPS_ADMIN_PASSWORD` 后用 `/ops/admin.html` 管理账户与角色
 

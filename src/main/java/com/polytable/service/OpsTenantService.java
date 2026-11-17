@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 协作台租户：总部（hq）与代投（agency）分域访问。
+ * 租户分域：工作台（hq）与协作空间（agency）按 Host 区分访问。
  * 默认关闭（ops.tenant.enabled=false），上线前再开。
  */
 @Service

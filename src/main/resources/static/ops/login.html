@@ -3,66 +3,193 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>登录 · 协作台</title>
+  <title>登录 · PolyTable</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <style>
+    :root {
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-soft: #eef2ff;
+      --ink: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --radius: 10px;
+    }
     * { box-sizing: border-box; }
     body {
-      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      padding: 24px; background: #fff;
-      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      color: #1f2329;
+      margin: 0; min-height: 100vh; display: flex;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+      color: var(--ink); background: #f8fafc;
     }
-    .login-card {
-      width: min(400px, 100%); background: #fff; border: 1px solid #e5e6eb;
-      border-radius: 16px; box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
-      padding: 28px 28px 24px;
+    /* 左侧品牌面板 */
+    .brand-pane {
+      flex: 1 1 52%; display: flex; flex-direction: column; justify-content: space-between;
+      padding: 44px 52px; position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #14163a 0%, #1e1b4b 45%, #312e81 100%);
+      color: #eef2ff;
     }
-    .login-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 650; }
-    .login-card .hint { color: #8f959e; font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
-    .field { margin-bottom: 14px; }
-    .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #646a73; }
+    .brand-pane::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(560px 420px at 82% 12%, rgba(124, 58, 237, 0.28), transparent 62%),
+        radial-gradient(520px 480px at 8% 92%, rgba(79, 70, 229, 0.30), transparent 60%);
+    }
+    .brand-pane::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .14;
+      background-image:
+        linear-gradient(rgba(199, 210, 254, .5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(199, 210, 254, .5) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(180deg, transparent 0%, #000 55%, transparent 100%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 55%, transparent 100%);
+    }
+    .brand-pane > * { position: relative; z-index: 1; }
+    .brand-mark { display: flex; align-items: center; gap: 12px; }
+    .brand-mark .word { font-size: 19px; font-weight: 700; letter-spacing: .3px; color: #fff; }
+    .brand-hero { max-width: 460px; }
+    .brand-hero h1 {
+      margin: 0 0 14px; font-size: 30px; line-height: 1.35; font-weight: 700; color: #fff;
+    }
+    .brand-hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #a5b4fc, #c4b5fd);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .brand-hero p { margin: 0; color: #c7d2fe; font-size: 14px; line-height: 1.7; }
+    .brand-points { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }
+    .brand-points li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: #e0e7ff; }
+    .brand-points svg { flex: 0 0 auto; }
+    .brand-foot { font-size: 12px; color: rgba(199, 210, 254, .6); }
+    /* 右侧表单区 */
+    .form-pane {
+      flex: 1 1 48%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px; position: relative;
+    }
+    .form-pane .mobile-brand { display: none; }
+    .login-card { width: min(380px, 100%); }
+    .login-card h2 { margin: 0 0 8px; font-size: 24px; font-weight: 700; letter-spacing: .2px; }
+    .login-card .hint { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 26px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 500; color: #374151; }
     .field input {
-      width: 100%; height: 40px; padding: 0 12px;
-      border: 1px solid #dee0e3; border-radius: 8px; font-size: 14px; outline: none;
+      width: 100%; height: 42px; padding: 0 14px;
+      border: 1px solid #d1d5db; border-radius: var(--radius); font-size: 14px; outline: none;
+      background: #fff; transition: border-color .15s, box-shadow .15s;
     }
-    .field input:focus { border-color: #3370ff; box-shadow: 0 0 0 3px rgba(51,112,255,0.12); }
+    .field input::placeholder { color: #9ca3af; }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14); }
     #loginBtn {
-      width: 100%; height: 40px; margin-top: 6px; border: 0; border-radius: 8px;
-      background: #0f6b5c; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+      width: 100%; height: 44px; margin-top: 8px; border: 0; border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--accent), #6d28d9); color: #fff;
+      font-size: 14.5px; font-weight: 600; cursor: pointer; letter-spacing: 1px;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
+      transition: background .15s, transform .1s, box-shadow .15s;
     }
-    #loginBtn:hover { background: #0c584c; }
-    #loginBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    #loginBtn:hover { background: linear-gradient(135deg, var(--accent-hover), #5b21b6); box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4); }
+    #loginBtn:active { transform: translateY(1px); }
+    #loginBtn:disabled { opacity: .6; cursor: not-allowed; }
+    .login-foot { margin-top: 26px; font-size: 12px; color: #9ca3af; text-align: center; }
+    .login-foot a { color: var(--accent); text-decoration: none; }
     .toast {
-      position: fixed; right: 18px; bottom: 18px; background: #111827; color: #fff;
+      position: fixed; right: 18px; bottom: 18px; background: var(--ink); color: #fff;
       padding: 10px 14px; border-radius: 10px; opacity: 0; transform: translateY(8px);
       transition: .2s; z-index: 860; max-width: 360px; font-size: 13px;
+      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.18);
     }
     .toast.show { opacity: 1; transform: none; }
-    .toast.error { background: #e03e3a; }
+    .toast.error { background: #ef4444; }
+    @media (max-width: 860px) {
+      body { flex-direction: column; }
+      .brand-pane { display: none; }
+      .form-pane { flex: 1; justify-content: center; }
+      .form-pane .mobile-brand {
+        display: flex; align-items: center; gap: 10px; margin-bottom: 34px;
+        font-size: 19px; font-weight: 700;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
   </style>
   <script src="ops-auth.js"></script>
   <script>
-    // 中文备注：已登录则直接进工作台，避免重复登录。
+    // 中文备注：已登录则直接进工作区，避免重复登录。
     if (OpsAuth.getToken()) {
       location.replace(OpsAuth.readRedirectTarget());
     }
   </script>
 </head>
 <body>
-  <div class="login-card">
-    <h2 id="loginTitle">登录协作台</h2>
-    <p class="hint" id="loginHint">请输入姓名与口令，登录后将进入协作表格。</p>
-    <div class="field">
-      <label for="loginName">姓名</label>
-      <input id="loginName" placeholder="姓名" autocomplete="username" />
+  <aside class="brand-pane" aria-hidden="true">
+    <div class="brand-mark">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="9" fill="url(#lg)"/>
+        <rect x="8" y="8" width="8" height="8" rx="2" fill="#fff" opacity=".92"/>
+        <rect x="18" y="8" width="8" height="8" rx="2" fill="#fff" opacity=".55"/>
+        <rect x="8" y="18" width="8" height="8" rx="2" fill="#fff" opacity=".55"/>
+        <rect x="18" y="18" width="8" height="8" rx="2" fill="#fff" opacity=".92"/>
+        <defs>
+          <linearGradient id="lg" x1="1" y1="1" x2="33" y2="33" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4f46e5"/><stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="word">PolyTable</span>
     </div>
-    <div class="field">
-      <label for="loginPassword">口令</label>
-      <input id="loginPassword" type="password" placeholder="口令" autocomplete="current-password" />
+    <div class="brand-hero">
+      <h1>把多维表格<br />装进<em>你自己的服务器</em></h1>
+      <p>开源自托管的协作表格：Canvas 大表引擎、119 个飞书兼容公式、实时协作，一个 JAR 加一个 MySQL 即可部署。</p>
     </div>
-    <button id="loginBtn" type="button">登录</button>
-  </div>
+    <ul class="brand-points">
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+        十万行级数据，滚动依旧顺滑
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 8l7-5 7 5M5 21l7-5 7 5"/></svg>
+        单元格级实时推送，多人协作不丢字
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        口令全走环境变量，数据不出内网
+      </li>
+    </ul>
+    <div class="brand-foot">MIT License · Self-hosted Bitable</div>
+  </aside>
+  <main class="form-pane">
+    <div class="mobile-brand" aria-hidden="true">
+      <svg width="30" height="30" viewBox="0 0 34 34" fill="none">
+        <rect x="1" y="1" width="32" height="32" rx="9" fill="url(#lgm)"/>
+        <rect x="8" y="8" width="8" height="8" rx="2" fill="#fff" opacity=".92"/>
+        <rect x="18" y="8" width="8" height="8" rx="2" fill="#fff" opacity=".55"/>
+        <rect x="8" y="18" width="8" height="8" rx="2" fill="#fff" opacity=".55"/>
+        <rect x="18" y="18" width="8" height="8" rx="2" fill="#fff" opacity=".92"/>
+        <defs>
+          <linearGradient id="lgm" x1="1" y1="1" x2="33" y2="33" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4f46e5"/><stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>PolyTable</span>
+    </div>
+    <section class="login-card">
+      <h2 id="loginTitle">登录 PolyTable</h2>
+      <p class="hint" id="loginHint">请输入姓名与口令，登录后将进入表格工作区。</p>
+      <div class="field">
+        <label for="loginName">姓名</label>
+        <input id="loginName" placeholder="姓名" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="loginPassword">口令</label>
+        <input id="loginPassword" type="password" placeholder="口令" autocomplete="current-password" />
+      </div>
+      <button id="loginBtn" type="button">登 录</button>
+      <p class="login-foot">
+        首次部署？初始口令 = 姓名拼音首字母 + <code>OPS_AUTH_PASSWORD_SUFFIX</code><br />
+        <a href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">GitHub</a> · 文档 · Issues
+      </p>
+    </section>
+  </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script>
     const $ = (id) => document.getElementById(id);
@@ -138,10 +265,7 @@
       try {
         const cfg = await api("/api/v1/ops/auth/config");
         const agency = !!cfg?.tenantEnabled && String(cfg?.tenantMode || cfg?.orgType || "").trim() === "agency";
-        const label = String(cfg?.tenantLabel || "").trim() || (agency ? "协作空间" : "工作台");
-        document.title = `登录 · ${label}`;
-        const titleEl = $("loginTitle");
-        if (titleEl) titleEl.textContent = `登录${label}`;
+        // 中文备注：主标题保持品牌名；租户语境只落在提示行。
         const hintEl = $("loginHint");
         if (hintEl && agency) {
           hintEl.textContent = "请输入协作账户与口令，登录后将进入协作空间。";

@@ -1,127 +1,174 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  PolyTable 官网 · 404 页面
+  PolyTable 官网 · 404 页面（靛蓝主题，与 index.html 同风格）
   ============================================================
-  本页面为完全自包含版本：样式与图形全部内联，
-  在 GitHub Pages 的任意路径深度下都能正常渲染。
+  本页面为完全自包含版本：样式与图形全部内联，不引用外部文件。
+  原因：GitHub Pages 的 404.html 会在任意缺失路径下被返回，
+  相对路径引用的 CSS 在二级路径深度下会失效，故全部内联。
 
   TODO 上线前检查：
-    1. 若使用项目站点（仓库名路径部署），"返回首页"的相对链接
-       ./index.html 在二级路径下可能失效，建议替换为绝对地址：
-       https://YOUR_GITHUB_NAME.github.io/polytable/
-    2. 若有正式域名，同步替换为正式地址。
+    1. "返回首页"链接为项目站点占位地址，若使用自定义域名，
+       替换为正式地址（全局搜索替换 YOUR_GITHUB_NAME）；
+    2. 若仓库名不是 polytable，同步替换链接路径。
   ============================================================
 -->
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 · 页面不存在 — PolyTable</title>
+  <title>404 · 这条记录不存在 — PolyTable</title>
   <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b0d14">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='2' y1='2' x2='46' y2='46' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%234f46e5'/%3E%3Cstop offset='1' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='3.5' y='3.5' width='18.5' height='18.5' rx='5.5' fill='url(%23g)'/%3E%3Crect x='26' y='3.5' width='18.5' height='18.5' rx='5.5' fill='url(%23g)' opacity='.82'/%3E%3Crect x='3.5' y='26' width='18.5' height='18.5' rx='5.5' fill='url(%23g)' opacity='.82'/%3E%3Crect x='26' y='26' width='18.5' height='18.5' rx='5.5' fill='url(%23g)'/%3E%3C/svg%3E" type="image/svg+xml">
   <style>
+    /* 与 assets/style.css 同一套设计令牌（自包含副本） */
     :root {
-      --dark-bg: #0a1120;
-      --dark-2: #0e1a30;
-      --ink: #e8eefb;
-      --muted: #9fb0cc;
-      --line: rgba(255, 255, 255, 0.09);
-      --brand: #3d6ff2;
-      --teal: #14b48f;
+      --brand: #4f46e5;
+      --brand-2: #7c3aed;
+      --grad: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      --grad-text: linear-gradient(100deg, #6366f1 0%, #8b5cf6 55%, #a78bfa 100%);
+      --dark-ink: #eef1f8;
+      --dark-muted: #9aa4b8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
     body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC",
-        "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-      color: var(--ink);
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      color: var(--dark-ink);
       background:
-        radial-gradient(800px 420px at 80% -10%, rgba(61, 111, 242, 0.30), transparent 62%),
-        radial-gradient(700px 420px at 0% 110%, rgba(20, 180, 143, 0.18), transparent 58%),
-        linear-gradient(180deg, var(--dark-bg), var(--dark-2));
+        radial-gradient(720px 460px at 14% -6%, rgba(79, 70, 229, 0.34), transparent 64%),
+        radial-gradient(820px 520px at 88% 4%, rgba(124, 58, 237, 0.26), transparent 62%),
+        linear-gradient(180deg, #0b0d14 0%, #12141f 55%, #171a2b 100%);
+      -webkit-font-smoothing: antialiased;
+    }
+    /* subtle grid 纹理 */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 56px 56px,
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 56px 56px;
+      -webkit-mask-image: radial-gradient(900px 560px at 50% 20%, #000 30%, transparent 78%);
+      mask-image: radial-gradient(900px 560px at 50% 20%, #000 30%, transparent 78%);
+      pointer-events: none;
+    }
+    .nf-wrap {
+      position: relative;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 32px;
-      line-height: 1.65;
+      padding: 40px 20px;
+      text-align: center;
     }
-    .nf-card { text-align: center; max-width: 480px; }
-    .nf-card .logo-svg { width: 56px; height: 56px; margin-bottom: 24px; }
+    .nf-card { max-width: 560px; }
+    .nf-logo { width: 44px; height: 44px; margin: 0 auto 26px; display: block; }
     .nf-code {
-      font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-      font-size: 72px;
+      font-family: var(--font-mono);
+      font-size: clamp(72px, 18vw, 128px);
       font-weight: 800;
-      letter-spacing: 4px;
       line-height: 1;
-      margin-bottom: 18px;
-      background: linear-gradient(92deg, #8fb4ff, #3ee4c0);
+      letter-spacing: -0.04em;
+      background: var(--grad-text);
       -webkit-background-clip: text;
       background-clip: text;
+      -webkit-text-fill-color: transparent;
       color: transparent;
     }
-    .nf-card h1 { font-size: 20px; margin-bottom: 10px; }
-    .nf-card p { color: var(--muted); font-size: 14px; margin-bottom: 30px; }
-    .nf-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-    .nf-btn {
+    .nf-title { margin-top: 18px; font-size: clamp(20px, 4vw, 26px); font-weight: 700; color: #fff; }
+    .nf-desc { margin-top: 12px; font-size: 15px; line-height: 1.75; color: var(--dark-muted); }
+    .nf-actions { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 11px 22px;
+      justify-content: center;
+      gap: 9px;
+      padding: 12px 24px;
       border-radius: 12px;
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 600;
       text-decoration: none;
-      border: 1px solid transparent;
-      transition: transform 0.15s ease, background 0.15s ease;
+      transition: transform .18s ease, filter .18s ease, border-color .18s ease, background-color .18s ease;
     }
-    .nf-btn:hover { transform: translateY(-1px); }
-    .nf-btn-primary {
-      background: linear-gradient(135deg, var(--brand) 0%, #2f5ce0 60%, var(--teal) 140%);
-      color: #fff;
-      box-shadow: 0 8px 22px rgba(47, 92, 224, 0.38);
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--grad); color: #fff; box-shadow: 0 8px 24px rgba(79, 70, 229, .38); }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-ghost { border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .06); color: #fff; }
+    .btn-ghost:hover { border-color: rgba(255, 255, 255, .4); background: rgba(255, 255, 255, .11); }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
+    .nf-meta {
+      margin-top: 34px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: #5d6472;
     }
-    .nf-btn-ghost {
-      color: var(--ink);
-      border-color: rgba(255, 255, 255, 0.28);
+    .nf-meta .row {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
       background: rgba(255, 255, 255, 0.04);
+      font-variant-numeric: tabular-nums;
     }
-    .nf-btn svg { width: 15px; height: 15px; }
+    .nf-meta i {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--grad);
+      box-shadow: 0 0 10px rgba(124, 58, 237, .9);
+    }
+    @media (max-width: 480px) {
+      .nf-actions .btn { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+      .btn:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
-  <div class="nf-card">
-    <svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="lg404" x1="6" y1="4" x2="42" y2="44" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#4d7cff"/>
-          <stop offset="1" stop-color="#14b48f"/>
-        </linearGradient>
-      </defs>
-      <rect x="2.5" y="2.5" width="43" height="43" rx="10.5" fill="url(#lg404)"/>
-      <rect x="10.5" y="13" width="27" height="6" rx="1.5" fill="#ffffff" fill-opacity="0.92"/>
-      <rect x="10.5" y="21" width="27" height="14" rx="1.5" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.8"/>
-      <path d="M10.5 25.5h27M10.5 30h27" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
-      <path d="M19.5 21v14M28.5 21v14" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
-      <rect x="19.5" y="25.5" width="9" height="4.5" fill="#ffffff" fill-opacity="0.38"/>
-    </svg>
+  <main class="nf-wrap">
+    <div class="nf-card">
+      <!-- Logo：圆角方块 2×2 网格渐变（与 index.html / favicon 一致） -->
+      <svg class="nf-logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="lg" x1="2" y1="2" x2="46" y2="46" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#4f46e5"/>
+            <stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+        <rect x="3.5" y="3.5" width="18.5" height="18.5" rx="5.5" fill="url(#lg)"/>
+        <rect x="26" y="3.5" width="18.5" height="18.5" rx="5.5" fill="url(#lg)" opacity="0.82"/>
+        <rect x="3.5" y="26" width="18.5" height="18.5" rx="5.5" fill="url(#lg)" opacity="0.82"/>
+        <rect x="26" y="26" width="18.5" height="18.5" rx="5.5" fill="url(#lg)"/>
+      </svg>
 
-    <div class="nf-code">404</div>
-    <h1>这一格是空的</h1>
-    <p>你要找的页面不存在，可能已被移动或删除。</p>
+      <p class="nf-code">404</p>
+      <h1 class="nf-title">这条记录不存在</h1>
+      <p class="nf-desc">它可能已被软删除，也可能从未创建过。<br>别担心——你的数据还在你自己的服务器上。</p>
 
-    <div class="nf-actions">
-      <!-- TODO: 项目站点部署时建议替换为绝对地址，见文件顶部注释 -->
-      <a class="nf-btn nf-btn-primary" href="./index.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
-        返回首页
-      </a>
-      <!-- TODO: 替换为正式 GitHub 仓库地址 -->
-      <a class="nf-btn nf-btn-ghost" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6 2 12l6 6"/><path d="m16 6 6 6-6 6"/></svg>
-        GitHub 源码
-      </a>
+      <div class="nf-actions">
+        <!-- TODO: 替换为正式站点首页地址（项目站点路径 / 自定义域名） -->
+        <a class="btn btn-primary" href="https://YOUR_GITHUB_NAME.github.io/polytable/">返回首页</a>
+        <!-- TODO: 替换为正式 GitHub 仓库地址 -->
+        <a class="btn btn-ghost" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.44-2.69-.84-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub 源码
+        </a>
+      </div>
+
+      <p class="nf-meta">
+        <span class="row"><i></i>HTTP 404 · row not found<i></i></span>
+      </p>
     </div>
-  </div>
+  </main>
 </body>
 </html>

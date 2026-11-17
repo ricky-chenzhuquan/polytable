@@ -1,5 +1,5 @@
 /**
- * 协作台登录态（login.html 与 index.html 共用）。
+ * PolyTable 登录态（login.html 与 index.html 共用）。
  */
 (function (global) {
   const TOKEN_KEY = "ops.token";

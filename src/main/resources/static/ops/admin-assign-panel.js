@@ -103,7 +103,7 @@
           "  <div v-show=\"subTab === 'members'\">",
           "    <div class=\"toolbar assign-toolbar\">",
           "      <el-button size=\"small\" :loading=\"memberLoading\" @click=\"loadMembersNow\">刷新</el-button>",
-          "      <span style=\"color:#6b7280;font-size:12px\">均分/任务配置读后台启用账户（协作台「负责人」下拉仍由字段配置维护）</span>",
+          "      <span style=\"color:#6b7280;font-size:12px\">均分/任务配置读后台启用账户（工作区「负责人」下拉仍由字段配置维护）</span>",
           "    </div>",
           "    <div class=\"table-wrap assign-table-wrap\">",
           "      <el-table :data=\"memberPageRows\" size=\"small\" border stripe v-loading=\"memberLoading\" empty-text=\"暂无成员\" style=\"width:100%\">",

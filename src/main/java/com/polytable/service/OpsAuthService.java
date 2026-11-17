@@ -58,7 +58,7 @@ public class OpsAuthService {
     // 中文备注：姓名 → 拼音首字母（大写），种子写入 ops_account；登录优先读库。
     // 开源版不内置任何真实名单，仅提供两个演示账户；正式名单由部署方通过账户管理接口维护。
     private static final Map<String, String> NAME_INITIALS = buildNameInitials();
-    private static final Set<String> EDITOR_PERSONNEL_NAMES = Set.of("张三", "李四");
+    private static final Set<String> EDITOR_PERSONNEL_NAMES = Set.of("陈明", "林芳");
     private static final Set<String> LEGACY_EDITOR_PERSONNEL_NAMES = Set.of();
 
     // 中文备注：主动登出的 token 加入黑名单；重启后清空，靠 token 自身过期时间兜底。
@@ -71,6 +71,12 @@ public class OpsAuthService {
     private static final long PRESENCE_TOUCH_MIN_INTERVAL_MS = 30_000L;
     private final ConcurrentHashMap<String, Long> presenceTouchAtMs = new ConcurrentHashMap<>();
     private static final int MIN_PASSWORD_LENGTH = 6;
+    // 登录防爆破：同名账户在滑动窗口内连续失败达到上限后锁定一段时间（进程内，重启清零）。
+    private static final int LOGIN_MAX_FAILURES = 8;
+    private static final long LOGIN_WINDOW_MS = 10 * 60_000L;
+    private record LoginFailureWindow(long windowStart, int count, long lockedUntil) {
+    }
+    private final ConcurrentHashMap<String, LoginFailureWindow> loginFailures = new ConcurrentHashMap<>();
     private final OpsPresenceRepository presenceRepository;
     private final OpsAccountRepository opsAccountRepository;
     private final OpsTenantService opsTenantService;
@@ -162,15 +168,15 @@ public class OpsAuthService {
                 }
             }
             if (seeded > 0) {
-                System.out.println("协作台账户种子同步：新增=" + seeded);
-                System.out.println("[PolyTable] 已创建演示账户：张三、李四。默认口令 = 姓名拼音首字母 + OPS_AUTH_PASSWORD_SUFFIX"
+                System.out.println("[PolyTable] 账户种子同步：新增=" + seeded);
+                System.out.println("[PolyTable] 已创建演示账户：陈明、林芳。默认口令 = 姓名拼音首字母 + OPS_AUTH_PASSWORD_SUFFIX"
                         + (passwordSuffix.isBlank()
-                                ? "（未设置后缀：口令即首字母 ZS / LS，仅限本地体验，请尽快改密）"
-                                : "，例如 " + NAME_INITIALS.get("张三") + passwordSuffix + "。"));
+                                ? "（未设置后缀：口令即首字母 CM / LF，仅限本地体验，请尽快改密）"
+                                : "，例如 " + NAME_INITIALS.get("陈明") + passwordSuffix + "。"));
                 System.out.println("[PolyTable] 系统管理员：账户管理页 /ops/admin.html 用 OPS_ADMIN_USERNAME / OPS_ADMIN_PASSWORD 配置的口令登录。");
             }
         } catch (Exception e) {
-            System.out.println("协作台账户种子同步跳过：" + e.getMessage());
+            System.out.println("[PolyTable] 账户种子同步跳过：" + e.getMessage());
         }
     }
 
@@ -194,6 +200,43 @@ public class OpsAuthService {
      * @param requestMode 当前访问入口租户：hq / agency。
      */
     public LoginResult login(String displayName, String password, boolean adminOnly, String requestMode) {
+        String lockKey = normalizePersonName(displayName).toLowerCase(Locale.ROOT);
+        assertNotLoginLocked(lockKey);
+        try {
+            LoginResult result = doLogin(displayName, password, adminOnly, requestMode);
+            loginFailures.remove(lockKey);
+            return result;
+        } catch (IllegalArgumentException e) {
+            recordLoginFailure(lockKey);
+            throw e;
+        }
+    }
+
+    private void assertNotLoginLocked(String key) {
+        LoginFailureWindow window = loginFailures.get(key);
+        if (window != null && window.lockedUntil() > System.currentTimeMillis()) {
+            long seconds = Math.max(1, (window.lockedUntil() - System.currentTimeMillis()) / 1000);
+            throw new IllegalArgumentException("登录尝试次数过多，请 " + seconds + " 秒后再试");
+        }
+        // 防内存滥用：异常账户名洪泛时整体清空计数器（可接受的精度损失）。
+        if (loginFailures.size() > 10_000) {
+            loginFailures.clear();
+        }
+    }
+
+    private void recordLoginFailure(String key) {
+        long now = System.currentTimeMillis();
+        loginFailures.compute(key, (k, window) -> {
+            if (window == null || now - window.windowStart() > LOGIN_WINDOW_MS) {
+                return new LoginFailureWindow(now, 1, 0);
+            }
+            int count = window.count() + 1;
+            long lockedUntil = count >= LOGIN_MAX_FAILURES ? now + LOGIN_WINDOW_MS : 0;
+            return new LoginFailureWindow(window.windowStart(), count, lockedUntil);
+        });
+    }
+
+    private LoginResult doLogin(String displayName, String password, boolean adminOnly, String requestMode) {
         String provided = trimToEmpty(password);
         String name = normalizePersonName(displayName);
         String tenantMode = OpsTenantService.normalizeOrg(requestMode, ORG_HQ);
@@ -1136,8 +1179,8 @@ public class OpsAuthService {
     private static Map<String, String> buildNameInitials() {
         Map<String, String> map = new LinkedHashMap<>();
         // 中文备注：演示账户；缺失账号按默认口令规则（拼音首字母 + 后缀）创建。
-        put(map, "张三", "ZS");
-        put(map, "李四", "LS");
+        put(map, "陈明", "CM");
+        put(map, "林芳", "LF");
         return Map.copyOf(map);
     }
 

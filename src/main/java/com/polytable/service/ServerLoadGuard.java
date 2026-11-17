@@ -126,7 +126,7 @@ public class ServerLoadGuard {
     }
 
     /**
-     * 协作台列表：不缩 batch（同事操作不受限）；防 CPU 靠首屏 gzip 缓存 + 补页 JSON，不靠砍 limit。
+     * 工作区列表：不缩 batch（同事操作不受限）；防 CPU 靠首屏 gzip 缓存 + 补页 JSON，不靠砍 limit。
      */
     public int capListBatchSize(int requestedLimit) {
         return Math.max(1, requestedLimit);

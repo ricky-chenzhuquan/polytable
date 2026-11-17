@@ -6,31 +6,40 @@
   <!-- ops-static-rev:20261115a -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>协作台 · 账户管理</title>
-  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css" />
+  <title>PolyTable · 账户管理</title>
+  <link rel="stylesheet" href="vendor/element-ui.css" />
   <style>
     :root {
-      --bg: #f3f5f8;
+      /* PolyTable 设计 token——靛蓝主色 / 暖灰中性阶 / 柔和阴影（与 index.html 同步） */
+      --bg: #f8fafc;
       --card: #ffffff;
       --line: #e5e7eb;
       --text: #111827;
       --muted: #6b7280;
-      --accent: #0f766e;
-      --accent-soft: #ccfbf1;
-      --danger: #b91c1c;
-      --danger-soft: #fee2e2;
-      --ok: #15803d;
-      --ok-soft: #dcfce7;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-soft: #eef2ff;
+      --danger: #ef4444;
+      --danger-soft: #fef2f2;
+      --ok: #10b981;
+      --ok-soft: #ecfdf5;
       --warn: #a16207;
       --warn-soft: #fef3c7;
+      --shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 4px 16px rgba(17, 24, 39, 0.08);
+      --radius: 8px;
     }
-    * { box-sizing: border-box; }
+    /* 中文备注：全局细滚动条——6px 圆角，thumb 浅灰、hover 加深（与 index.html 一致）。 */
+    * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #d1d5db transparent; }
+    *::-webkit-scrollbar { width: 6px; height: 6px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+    *::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     body {
       margin: 0;
-      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
       background:
-        radial-gradient(1200px 500px at 10% -10%, #d1fae5 0%, transparent 55%),
-        radial-gradient(900px 420px at 100% 0%, #e0f2fe 0%, transparent 50%),
+        radial-gradient(1200px 500px at 10% -10%, #e0e7ff 0%, transparent 55%),
+        radial-gradient(900px 420px at 100% 0%, #eef2ff 0%, transparent 50%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -49,7 +58,7 @@
     }
     .card {
       background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
+      box-shadow: var(--shadow);
       padding: 16px;
     }
     .toolbar {
@@ -86,7 +95,7 @@
     .toolbar button:disabled,
     .actions button:disabled,
     .login-card #loginBtn:disabled,
-    .logout-confirm-card .loc-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .logout-confirm-card .loc-foot button:disabled { opacity: 0.45; cursor: not-allowed; }
     #panelAccounts .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
     #panelAccounts .table-wrap th,
     #panelAccounts .table-wrap td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
@@ -98,7 +107,7 @@
     .tag.off { background: var(--danger-soft); color: var(--danger); }
     .tag.admin { background: var(--accent-soft); color: var(--accent); }
     .tag.user { background: #f3f4f6; color: #374151; }
-    .tag.hq { background: #dbeafe; color: #1d4ed8; }
+    .tag.hq { background: #e0e7ff; color: #4338ca; }
     .tag.agency { background: #ffedd5; color: #c2410c; }
     .tag.pwd { background: var(--warn-soft); color: var(--warn); }
     .actions { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -123,12 +132,12 @@
       border: 1px solid #dee0e3; border-radius: 8px; font-size: 14px; outline: none;
       background: #fff;
     }
-    .field input:focus { border-color: #3370ff; box-shadow: 0 0 0 3px rgba(51,112,255,0.12); }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
     .login-card #loginBtn {
       width: 100%; height: 40px; border: 0; border-radius: 8px;
-      background: #0f6b5c; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+      background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
     }
-    .login-card #loginBtn:hover { background: #0c584c; }
+    .login-card #loginBtn:hover { background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%); }
     .toast {
       position: fixed; right: 18px; bottom: 18px; background: #111827; color: #fff;
       padding: 10px 14px; border-radius: 10px; opacity: 0; transform: translateY(8px);
@@ -151,7 +160,7 @@
     }
     .logout-confirm-card .loc-ico {
       flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%;
-      background: #3370ff; color: #fff; display: inline-flex; align-items: center;
+      background: var(--accent); color: #fff; display: inline-flex; align-items: center;
       justify-content: center; font-size: 14px; font-weight: 700; line-height: 1; margin-top: 1px;
     }
     .logout-confirm-card .loc-text { min-width: 0; flex: 1; }
@@ -168,9 +177,9 @@
       min-width: 72px; padding: 7px 16px; font-size: 13px; border-radius: 6px;
     }
     .logout-confirm-card .loc-ok {
-      background: #f54a45; border: 1px solid #f54a45; color: #fff;
+      background: var(--danger); border: 1px solid var(--danger); color: #fff;
     }
-    .logout-confirm-card .loc-ok:hover { background: #e03e3a; border-color: #e03e3a; }
+    .logout-confirm-card .loc-ok:hover { background: #dc2626; border-color: #dc2626; }
     .table-wrap { max-height: calc(100vh - 300px); overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
     .pager-wrap {
       display: flex; justify-content: flex-end; align-items: center;
@@ -195,7 +204,7 @@
       background: #f4f4f5; color: #606266;
     }
     .pager-wrap .el-pagination.is-background .el-pager li.active {
-      background: #409eff; color: #fff;
+      background: var(--accent); color: #fff;
     }
     .pager-wrap .el-pagination .el-pagination__sizes .el-input__inner,
     .pager-wrap .el-pagination .el-pagination__editor.el-input .el-input__inner {
@@ -229,7 +238,7 @@
       border-radius: 0 4px 4px 0;
     }
     .admin-account-dialog .el-radio-button__orig-radio:checked + .el-radio-button__inner {
-      background-color: #409eff; border-color: #409eff; box-shadow: -1px 0 0 0 #409eff;
+      background-color: var(--accent); border-color: var(--accent); box-shadow: -1px 0 0 0 var(--accent);
     }
     .admin-tabs {
       display: flex; gap: 8px; margin-bottom: 16px;
@@ -289,7 +298,7 @@
     .scripts-command-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fcfdfd; }
     .scripts-command-head { align-items: flex-start; margin-bottom: 12px; }
     .scripts-command-head h3 { font-size: 15px; }
-    .scripts-command-card .el-textarea__inner { min-height: 58px !important; padding: 9px 10px; color: #134e4a; background: #f0fdfa; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .scripts-command-card .el-textarea__inner { min-height: 58px !important; padding: 9px 10px; color: #3730a3; background: #eef2ff; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
     .scripts-panel-footnote { align-items: flex-start; flex-direction: column; gap: 4px; margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
     @media (max-width: 680px) {
       .scripts-panel-intro { align-items: flex-start; flex-direction: column; }
@@ -305,6 +314,23 @@
       margin: -6px 0 4px 88px; color: var(--muted); font-size: 12px; line-height: 1.5;
     }
     .assign-pager-wrap { margin-top: 12px; padding-top: 0; border-top: none; }
+
+    /* 中文备注：ElementUI primary 固定蓝走 CSS 层覆盖——统一到 --accent 靛蓝主色（与 index.html 一致）。 */
+    .el-button--primary { background-color: var(--accent); border-color: var(--accent); }
+    .el-button--primary:hover, .el-button--primary:focus { background-color: var(--accent-hover); border-color: var(--accent-hover); }
+    .el-button--primary.is-plain { color: var(--accent); background: var(--accent-soft); border-color: transparent; }
+    .el-button--text { color: var(--accent); }
+    .el-button--text:hover { color: var(--accent-hover); }
+    .el-checkbox__input.is-checked .el-checkbox__inner,
+    .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+      background-color: var(--accent); border-color: var(--accent);
+    }
+    .el-radio__input.is-checked .el-radio__inner { background-color: var(--accent); border-color: var(--accent); }
+    .el-switch.is-checked .el-switch__core { background-color: var(--accent); border-color: var(--accent); }
+    .el-input__inner:focus, .el-textarea__inner:focus { border-color: var(--accent); }
+    .el-select .el-input.is-focus .el-input__inner { border-color: var(--accent); }
+    .el-pagination .el-pager li.active { color: var(--accent) !important; }
+    .el-loading-spinner .path { stroke: var(--accent); }
   </style>
 </head>
 <body>
@@ -376,7 +402,7 @@
   <div id="loginMask" class="login-mask show">
     <div class="login-card">
       <h2>系统管理员登录</h2>
-      <div class="hint" id="loginHint">请输入管理员账号和口令；普通协作台账户无法登录。</div>
+      <div class="hint" id="loginHint">请输入管理员账号和口令；普通工作区账户无法登录。</div>
       <div class="field">
         <label>账号</label>
         <input id="loginName" value="" placeholder="账号" autocomplete="username" />
@@ -409,9 +435,9 @@
 
   <div id="toast" class="toast"></div>
 
-  <script src="https://unpkg.com/vue@2.7.16/dist/vue.min.js"></script>
-  <script src="https://unpkg.com/element-ui@2.15.14/lib/index.js"></script>
-  <script src="https://unpkg.com/element-ui@2.15.14/lib/umd/locale/zh-CN.js"></script>
+  <script src="vendor/vue.min.js"></script>
+  <script src="vendor/element-ui.js"></script>
+  <script src="vendor/zh-CN.js"></script>
   <script src="./ops-static-guard.js?v=20261115a"></script>
   <script src="./admin-editor-group-panel.js?v=20261115a"></script>
   <script src="./admin-assign-panel.js?v=20261115a"></script>
@@ -454,7 +480,7 @@
             :close-on-click-modal="false">
             <el-form label-width="100px" size="small" @submit.native.prevent="submit">
               <el-form-item v-if="mode === 'create'" label="姓名">
-                <el-input v-model="form.displayName" placeholder="例如：张三" clearable></el-input>
+                <el-input v-model="form.displayName" placeholder="例如：陈明" clearable></el-input>
               </el-form-item>
               <el-form-item v-else label="姓名">
                 <el-input v-model="form.displayName" disabled></el-input>

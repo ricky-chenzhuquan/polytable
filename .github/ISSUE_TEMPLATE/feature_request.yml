@@ -1,0 +1,21 @@
+name: 功能建议
+description: 提出一个新功能或改进
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 想解决什么问题
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望的方案
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 备选方案与其他上下文
+      description: 已确认过 docs/roadmap.md 里没有同类规划？欢迎引用相关条目

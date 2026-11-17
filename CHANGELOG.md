@@ -18,5 +18,17 @@
 - 行操作：批量粘贴（含撤销批次）、软删除 / 恢复、乐观锁版本守卫
 - 账户与权限：HMAC token 登录、角色菜单权限、账户管理面板（`/ops/admin.html`）
 - 多租户分域雏形（按 Host 区分，默认关闭）
-- 首次启动种子：演示账户（张三 / 李四）与示例项目表
+- 首次启动种子：演示账户（陈明 / 林芳）与示例项目表
 - 官网（`website/`）与全套开源文档（architecture / performance / guardrails / design / roadmap）
+
+### 安全
+
+- 登录防爆破：同名账户 10 分钟窗口内失败 8 次后锁定 10 分钟（进程内滑动窗口）
+- 前端依赖本地化：Vue / ElementUI 从公共 CDN 改为仓库内 `static/ops/vendor/`，消除供应链与可用性风险
+- 登录 token 签名密钥未配置时使用随机临时密钥（重启失效），不再回退可预测盐值
+
+### 变更
+
+- 全新靛蓝视觉主题：登录页（分屏品牌面板）与工作台整体换肤，品牌统一为 PolyTable
+- CI：测试 + 打包；Release：tag 触发（jar 附件 + GHCR 镜像）；CodeQL 周扫；PR 依赖审查
+- 社区模板：issue 表单（bug/feature）、PR 模板（含脱敏自查清单）

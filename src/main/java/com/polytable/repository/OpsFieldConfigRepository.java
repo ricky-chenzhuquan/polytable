@@ -1,7 +1,5 @@
 package com.polytable.repository;
 
-import com.polytable.collect.OpsDramaListSchemaContext;
-import com.polytable.collect.OpsJdbcReadOverride;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -22,12 +20,12 @@ public class OpsFieldConfigRepository {
     }
 
     private JdbcTemplate jdbc() {
-        return OpsJdbcReadOverride.resolve(jdbcTemplate);
+        return jdbcTemplate;
     }
 
     public Map<String, Map<String, Object>> listAll() {
         Map<String, Map<String, Object>> out = new LinkedHashMap<>();
-        String table = OpsDramaListSchemaContext.qualify("ops_field_config");
+        String table = "ops_field_config";
         jdbc().query("""
                 SELECT field_key, field_type, default_value, options_json, is_custom, field_title, master_link_json, updated_by, update_time
                 FROM %s

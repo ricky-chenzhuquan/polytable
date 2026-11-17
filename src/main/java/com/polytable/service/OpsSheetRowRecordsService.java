@@ -89,7 +89,7 @@ public class OpsSheetRowRecordsService {
                 pageLimit);
     }
 
-    /** 飞书式分片：协作表 records 单块行数上限（与前端 BLANK_SHEET_RECORDS_CHUNK 对齐）。 */
+    /** 分片：协作表 records 单块行数上限（与前端 BLANK_SHEET_RECORDS_CHUNK 对齐）。 */
     public static final int RECORDS_CHUNK_ROW_LIMIT = 4000;
 
     public int capRecordsPageLimit(Integer limit) {

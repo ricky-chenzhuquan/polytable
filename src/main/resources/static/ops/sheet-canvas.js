@@ -1,10 +1,10 @@
 /**
- * 中文备注：协作工作台 Canvas 表格引擎（类飞书多维表 / Excel 网格）。
+ * 中文备注：协作工作台 Canvas 表格引擎（类多维表格 / Excel 网格）。
  * 依赖页面注入的 hooks：getRows / getDraft / isDirty / columnDefs / options / labels 等。
  */
 (function (global) {
   const OPS_SHEET_CANVAS_REV = "20261115a";
-  // 中文备注：飞书实测行高 30px(紧凑档)/表头 30px。
+  // 中文备注：主流多维表格实测行高 30px(紧凑档)/表头 30px。
   const DEFAULT_ROW_H = 30;
   const HEADER_H = 30;
   // 中文备注：行号列要能完整显示四位数（上千行）；过窄会被 drawText 默认 pad 裁成省略号。
@@ -154,7 +154,7 @@
       widthOverrides: {}, // drag 中的临时列宽
       edgeKey: "",
       suppressClick: false,
-      // 中文备注：已选列表头长按后进入拖拽改列序（飞书：先点选整列，再长按拖）。
+      // 中文备注：已选列表头长按后进入拖拽改列序（多维表格：先点选整列，再长按拖）。
       colLongPress: null, // { key, timer, x, y }
       colDragging: null, // { key, insertKey, place, lineX }
       // 中文备注：填充柄拖拽快照；源选区固定，预览区随指针向下扩展；边拖边提交共用 pasteBatchId。
@@ -339,7 +339,7 @@
       const pad = GROUP_CARD_PAD;
       const cardW = Math.max(0, viewportW - pad * 2);
 
-      // 中文备注：只画一级（剪辑）白底大卡片；内层分组不另铺灰底，全白。
+      // 中文备注：只画一级（顶层）白底大卡片；内层分组不另铺灰底，全白。
       for (const b of blocks) {
         const y0 = bodyTop + b.start * rowH() - st;
         const y1 = bodyTop + (b.end + 1) * rowH() - st;
@@ -663,7 +663,7 @@
       const vr = viewport.getBoundingClientRect();
       const pad = 10;
       const scrollbarW = Math.max(0, viewport.offsetWidth - viewport.clientWidth);
-      // 中文备注：钉在表格视口右下角（飞书风格），不跟随选区矩形移动。
+      // 中文备注：钉在表格视口右下角（多维表格风格），不跟随选区矩形移动。
       const left = vr.right - pw - pad - scrollbarW;
       const top = vr.bottom - ph - pad;
       selectionStatEl.style.left = `${Math.round(left)}px`;
@@ -1106,7 +1106,7 @@
       return out;
     }
 
-    /** 中文备注：Excel/飞书复制单格常带尾部空行；仍视为单值以便填满多格选区。 */
+    /** 中文备注：Excel/多维表格复制单格常带尾部空行；仍视为单值以便填满多格选区。 */
     function extractSinglePasteValue(matrix) {
       if (!matrix?.length) return null;
       const flat = flattenMatrixValues(matrix);
@@ -1205,7 +1205,7 @@
       return allRanges();
     }
 
-    // 中文备注：筛剧评级/剪辑等下拉，粘贴时按选项精确或忽略大小写匹配，避免脏值入库。
+    // 中文备注：评级/负责人等下拉，粘贴时按选项精确或忽略大小写匹配，避免脏值入库。
     function matchPasteValue(col, raw) {
       const text = String(raw ?? "").trim();
       if (!col) return null;
@@ -1350,7 +1350,7 @@
         if (matched == null) return;
         // 中文备注：空串粘贴到空格无意义，跳过。
         if (matched === "" && !String(raw ?? "").trim()) return;
-        // 中文备注：筛剧评级是内部只补空的字段；已有评级不允许被粘贴或填充覆盖。
+        // 中文备注：评级是内部只补空的字段；已有评级不允许被粘贴或填充覆盖。
         if (col.key === "screeningRating" && cellCopyValue(row, col).trim() && String(matched).trim()) return;
         // 中文备注：允许覆盖已有内容；值未变化时不生成保存请求，多选区重叠时同一格只提交一次。
         if (String(cellText(row, col) ?? "") === String(matched)) return;
@@ -1753,7 +1753,7 @@
         return String(row.seriesName || "");
       }
       if (col.key === "bookId") {
-        // 中文备注：ADX 热榜运营键是 name-剧名，表头 book_id 只展示匹配到的真实 id。
+        // 中文备注：ADX 热榜运营键是 name-名称，表头 book_id 只展示匹配到的真实 id。
         if (row.dramaType === "adx") {
           return String(row.bookId || "").trim();
         }
@@ -1765,14 +1765,14 @@
       if (col.key === "playCount") {
         return String(row.playCountText || row.playCount || "").trim();
       }
-      // 中文备注：运营可编辑字段（版权/剪辑/评级等）优先 draft，保证框选复制与标签展示一致。
+      // 中文备注：可编辑字段（版权/负责人/评级等）优先 draft，保证框选复制与标签展示一致。
       const draft = hooks().getDraft?.(row) || {};
       if (Object.prototype.hasOwnProperty.call(draft, col.key)) {
         const dv = draft[col.key];
         return dv == null || String(dv).trim() === "" ? "" : String(dv);
       }
-      if (["douyinWorkId", "douyinAccount", "publishAwemeUser", "isFocus", "categoryText",
-           "estimatePublishTime", "publishTime", "changduCreateTime", "timeDiffMinutes",
+      if (["workId", "account", "publishAwemeUser", "isFocus", "categoryText",
+           "estimatePublishTime", "publishTime", "createTime", "timeDiffMinutes",
            "onlineTime", "crawlUpdateTime", "episodeAmount"].includes(col.key)) {
         // 中文备注：空值一律留白，不再用 “-” 占位（四表通用）。
         const v = row[col.key];
@@ -1823,7 +1823,7 @@
     }
 
     function strokeGrid(x, y, w, h, color) {
-      // 中文备注：飞书式——每格只画上边+左边,相邻格共享边只画一次;逐格四边矩形会让
+      // 中文备注：多维表格式——每格只画上边+左边,相邻格共享边只画一次;逐格四边矩形会让
       // 共享边出现 1px 错位(重边/缝隙),视觉粗细不均。网格最外圈右/下边由网格级补线负责。
       ctx.strokeStyle = color || COLORS.grid;
       ctx.lineWidth = 1;
@@ -1877,7 +1877,7 @@
       if (col.key === "copyrightOwner") return "tag";
       if (col.key === "categoryText") return "text";
       if (col.key === "estimatePublishTime" || col.key === "publishTime"
-          || col.key === "changduCreateTime" || col.key === "onlineTime" || col.key === "crawlUpdateTime") {
+          || col.key === "createTime" || col.key === "onlineTime" || col.key === "crawlUpdateTime") {
         return "date";
       }
       if (col.key === "episodeAmount" || col.key === "materialCount" || col.key === "priorityLevel"
@@ -1978,7 +1978,7 @@
     }
 
     function drawHeaderMenuIcon(x, y, w, h, active) {
-      // 中文备注：飞书行为——菜单箭头仅 hover/选中时出现,常驻会显得嘈杂。
+      // 中文备注：多维表格行为——菜单箭头仅 hover/选中时出现,常驻会显得嘈杂。
       if (!active && !sheet.activeCol) return;
       const cx = x + w / 2;
       const cy = y + h / 2;
@@ -2031,7 +2031,7 @@
       if (syncing) {
         drawHeaderSyncSpinner(menuX - 9, HEADER_H / 2);
       }
-      // 中文备注：拖宽/拖列进行中隐藏下拉箭头(对齐飞书——拖拽态不出现菜单入口,也不误提示可点)。
+      // 中文备注：拖宽/拖列进行中隐藏下拉箭头(对齐主流多维表格——拖拽态不出现菜单入口,也不误提示可点)。
       if (!sheet.resizing && !sheet.colDragging) {
         drawHeaderMenuIcon(menuX, 0, HEADER_MENU_W, HEADER_H, hot);
       }
@@ -2043,7 +2043,7 @@
       }
       const textX = screenX + HEADER_PAD_X + HEADER_ICON_W + 4;
       const textW = Math.max(12, menuX - textX - 2);
-      // 中文备注：飞书实测表头文字——14px 常规字重深色 #1F2329,选中整列转蓝。
+      // 中文备注：主流多维表格实测表头文字——14px 常规字重深色 #1F2329,选中整列转蓝。
       drawText(label, textX, 0, textW, HEADER_H, {
         align: "left", bold: false, color: selected ? COLORS.headerSelectedText : COLORS.headerText, size: 14, pad: 0
       });
@@ -2058,7 +2058,7 @@
         || v === "勾选" || v === "已勾选" || v === "选中" || v === "对";
     }
 
-    /** 中文备注：表头/整列粘贴复选框时，兼容 Excel/飞书/WPS 常见勾选对号写法。 */
+    /** 中文备注：表头/整列粘贴复选框时，兼容 Excel/多维表格/WPS 常见勾选对号写法。 */
     function normalizeCheckboxPasteValue(raw) {
       const text = String(raw ?? "").trim();
       if (!text) return "";
@@ -2462,7 +2462,7 @@
       const bg = hover
         ? (level === 0 ? COLORS.groupBgHover : COLORS.groupBgL1Hover)
         : COLORS.groupBg;
-      // 中文备注：飞书分组头浅灰底，落在白卡片宽度内。
+      // 中文备注：多维表格分组头浅灰底，落在白卡片宽度内。
       fillRect(pad, rowY, Math.max(0, viewportW - pad * 2), rowH(), bg);
       ctx.strokeStyle = COLORS.groupLineSoft;
       ctx.beginPath();
@@ -2569,7 +2569,7 @@
           drawText(label, bx, by, btnW, btnH, { align: "center", size: 11, color: COLORS.subtle, pad: 2 });
         }
       } else if (col.key === "seriesName") {
-        // 中文备注：剧名列只展示剧名（含草稿）；类目/描述类型走独立列。
+        // 中文备注：名称列只展示名称（含草稿）；类目/描述类型走独立列。
         const name = cellText(row, col) || "";
         if (name) {
           drawText(name, screenX, rowY, w - (dirty ? 48 : 0), rowH(), {
@@ -2666,7 +2666,7 @@
       if (!peers.length || !row || !col) return;
       const rowOps = String(row.opsKey || "");
       const rowType = String(row.dramaType || "");
-      // W2 选区广播——他人框选的行键×列键命中时,先用极淡底色铺满选区格子(飞书式协作选区)。
+      // W2 选区广播——他人框选的行键×列键命中时,先用极淡底色铺满选区格子(多维表格式协作选区)。
       for (const peer of peers) {
         if (!peer?.sel) continue;
         if (!peer.sel.rowSet.has(rowOps) || !peer.sel.colSet.has(col.key)) continue;
@@ -2898,7 +2898,7 @@
           if (sheet.hoverRow === r) bg = isFocusRow(row) ? COLORS.focus : COLORS.headerHot;
           fillRect(0, rowY, ix, rowH(), bg);
           strokeGrid(0, rowY, ix, rowH(), COLORS.gridStrong);
-          // 中文备注：飞书式——行号 hover 显示展开箭头(替代数字),点击打开记录详情抽屉。
+          // 中文备注：多维表格式——行号 hover 显示展开箭头(替代数字),点击打开记录详情抽屉。
           if (sheet.hoverRow === r) {
             const cx = ix / 2;
             const cy = rowY + rowH() / 2;
@@ -2922,7 +2922,7 @@
         }
       }
 
-      // 中文备注：分组行最后全宽绘制，盖住序号列底色与单元格，对齐飞书分组条。
+      // 中文备注：分组行最后全宽绘制，盖住序号列底色与单元格，对齐主流多维表格分组条。
       ctx.save();
       ctx.beginPath();
       ctx.rect(0, HEADER_H, W, Math.max(0, H - HEADER_H));
@@ -2934,7 +2934,7 @@
       }
       ctx.restore();
 
-      // 中文备注：空白表固定在末行下方显示飞书式「+」新增行入口。
+      // 中文备注：空白表固定在末行下方显示多维表格式「+」新增行入口。
       if (L.hasBottomAddRow && !grouped) {
         const addY = HEADER_H + L.rowCount * rowH() - st;
         if (addY < H && addY + rowH() > HEADER_H) {
@@ -2957,7 +2957,7 @@
         strokeGrid(0, 0, ix, HEADER_H, COLORS.gridStrong);
       }
 
-      // top/left separators — softer than cell grid for a cleaner Feishu feel
+      // top/left separators — softer than cell grid for a cleaner spreadsheet feel
       ctx.strokeStyle = COLORS.gridStrong;
       ctx.beginPath();
       ctx.moveTo(0, HEADER_H - 0.5);
@@ -3010,7 +3010,7 @@
       // 中文备注：长按拖列时画插入指示线。
       if (sheet.colDragging && Number.isFinite(sheet.colDragging.lineX)) {
         const lineX = sheet.colDragging.lineX;
-        // 中文备注：拖列时只强调表头插入位置，使用飞书式低饱和蓝色指示线。
+        // 中文备注：拖列时只强调表头插入位置，使用多维表格式低饱和蓝色指示线。
         ctx.strokeStyle = "#3370ff";
         ctx.lineWidth = 3;
         ctx.beginPath();
@@ -3120,7 +3120,7 @@
       const L = layout();
       const sl = sheet.scrollLeft;
       // 中文备注：拖宽热区=边界线 ±5px——10px 会盖住下拉箭头(中心在右缘 -10px)的点击区,
-      // 点箭头变成拖宽、菜单永远打不开(飞书:边界线拖宽、箭头开菜单,两个热区不重叠)。
+      // 点箭头变成拖宽、菜单永远打不开(多维表格:边界线拖宽、箭头开菜单,两个热区不重叠)。
       const edge = 5;
       const check = (meta, screenX) => {
         const right = screenX + meta.w;
@@ -3279,7 +3279,7 @@
       tooltip.style.top = Math.max(8, top) + "px";
     }
 
-    /** 中文备注：飞书式——被截断的单元格内容气泡悬于单元格上方;上方放不下翻到下方。 */
+    /** 中文备注：多维表格式——被截断的单元格内容气泡悬于单元格上方;上方放不下翻到下方。 */
     function showTooltipAbove(text, clientX, cellTopClientY) {
       if (!tooltip) return;
       const t = String(text ?? "").trim();
@@ -3300,7 +3300,7 @@
       tooltip.style.top = `${top}px`;
     }
 
-    // ===== 公式单元格单击展开(飞书式:白底蓝框,约 3 行高滚动查看;点别处/滚动关闭) =====
+    // ===== 公式单元格单击展开(多维表格式:白底蓝框,约 3 行高滚动查看;点别处/滚动关闭) =====
     function ensureFormulaPeek() {
       let el = document.getElementById("formulaPeek");
       if (!el) {
@@ -3662,7 +3662,7 @@
       return { ...col, ...fresh, key: col.key };
     }
 
-    /** 中文备注：飞书式长文本多行编辑——textarea 与 input 同语义(Enter 提交/Esc 取消/blur 提交),
+    /** 中文备注：多维表格式长文本多行编辑——textarea 与 input 同语义(Enter 提交/Esc 取消/blur 提交),
      *  值实时镜像进 input.value,closeEditor 无需感知差异。单击 ~4 行,双击 ~10 行。 */
     function ensureEditorTextarea() {
       let ta = editor.querySelector("textarea.sheet-textarea");
@@ -3803,7 +3803,7 @@
         positionEditor();
         global.FrDateTimePicker?.focusSheet?.();
       } else {
-        // 中文备注：飞书式——长文本(超长 URL 等)进入多行编辑:单击适量高度滚动查看,双击更高。
+        // 中文备注：多维表格式——长文本(超长 URL 等)进入多行编辑:单击适量高度滚动查看,双击更高。
         if (String(value || "").length > 36) {
           openTextMultiline(value, !!opts.tall);
           scheduleDraw();
@@ -4302,7 +4302,7 @@
           canvas.style.cursor = (isActionColumn(hit.col) || hit.col.type === "copy" || hit.col.type === "checkbox")
             ? "pointer"
             : "default";
-          // 中文备注：飞书式——内容被截断(省略号)才弹完整气泡,且悬于单元格上方;未截断不弹。
+          // 中文备注：多维表格式——内容被截断(省略号)才弹完整气泡,且悬于单元格上方;未截断不弹。
           const usableW = Math.max(20, (hit.w || colWidth(hit.col)) - CELL_PAD_X * 2);
           ctx.font = '13px "PingFang SC","Microsoft YaHei","Segoe UI",Calibri,Arial,sans-serif';
           const truncated = String(text ?? "").length > 0 && ctx.measureText(String(text)).width > usableW;
@@ -4426,7 +4426,7 @@
           sheet.active = null;
           sheet.activeCol = "";
           clearSelection();
-          // 中文备注：仅点展开箭头才折叠，避免点标签误收起（对齐飞书）。
+          // 中文备注：仅点展开箭头才折叠，避免点标签误收起（对齐主流多维表格）。
           if (hit.onChevron) hooks().onGroupToggle?.(hit.row, hit.rowIndex);
           scheduleDraw();
           emitFocusChange("idle");
@@ -4507,7 +4507,7 @@
           emitFocusChange(keepChip && sheet.editing ? "edit" : "select");
           return;
         }
-        // 中文备注：飞书式——hover 行号出现的展开箭头点击打开记录详情抽屉(替代数字的中央区域)。
+        // 中文备注：多维表格式——hover 行号出现的展开箭头点击打开记录详情抽屉(替代数字的中央区域)。
         if (hit?.kind === "rowIndex" && hit.expand) {
           e.preventDefault();
           e.stopPropagation();
@@ -4533,7 +4533,7 @@
           sheet.active = { rowIndex: hit.rowIndex, colKey: cols[0].key };
           sheet.activeCol = "";
           sheet._selAnchor = { rowIndex: hit.rowIndex, colIndex: 0 };
-          // 中文备注：行号按下拖动可跨屏多选整行，对齐 Excel/飞书。
+          // 中文备注：行号按下拖动可跨屏多选整行，对齐 Excel/多维表格。
           sheet.selecting = {
             add,
             startRow: hit.rowIndex,
@@ -4554,7 +4554,7 @@
         const key = sheet.resizing.key;
         const w = clampColW(Number(sheet.widthOverrides[key]) || sheet.resizing.startW, { manual: true });
         // 中文备注：拖宽结束后鼠标必落在列缝附近(hit.menu 区)——必须吞掉随行的 click,
-        // 否则 mouseup 先清 resizing、click 再命中菜单区,每次拖完都弹字段菜单(飞书无此行为)。
+        // 否则 mouseup 先清 resizing、click 再命中菜单区,每次拖完都弹字段菜单(多维表格无此行为)。
         sheet.suppressClick = true;
         sheet.resizing = null;
         sheet.edgeKey = "";
@@ -4702,7 +4702,7 @@
           e.stopPropagation();
           if (hit.menu) {
             const rect = canvas.getBoundingClientRect();
-            // 中文备注：飞书实测——字段菜单展开锚点=整列左下(菜单左缘贴列左缘,悬于表头下方),不是右侧箭头处。
+            // 中文备注：主流多维表格实测——字段菜单展开锚点=整列左下(菜单左缘贴列左缘,悬于表头下方),不是右侧箭头处。
             hooks().onHeaderMenu?.(hit.col.key, {
               getBoundingClientRect: () => ({
                 left: rect.left + hit.screenX + 2,
@@ -4814,7 +4814,7 @@
             if (reopenSelect) openEditor(hit);
             return;
           }
-          // 中文备注：公式列单击=展开查看(白底蓝框约 3 行,飞书式;公式只读不可编辑)。
+          // 中文备注：公式列单击=展开查看(白底蓝框约 3 行,多维表格式;公式只读不可编辑)。
           if (colType === "formula") {
             openFormulaPeek(hit);
             return;
@@ -4872,7 +4872,7 @@
           else openEditor(hit, { tall: true });
           return;
         }
-        // 中文备注：公式列双击=打开该字段的公式编辑面板(飞书式;查看/修改定义)。
+        // 中文备注：公式列双击=打开该字段的公式编辑面板(多维表格式;查看/修改定义)。
         if (colType === "formula" && hit.col?.key) {
           e.stopPropagation();
           closeFormulaPeek();
@@ -5101,7 +5101,7 @@
         });
       });
 
-      // 中文备注：Ctrl/Cmd+V 可覆盖已有内容；筛剧评级/剪辑等 select 仍按选项匹配。
+      // 中文备注：Ctrl/Cmd+V 可覆盖已有内容；评级/负责人等 select 仍按选项匹配。
       window.addEventListener("paste", async (e) => {
         // 中文备注：多选/单选编辑器内粘贴仍走表格批量解析；普通文本编辑器保留原生粘贴。
         const editingType = sheet.editing ? (liveColumn(sheet.editing.col)?.type || sheet.editing.col?.type || "") : "";
@@ -5192,7 +5192,7 @@
       // 中文备注：恢复绘制；曾因异常 pause 时，筛选/滚动刷新应能自愈，避免一直白屏。
       drawPaused = false;
       invalidateLayoutCache();
-      // 中文备注：编辑/选项菜单打开时勿强行关编辑器，否则后台 drain/增量 render 会把剪辑等下拉「弹走」且未提交。
+      // 中文备注：编辑/选项菜单打开时勿强行关编辑器，否则后台 drain/增量 render 会把下拉「弹走」且未提交。
       if (sheet.editing) {
         if (!rematchEditingRow()) {
           resize();

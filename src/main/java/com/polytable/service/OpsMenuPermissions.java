@@ -9,13 +9,13 @@ import java.util.Set;
 
 public final class OpsMenuPermissions {
 
-    public static final String DRAMA_DATA = "drama-data";
+    public static final String DATA_USER = "data-user";
     public static final String CLIPS = "clips";
     public static final String ACCOUNTS = "accounts";
     public static final String SCRIPTS = "scripts";
     public static final String RULES = "rules";
-    private static final Set<String> ASSIGNABLE = Set.of(DRAMA_DATA, CLIPS, ACCOUNTS);
-    private static final List<String> ORDER = List.of(DRAMA_DATA, CLIPS, ACCOUNTS);
+    private static final Set<String> ASSIGNABLE = Set.of(DATA_USER, CLIPS, ACCOUNTS);
+    private static final List<String> ORDER = List.of(DATA_USER, CLIPS, ACCOUNTS);
 
     private OpsMenuPermissions() {
     }

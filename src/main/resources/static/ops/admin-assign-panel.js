@@ -1,5 +1,5 @@
 /**
- * 中文备注：剪辑分配入口（人员分配 + 按投放时间分配 + 按创建时间分配），单 Vue 实例避免嵌套挂载错乱。
+ * 中文备注：成员分配入口（人员分配 + 按发布时间分配 + 按创建时间分配），单 Vue 实例避免嵌套挂载错乱。
  */
 (function (global) {
   "use strict";
@@ -97,17 +97,17 @@
           "<div class=\"assign-panel-root\">",
           "  <div class=\"assign-sub-tabs\">",
           "    <el-button round size=\"small\" :type=\"subTab === 'members' ? 'primary' : 'default'\" @click=\"pickSubTab('members')\">人员分配</el-button>",
-          "    <el-button round size=\"small\" :type=\"subTab === 'delivery' ? 'primary' : 'default'\" @click=\"pickSubTab('delivery')\">按投放时间分配</el-button>",
+          "    <el-button round size=\"small\" :type=\"subTab === 'delivery' ? 'primary' : 'default'\" @click=\"pickSubTab('delivery')\">按发布时间分配</el-button>",
           "    <el-button round size=\"small\" :type=\"subTab === 'create' ? 'primary' : 'default'\" @click=\"pickSubTab('create')\">按创建时间分配</el-button>",
           "  </div>",
           "  <div v-show=\"subTab === 'members'\">",
           "    <div class=\"toolbar assign-toolbar\">",
           "      <el-button size=\"small\" :loading=\"memberLoading\" @click=\"loadMembersNow\">刷新</el-button>",
-          "      <span style=\"color:#6b7280;font-size:12px\">均分/任务配置读后台启用账户（协作台「剪辑」下拉仍由字段配置维护）</span>",
+          "      <span style=\"color:#6b7280;font-size:12px\">均分/任务配置读后台启用账户（协作台「负责人」下拉仍由字段配置维护）</span>",
           "    </div>",
           "    <div class=\"table-wrap assign-table-wrap\">",
-          "      <el-table :data=\"memberPageRows\" size=\"small\" border stripe v-loading=\"memberLoading\" empty-text=\"暂无剪辑\" style=\"width:100%\">",
-          "        <el-table-column label=\"剪辑\" min-width=\"120\"><template slot-scope=\"{ row }\"><strong>{{ row.editorName }}</strong></template></el-table-column>",
+          "      <el-table :data=\"memberPageRows\" size=\"small\" border stripe v-loading=\"memberLoading\" empty-text=\"暂无成员\" style=\"width:100%\">",
+          "        <el-table-column label=\"成员\" min-width=\"120\"><template slot-scope=\"{ row }\"><strong>{{ row.editorName }}</strong></template></el-table-column>",
           "        <el-table-column label=\"所属分组\" min-width=\"140\">",
           "          <template slot-scope=\"{ row }\"><span :style=\"rowGroupStyle(row)\">{{ rowGroupText(row) }}</span></template>",
           "        </el-table-column>",
@@ -127,7 +127,7 @@
           "    </div>",
           "    <el-dialog title=\"编辑分组\" :visible.sync=\"memberDialogVisible\" width=\"420px\" append-to-body custom-class=\"admin-account-dialog\" :close-on-click-modal=\"false\">",
           "      <el-form label-width=\"88px\" size=\"small\" @submit.native.prevent=\"submitMemberDialog\">",
-          "        <el-form-item label=\"剪辑\"><el-input v-model=\"memberForm.editorName\" disabled></el-input></el-form-item>",
+          "        <el-form-item label=\"成员\"><el-input v-model=\"memberForm.editorName\" disabled></el-input></el-form-item>",
           "        <el-form-item label=\"分组\">",
           "          <el-select v-model=\"memberForm.groupName\" placeholder=\"选择分组\" filterable style=\"width:100%\">",
           "            <el-option :label=\"deferredGroupLabel\" :value=\"deferredGroupLabel\"></el-option>",
@@ -243,27 +243,27 @@
             }
           },
           taskDateColumnLabel: function () {
-            return this.subTab === "create" ? "承接日期（请假日期）" : "投放时间";
+            return this.subTab === "create" ? "承接日期（请假日期）" : "发布时间";
           },
           taskDateFromPlaceholder: function () {
-            return this.subTab === "create" ? "起始承接日期" : "起始投放日";
+            return this.subTab === "create" ? "起始承接日期" : "起始发布日";
           },
           taskDateToPlaceholder: function () {
-            return this.subTab === "create" ? "结束承接日期" : "结束投放日";
+            return this.subTab === "create" ? "结束承接日期" : "结束发布日";
           },
           taskDatePickerPlaceholder: function () {
-            return this.subTab === "create" ? "选择请假/承接日期" : "选择投放时间";
+            return this.subTab === "create" ? "选择请假/承接日期" : "选择发布时间";
           },
           taskTargetColumnLabel: function () {
-            return this.subTab === "create" ? "剪辑（可多选）" : "小组（可多选）";
+            return this.subTab === "create" ? "成员（可多选）" : "小组（可多选）";
           },
           taskTargetSelectPlaceholder: function () {
-            return this.subTab === "create" ? "批量选择剪辑" : "批量选择小组";
+            return this.subTab === "create" ? "批量选择成员" : "批量选择小组";
           },
           assignConfigBanner: function () {
             var cfg = this.assignConfig || {};
             if (this.subTab === "create" && cfg.createEditorAssignEnabled === false) {
-              return "筛剧自动分配已关闭，保存后不生效。";
+              return "自动分配，保存后不生效。";
             }
             if (this.subTab === "delivery" && cfg.groupAssignEnabled === false) {
               return "小组自动分配已关闭，保存后不生效。";
@@ -386,7 +386,7 @@
             if (this.memberDialogSaving) return;
             var editor = (this.memberForm.editorName || "").trim();
             var group = (this.memberForm.groupName || "").trim();
-            if (!editor) { toast("缺少剪辑", true); return; }
+            if (!editor) { toast("缺少成员", true); return; }
             if (!group) { toast("请选择分组", true); return; }
             this.memberDialogSaving = true;
             try {
@@ -436,14 +436,14 @@
           },
           openTaskCreate: function () {
             this.taskDialogMode = "create";
-            this.taskDialogTitle = this.subTab === "create" ? "批量新增常读创建日任务" : "批量新增投放日任务";
+            this.taskDialogTitle = this.subTab === "create" ? "批量新增创建日任务" : "批量新增发布日任务";
             this.taskDialogOrigin = null;
             this.taskForm = { targets: [], deliveryDate: "", statusKey: "pause" };
             this.taskDialogVisible = true;
           },
           openTaskEdit: function (row) {
             this.taskDialogMode = "edit";
-            this.taskDialogTitle = this.subTab === "create" ? "编辑常读创建日任务" : "编辑投放日任务";
+            this.taskDialogTitle = this.subTab === "create" ? "编辑创建日任务" : "编辑发布日任务";
             this.taskDialogOrigin = row;
             var rule = this.findRuleById(row.ruleId);
             var targets = rule && Array.isArray(rule.excludedGroups) ? rule.excludedGroups.slice() : [];
@@ -489,8 +489,8 @@
             var rawTargets = this.normalizeTargets(this.taskForm.targets);
             var targets = this.filterValidTargets(rawTargets);
             var day = (this.taskForm.deliveryDate || "").trim();
-            var dayLabel = this.dateFieldLabel || (this.subTab === "create" ? "承接日期（请假日期）" : "投放时间");
-            var targetLabel = this.subTab === "create" ? "剪辑" : "小组";
+            var dayLabel = this.dateFieldLabel || (this.subTab === "create" ? "承接日期（请假日期）" : "发布时间");
+            var targetLabel = this.subTab === "create" ? "成员" : "小组";
             if (!targets.length) {
               toast(rawTargets.length ? "所选" + targetLabel + "不在当前可选列表，请刷新后重试" : "请至少选择一个" + targetLabel, true);
               return;
@@ -547,7 +547,7 @@
                   body: JSON.stringify(payload)
                 });
               }
-              toast("任务已保存，将自动重分配该" + (this.subTab === "create" ? "创建窗口" : "投放日"));
+              toast("任务已保存，将自动重分配该" + (this.subTab === "create" ? "创建窗口" : "发布日"));
               this.taskDialogVisible = false;
               await this._loadTasks();
             } catch (e) {

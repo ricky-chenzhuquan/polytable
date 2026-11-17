@@ -41,33 +41,17 @@ public class OpsFormulaEvalService {
     private static final int PARALLEL_ROW_THRESHOLD = 512;
 
     private static final Map<String, String> SYSTEM_FIELD_LABELS = Map.ofEntries(
-            Map.entry("日增播放量", "playCountAdd"),
-            Map.entry("总播放量", "playCount"),
-            Map.entry("剧名", "seriesName"),
             Map.entry("剧目类型", "dramaTypeLabel"),
             Map.entry("版权", "copyrightOwner"),
-            Map.entry("版权(主表)", "copyrightOwner"),
             Map.entry("book_id", "bookId"),
             Map.entry("bookId", "bookId"),
-            Map.entry("抖音作品id", "douyinWorkId"),
-            Map.entry("发布抖音号", "publishAwemeUser"),
-            Map.entry("预估投放时间", "estimatePublishTime"),
             Map.entry("预估发布时间", "publishTime"),
             Map.entry("总集数", "episodeAmount"),
-            Map.entry("筛剧评级", "screeningRating"),
             Map.entry("最终评级", "finalRating"),
-            Map.entry("剪辑", "editorAssignee"),
             Map.entry("素材数", "materialCount"),
-            Map.entry("投放测试", "deliveryTest"),
             Map.entry("网盘链接", "cloudDiskUrl"),
             Map.entry("优先级", "priorityLevel"),
-            Map.entry("投手评级", "bidderRating"),
-            Map.entry("投手", "deliveryAssignee"),
-            Map.entry("采集日", "crawlDay"),
-            Map.entry("上线时间", "onlineTime"),
-            Map.entry("更新时间", "crawlUpdateTime"),
-            Map.entry("常读创建时间", "changduCreateTime"),
-            Map.entry("时间差分钟", "timeDiffMinutes")
+            Map.entry("更新时间", "crawlUpdateTime")
     );
 
     private final OpsFieldConfigRepository fieldConfigRepository;
@@ -85,7 +69,7 @@ public class OpsFormulaEvalService {
     }
 
     /** 为每行写入 formulaValues（fieldKey → 展示字符串），前端只读展示、滚动不算公式。 */
-    /** 中文备注：飞书式行级公式物化——结果按 (公式版本|上下文|行标识) 缓存,引用输入未变的行直接复用,
+    /** 中文备注：行级公式物化——结果按 (公式版本|上下文|行标识) 缓存,引用输入未变的行直接复用,
      *  只有输入变化的行才重算。写入序 LRU,上限 15 万行条目(约 40MB)。 */
     /** 中文备注：并发安全 + 容量超限整体清空——并行流下避免全局锁竞争(access-order LRU 的 get 也是写)。 */
     private final Map<String, CachedRowFormulas> rowFormulaResultCache = new java.util.concurrent.ConcurrentHashMap<>();
@@ -389,7 +373,7 @@ public class OpsFormulaEvalService {
     }
 
     private static List<Map<String, Object>> loadFormulaFunctionCatalog() {
-        try (var input = OpsFormulaEvalService.class.getResourceAsStream("/formula/feishu-bitable-formula-catalog.json")) {
+        try (var input = OpsFormulaEvalService.class.getResourceAsStream("/formula/bitable-formula-catalog.json")) {
             if (input == null) return List.of();
             JsonNode root = new ObjectMapper().readTree(input);
             Map<String, JsonNode> byName = new HashMap<>();
@@ -496,7 +480,7 @@ public class OpsFormulaEvalService {
     }
 
     /**
-     * 中文备注：飞书常见「亿/w/万 → 数字」播放量公式；命中则单行 O(1) parse，不走 IF 树。
+     * 中文备注：常见「亿/w/万 → 数字」数量公式；命中则单行 O(1) parse，不走 IF 树。
      */
     static FastPathKind detectPlayCountFastPath(String normalizedExpr, Map<String, String> titleToKey) {
         if (normalizedExpr == null || normalizedExpr.isBlank()) {
@@ -707,7 +691,7 @@ public class OpsFormulaEvalService {
             return trimToEmpty(row.get("seriesName"));
         }
         if ("bookId".equals(key)) {
-            if (OpsDramaListService.ADX_TYPE.equals(trimToEmpty(row.get("dramaType")))) {
+            if ("adx".equals(trimToEmpty(row.get("dramaType")))) {
                 return trimToEmpty(row.get("bookId"));
             }
             String book = trimToEmpty(row.get("bookId"));

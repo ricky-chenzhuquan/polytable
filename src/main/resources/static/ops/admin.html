@@ -312,7 +312,7 @@
     <div class="top">
       <div>
         <h1 id="pageTitle">账户管理</h1>
-        <div class="sub" id="pageSub">仅系统管理员可操作：账户与剪辑小组分配规则</div>
+        <div class="sub" id="pageSub">仅系统管理员可操作：账户与成员分组分配规则</div>
       </div>
       <div class="chip">
         <span id="adminUser">未登录</span>
@@ -332,7 +332,7 @@
         </select>
         <select id="personnelTypeFilter" class="filter-select" title="人员类型筛选">
           <option value="">全部人员类型</option>
-          <option value="editor">剪辑师</option>
+          <option value="editor">成员</option>
           <option value="optimizer">优化师</option>
           <option value="management">管理</option>
         </select>
@@ -469,20 +469,20 @@
 
               <el-form-item label="人员类型">
                 <el-select v-model="form.personnelType" placeholder="请选择" clearable style="width:100%">
-                  <el-option label="剪辑师" value="editor"></el-option>
+                  <el-option label="成员" value="editor"></el-option>
                   <el-option label="优化师" value="optimizer"></el-option>
                   <el-option label="管理" value="management"></el-option>
                 </el-select>
               </el-form-item>
               <div class="form-tip">仅用于后台管理标识，不改变登录权限和数据归属。</div>
 
-              <el-form-item v-if="form.personnelType === 'editor'" label="是否安排筛剧">
+              <el-form-item v-if="form.personnelType === 'editor'" label="是否参与分配">
                 <el-select v-model="form.screeningAssignEnabled" style="width:100%">
                   <el-option label="是" :value="true"></el-option>
                   <el-option label="否" :value="false"></el-option>
                 </el-select>
               </el-form-item>
-              <div v-if="form.personnelType === 'editor'" class="form-tip">选择“否”后停止进入筛剧分配池，已分配作品会在后续批次转给其他剪辑。</div>
+              <div v-if="form.personnelType === 'editor'" class="form-tip">选择“否”后停止进入分配池，已分配任务会在后续批次转给其他成员。</div>
 
               <el-form-item label="首字母">
                 <el-input v-model="form.initials" placeholder="例如：ZS" maxlength="16" clearable></el-input>
@@ -623,15 +623,15 @@
             let createError = agencySyncFailed(created);
             if (screeningSchedule) {
               if (screeningSchedule.error) {
-                createMsg += "；筛剧分配任务登记失败：" + screeningSchedule.error;
+                createMsg += "；分配任务登记失败：" + screeningSchedule.error;
                 createError = true;
               } else if (screeningSchedule.scheduleSkipped) {
-                createMsg += "；筛剧分配未登记：" + (screeningSchedule.reason || "当前配置未运行");
+                createMsg += "；分配未登记：" + (screeningSchedule.reason || "当前配置未运行");
                 createError = true;
               } else if (screeningSchedule.scheduleCreateDays > 0) {
-                createMsg += "；已登记筛剧分配批次 " + screeningSchedule.scheduleCreateDays + " 个日期";
+                createMsg += "；已登记分配批次 " + screeningSchedule.scheduleCreateDays + " 个日期";
               } else {
-                createMsg += "；当前没有待登记的筛剧批次";
+                createMsg += "；当前没有待登记的分配批次";
               }
             }
             toast(createMsg, createError);
@@ -673,15 +673,15 @@
                 msgs.push("人员类型已更新为" + (data.personnelTypeLabel || "未标记"));
               }
               if (nextPersonnelType === "editor") {
-                msgs.push("筛剧安排已更新为" + (nextScreeningAssignEnabled ? "是" : "否"));
+                msgs.push("分配安排已更新为" + (nextScreeningAssignEnabled ? "是" : "否"));
               }
               const poolSync = data.screeningAssignOptionsSync || {};
               const poolReason = poolSync.reason || poolSync.error || "";
               if (poolSync.error || (poolSync.skipped && !poolReason.includes("options already match"))) {
                 syncError = true;
-                msgs.push("筛剧设置已保存，但分配选项未同步" + (poolReason ? "：" + poolReason : ""));
+                msgs.push("分配设置已保存，但选项未同步" + (poolReason ? "：" + poolReason : ""));
               } else {
-                msgs.push("筛剧分配选项已同步");
+                msgs.push("分配选项已同步");
               }
             }
             if (nextInitials && nextInitials !== (account.initials || "")) {
@@ -738,7 +738,7 @@
         template: `
           <div>
             <el-button round size="small" :type="tab === 'accounts' ? 'primary' : 'default'" @click="pick('accounts')">账户管理</el-button>
-            <el-button round size="small" :type="tab === 'assign' ? 'primary' : 'default'" @click="pick('assign')">剪辑分配</el-button>
+            <el-button round size="small" :type="tab === 'assign' ? 'primary' : 'default'" @click="pick('assign')">任务分配</el-button>
             <el-button round size="small" :type="tab === 'scripts' ? 'primary' : 'default'" @click="pick('scripts')">采集脚本</el-button>
           </div>
         `,

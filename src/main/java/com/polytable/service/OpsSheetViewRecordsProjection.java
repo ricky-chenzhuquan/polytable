@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 协作表 records 列投影：按视图 hiddenFields 裁剪列，缩小 gzip 块（对齐飞书 view 首屏）。
+ * 协作表 records 列投影：按视图 hiddenFields 裁剪列，缩小 gzip 块。
  */
 @Service
 public class OpsSheetViewRecordsProjection {

@@ -1,5 +1,5 @@
 /**
- * 中文备注：剪辑人员分组面板（名单来自后台启用账户，归属可编辑）。
+ * 中文备注：成员分组面板（名单来自后台启用账户，归属可编辑）。
  */
 (function (global) {
   "use strict";
@@ -30,11 +30,11 @@
           "<div>",
           "  <div class=\"toolbar assign-toolbar\">",
           "    <el-button size=\"small\" :loading=\"loading\" @click=\"loadMembersNow\">刷新</el-button>",
-          "    <span style=\"color:#6b7280;font-size:12px\">剪辑名单来自后台启用账户；账户停用后不再参与分配</span>",
+          "    <span style=\"color:#6b7280;font-size:12px\">成员名单来自后台启用账户；账户停用后不再参与分配</span>",
           "  </div>",
           "  <div class=\"table-wrap assign-table-wrap\">",
-          "    <el-table :data=\"memberRows\" size=\"small\" v-loading=\"loading\" empty-text=\"暂无剪辑\" style=\"width:100%\">",
-          "      <el-table-column label=\"剪辑\" min-width=\"120\"><template slot-scope=\"{ row }\"><strong>{{ row.editorName }}</strong></template></el-table-column>",
+          "    <el-table :data=\"memberRows\" size=\"small\" v-loading=\"loading\" empty-text=\"暂无成员\" style=\"width:100%\">",
+          "      <el-table-column label=\"成员\" min-width=\"120\"><template slot-scope=\"{ row }\"><strong>{{ row.editorName }}</strong></template></el-table-column>",
           "      <el-table-column label=\"所属分组\" min-width=\"140\">",
           "        <template slot-scope=\"{ row }\">",
           "          <span :style=\"rowGroupStyle(row)\">{{ rowGroupText(row) }}</span>",
@@ -53,7 +53,7 @@
           "  </div>",
           "  <el-dialog title=\"编辑分组\" :visible.sync=\"dialogVisible\" width=\"420px\" append-to-body custom-class=\"admin-account-dialog\" :close-on-click-modal=\"false\">",
           "    <el-form label-width=\"88px\" size=\"small\" @submit.native.prevent=\"submitDialog\">",
-          "      <el-form-item label=\"剪辑\">",
+          "      <el-form-item label=\"成员\">",
           "        <el-input v-model=\"form.editorName\" disabled></el-input>",
           "      </el-form-item>",
           "      <el-form-item label=\"分组\">",
@@ -62,7 +62,7 @@
           "          <el-option v-for=\"g in groupOptions\" :key=\"g\" :label=\"g\" :value=\"g\"></el-option>",
           "        </el-select>",
           "      </el-form-item>",
-          "      <div class=\"form-tip\">「暂不分配」：该剪辑尚未划入小组，不参与按人锁定剪辑小组。</div>",
+          "      <div class=\"form-tip\">「暂不分配」：该成员尚未划入小组，不参与按人锁定分组。</div>",
           "    </el-form>",
           "    <span slot=\"footer\" class=\"dialog-footer\">",
           "      <el-button @click=\"dialogVisible = false\">取消</el-button>",
@@ -149,7 +149,7 @@
             if (this.dialogSaving) return;
             var editor = (this.form.editorName || "").trim();
             if (!editor) {
-              toast("缺少剪辑", true);
+              toast("缺少成员", true);
               return;
             }
             var group = (this.form.groupName || "").trim();

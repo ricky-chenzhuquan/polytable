@@ -20,7 +20,7 @@ public class OpsSheetListRecordsEncodeCache {
 
     public record CachedGzip(byte[] gzip, List<String> keys, int rowCount, String nextCursor, boolean hasMore,
                              String syncToken) {
-        /** 兼容旧 3 参用法（dramas 路径的 nextCursor/hasMore 在 data 里已有）。 */
+        /** 兼容旧 3 参用法（列表路径的 nextCursor/hasMore 在 data 里已有）。 */
         public CachedGzip(byte[] gzip, List<String> keys, int rowCount) {
             this(gzip, keys, rowCount, null, false, null);
         }

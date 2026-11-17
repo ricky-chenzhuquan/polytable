@@ -1,5 +1,5 @@
 /**
- * 协作表飞书式 records 解码
+ * 协作表多维表格式 records 解码
  * encoding=0：稠密列式 JSON + gzip + Base64
  * encoding=1：稀疏列式 v2 + gzip + Base64
  * encoding=2：稀疏 v2 + gzip 二进制（/records/payload?nonce=）

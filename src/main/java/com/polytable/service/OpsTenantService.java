@@ -73,7 +73,7 @@ public class OpsTenantService {
                 if (mapped != null) {
                     return mapped;
                 }
-                // 中文备注：子域前缀兜底，如 ad.starmemory.cn / agency.xxx.com → agency。
+                // 中文备注：子域前缀兜底，如 ad.example.cn / agency.example.com → agency。
                 int dot = host.indexOf('.');
                 if (dot > 0) {
                     String prefix = host.substring(0, dot);
@@ -152,7 +152,7 @@ public class OpsTenantService {
         if ("promo".equals(type) && enabled && ORG_AGENCY.equals(normalizedMode)) {
             return tenantFeatureService != null && tenantFeatureService.canSeeAgencyPromoTable(normalizedMode, session);
         }
-        if (OpsDramaListService.AGENCY_PROMO_TYPE.equals(type) && enabled && ORG_AGENCY.equals(normalizedMode)) {
+        if ("agency-promo".equals(type) && enabled && ORG_AGENCY.equals(normalizedMode)) {
             return tenantFeatureService != null && tenantFeatureService.canSeeAgencyAsPromoTable(normalizedMode);
         }
         if (!enabled || !ORG_AGENCY.equals(normalizedMode)) {
@@ -192,15 +192,15 @@ public class OpsTenantService {
             out.add(catalog);
         }
         if (tenantFeatureService != null && tenantFeatureService.canSeeAgencyHqMirrorNear(mode)) {
-            out.add(hqReadOnlyBuiltinRow(OpsTenantFeatureService.MIRROR_NEAR_TABLE_ID, "near", "剧目时间临近发布采集表"));
+            out.add(hqReadOnlyBuiltinRow(OpsTenantFeatureService.MIRROR_NEAR_TABLE_ID, "near", "临近发布采集表"));
         }
         if (tenantFeatureService != null && tenantFeatureService.canSeeAgencyHqMirrorAdx(mode)) {
-            out.add(hqReadOnlyBuiltinRow(OpsTenantFeatureService.MIRROR_ADX_TABLE_ID, "adx", "ADX抖音热播榜top采集表"));
+            out.add(hqReadOnlyBuiltinRow(OpsTenantFeatureService.MIRROR_ADX_TABLE_ID, "adx", "ADX 热播榜采集表"));
         }
         if (tenantFeatureService != null && tenantFeatureService.canSeeAgencyAsPromoTable(mode)) {
             out.add(hqReadOnlyBuiltinRow(
                     OpsTenantFeatureService.AGENCY_AS_PROMO_TABLE_ID,
-                    OpsDramaListService.AGENCY_PROMO_TYPE,
+                    "agency-promo",
                     "代投最终评级A/S当日推广链接"));
         }
         if (tenantFeatureService != null && tenantFeatureService.canSeeAgencyPromoTable(mode, session)) {

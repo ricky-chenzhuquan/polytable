@@ -46,6 +46,10 @@ schema:
   migration:
     enabled: ${SCHEMA_MIGRATION_ENABLED:true}
 
+# 首次启动种子：注册表为空时创建示例表（tbl_demo_projects）。
+demo:
+  seed-enabled: ${DEMO_SEED_ENABLED:true}
+
 ops:
   enabled: ${OPS_ENABLED:true}
   # 可选：为所有 /api/v1/ops 请求增加共享口令（X-Access-Key），内网裸跑可留空。

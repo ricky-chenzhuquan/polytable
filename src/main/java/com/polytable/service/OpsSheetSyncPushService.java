@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * 中文备注：协作表变更推送（飞书式「长连接推送代替轮询」）。
+ * 中文备注：协作表变更推送（「长连接推送代替轮询」）。
  * 前端 EventSource 订阅 /sheets/{tableId}/sync/stream；行写入经
  * {@link OpsSheetMetaCacheService#evictRows} 触发 broadcastDirty，
  * 推送的是「脏了」信号而非数据——客户端收到后走既有 metaOnly（1ms 缓存）+ sinceMs 增量拉取。

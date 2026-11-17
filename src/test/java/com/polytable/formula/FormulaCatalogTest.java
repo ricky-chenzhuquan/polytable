@@ -21,7 +21,7 @@ class FormulaCatalogTest {
     @Test
     void catalogEntriesHaveOfficialSourcesAndUniqueNames() throws Exception {
         JsonNode catalog = mapper.readTree(Files.newInputStream(
-                Path.of("docs/superpowers/specs/2026-11-04-feishu-bitable-formula-catalog.json")));
+                Path.of("src/main/resources/formula/bitable-formula-catalog.json")));
         assertTrue(catalog.path("asOf").isTextual());
         assertTrue(catalog.path("functions").isArray());
         assertTrue(catalog.path("operators").isArray());
@@ -60,7 +60,7 @@ class FormulaCatalogTest {
 
     @Test
     void goldenCasesHaveAnExpectedValueOrError() throws Exception {
-        JsonNode cases = read("/formula/feishu-bitable-golden.json");
+        JsonNode cases = read("/formula/bitable-formula-golden.json");
         assertTrue(cases.isArray());
         assertFalse(cases.isEmpty());
         for (JsonNode testCase : cases) {

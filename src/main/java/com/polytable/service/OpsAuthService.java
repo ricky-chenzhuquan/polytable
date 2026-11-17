@@ -26,10 +26,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 协作工作台鉴权：剪辑/投放人员用「拼音首字母 + 后缀」登录，token 默认有效 1 天。
+ * 协作工作台鉴权：成员用「拼音首字母 + 后缀」登录，token 默认有效 1 天。
  * token 采用 HMAC 签名的无状态格式，服务重启后浏览器里已保存的 token 依然可用。
  */
 @Service
@@ -47,7 +48,7 @@ public class OpsAuthService {
     private static final String PASSWORD_HASH_PREFIX = "ops-pwd::";
     public static final String ROLE_USER = "user";
     public static final String ROLE_ADMIN = "admin";
-    public static final String ROLE_DEFAULT_DATA = "drama-data";
+    public static final String ROLE_DEFAULT_DATA = "data-user";
     public static final String ORG_HQ = OpsTenantService.ORG_HQ;
     public static final String ORG_AGENCY = OpsTenantService.ORG_AGENCY;
     public static final String PERSONNEL_EDITOR = "editor";
@@ -55,17 +56,10 @@ public class OpsAuthService {
     public static final String PERSONNEL_MANAGEMENT = "management";
 
     // 中文备注：姓名 → 拼音首字母（大写），种子写入 ops_account；登录优先读库。
+    // 开源版不内置任何真实名单，仅提供两个演示账户；正式名单由部署方通过账户管理接口维护。
     private static final Map<String, String> NAME_INITIALS = buildNameInitials();
-    private static final Set<String> EDITOR_PERSONNEL_NAMES = Set.of(
-            "张力予", "谭星雨", "刘婷瑜", "吕炎炎", "郭鹏", "赵鑫同", "闫俊宇", "李闯", "高雨欣",
-            "徐柏霖", "陈奕言", "秦椰子", "雷远航", "袁媛", "魏清玲", "潘馨鑫", "林世奇",
-            "金媛", "李洁", "王逍", "张承志", "陈鹏宇", "李照湘", "刘帅", "杨瑞鑫", "王鸿运",
-            "王禹棋", "廖雄鹏", "陈威", "汪奇凡", "胡成云", "罗志远", "蒋涛", "徐扬宇", "王琦",
-            "朱胡敏", "徐银彤", "宿邵晗", "李小利",
-            "赵萍", "韩铁峰", "周纾意", "余金金", "李燕华", "罗佳", "程志远", "邹欣雨", "张琪",
-            "么孝天", "任曦晨", "文雪"
-    );
-    private static final Set<String> LEGACY_EDITOR_PERSONNEL_NAMES = Set.of("潘馨盘", "王道");
+    private static final Set<String> EDITOR_PERSONNEL_NAMES = Set.of("张三", "李四");
+    private static final Set<String> LEGACY_EDITOR_PERSONNEL_NAMES = Set.of();
 
     // 中文备注：主动登出的 token 加入黑名单；重启后清空，靠 token 自身过期时间兜底。
     private final ConcurrentHashMap<String, Instant> revoked = new ConcurrentHashMap<>();
@@ -80,7 +74,6 @@ public class OpsAuthService {
     private final OpsPresenceRepository presenceRepository;
     private final OpsAccountRepository opsAccountRepository;
     private final OpsTenantService opsTenantService;
-    private final OpsAccountAgencySync opsAccountAgencySync;
     private final ServerLoadGuard serverLoadGuard;
     private final String passwordSuffix;
     private final String masterAccessKey;
@@ -95,30 +88,32 @@ public class OpsAuthService {
             OpsPresenceRepository presenceRepository,
             OpsAccountRepository opsAccountRepository,
             OpsTenantService opsTenantService,
-            OpsAccountAgencySync opsAccountAgencySync,
             ServerLoadGuard serverLoadGuard,
-            @Value("${ops.auth.password-suffix:Ad123456}") String passwordSuffix,
+            @Value("${ops.auth.password-suffix:}") String passwordSuffix,
             @Value("${ops.access-key:}") String masterAccessKey,
             @Value("${ops.admin.username:admin}") String adminUsername,
-            @Value("${ops.admin.password:star_memory@20260615f9o9}") String adminPassword,
+            @Value("${ops.admin.password:}") String adminPassword,
             @Value("${ops.auth.token-ttl-hours:24}") long tokenTtlHours,
             @Value("${ops.auth.token-secret:}") String tokenSecret) {
         this.presenceRepository = presenceRepository;
         this.opsAccountRepository = opsAccountRepository;
         this.opsTenantService = opsTenantService;
-        this.opsAccountAgencySync = opsAccountAgencySync;
         this.serverLoadGuard = serverLoadGuard;
-        this.passwordSuffix = passwordSuffix == null || passwordSuffix.isBlank() ? "Ad123456" : passwordSuffix.trim();
+        this.passwordSuffix = passwordSuffix == null ? "" : passwordSuffix.trim();
         this.masterAccessKey = masterAccessKey == null ? "" : masterAccessKey.trim();
         this.adminUsername = adminUsername == null || adminUsername.isBlank() ? "admin" : adminUsername.trim();
-        this.adminPassword = adminPassword == null || adminPassword.isBlank()
-                ? "star_memory@20260615f9o9"
-                : adminPassword.trim();
+        this.adminPassword = adminPassword == null ? "" : adminPassword.trim();
         this.tokenTtl = tokenTtlHours <= 0 ? DEFAULT_TOKEN_TTL : Duration.ofHours(tokenTtlHours);
-        String secret = tokenSecret == null || tokenSecret.isBlank()
-                ? DEFAULT_SECRET_SALT + this.passwordSuffix
-                : tokenSecret.trim();
-        this.tokenSecret = secret.getBytes(StandardCharsets.UTF_8);
+        // 开源安全兜底：未配置签名密钥时不再回退到可预测的静态盐（源码公开后等于无签名），
+        // 改为每次启动生成随机密钥——重启后旧 token 全部失效；生产必须设置 OPS_AUTH_TOKEN_SECRET。
+        if (tokenSecret == null || tokenSecret.isBlank()) {
+            String generated = DEFAULT_SECRET_SALT + UUID.randomUUID() + ":" + System.nanoTime();
+            System.out.println("[PolyTable] 警告：未设置 OPS_AUTH_TOKEN_SECRET，本次启动使用随机签名密钥，"
+                    + "重启后所有登录态将失效。生产部署请显式设置该环境变量。");
+            this.tokenSecret = generated.getBytes(StandardCharsets.UTF_8);
+        } else {
+            this.tokenSecret = tokenSecret.trim().getBytes(StandardCharsets.UTF_8);
+        }
     }
 
     @PostConstruct
@@ -168,6 +163,11 @@ public class OpsAuthService {
             }
             if (seeded > 0) {
                 System.out.println("协作台账户种子同步：新增=" + seeded);
+                System.out.println("[PolyTable] 已创建演示账户：张三、李四。默认口令 = 姓名拼音首字母 + OPS_AUTH_PASSWORD_SUFFIX"
+                        + (passwordSuffix.isBlank()
+                                ? "（未设置后缀：口令即首字母 ZS / LS，仅限本地体验，请尽快改密）"
+                                : "，例如 " + NAME_INITIALS.get("张三") + passwordSuffix + "。"));
+                System.out.println("[PolyTable] 系统管理员：账户管理页 /ops/admin.html 用 OPS_ADMIN_USERNAME / OPS_ADMIN_PASSWORD 配置的口令登录。");
             }
         } catch (Exception e) {
             System.out.println("协作台账户种子同步跳过：" + e.getMessage());
@@ -285,15 +285,6 @@ public class OpsAuthService {
         }
         if (!passwordOk) {
             throw new IllegalArgumentException("姓名或口令错误");
-        }
-        if (ORG_AGENCY.equals(tenantMode) && opsAccountAgencySync.refreshFromMasterIfNeeded(name, tenantMode)) {
-            try {
-                Map<String, Object> refreshed = opsAccountRepository.findByDisplayName(name);
-                if (refreshed != null) {
-                    orgType = accountOrgType(refreshed);
-                }
-            } catch (Exception ignored) {
-            }
         }
         assertTenantAccess(orgType, tenantMode, name);
         return issueToken(name, initials, role, orgType);
@@ -577,7 +568,7 @@ public class OpsAuthService {
     }
 
     /**
-     * 中文备注：筛剧选项常带等级后缀（王宇鹏-C），登录/展示只保留人名。
+     * 中文备注：历史评级选项常带「备选-」前缀与 -S/-A/-B/-C 等级后缀，登录/展示只保留人名部分。
      */
     static String normalizePersonName(String displayName) {
         String name = displayName == null ? "" : displayName.trim();
@@ -587,7 +578,6 @@ public class OpsAuthService {
         if (name.startsWith("备选-")) {
             name = name.substring("备选-".length()).trim();
         }
-        // 王宇鹏-c / 王宇鹏-C / 王宇鹏-C二轮 / 王宇鹏-S
         name = name.replaceFirst("(?i)-[SABC](?:二轮)?$", "").trim();
         return name;
     }
@@ -661,11 +651,10 @@ public class OpsAuthService {
         }
         revokeCredentials(name);
         Map<String, Object> out = new LinkedHashMap<>();
-        attachAgencySync(out, syncAgencyAccount(name));
         out.put("displayName", name);
         out.put("orgType", next);
         out.put("orgTypeLabel", ORG_AGENCY.equals(next) ? "代投" : "自投");
-        out.put("message", buildAccountMutationMessage("归属已更新，该用户需重新登录", out));
+        out.put("message", "归属已更新，该用户需重新登录");
         return out;
     }
 
@@ -693,11 +682,10 @@ public class OpsAuthService {
         }
         revokeCredentials(name);
         Map<String, Object> out = new LinkedHashMap<>();
-        attachAgencySync(out, syncAgencyAccount(name));
         out.put("displayName", name);
         out.put("featureFlags", merged);
         out.put("promoTable", OpsAccountFeatureFlags.enabled(merged, OpsAccountFeatureFlags.PROMO_TABLE));
-        out.put("message", buildAccountMutationMessage("功能权限已更新，该用户需重新登录", out));
+        out.put("message", "功能权限已更新，该用户需重新登录");
         return out;
     }
 
@@ -785,9 +773,8 @@ public class OpsAuthService {
         Map<String, Object> created = opsAccountRepository.findByDisplayName(name);
         if (created != null) {
             created = toAdminAccountView(created);
-            attachAgencySync(created, syncAgencyAccount(name));
             if (created.get("message") == null && Boolean.FALSE.equals(created.get("agencySyncSuccess"))) {
-                created.put("message", buildAccountMutationMessage("账户已创建", created));
+                created.put("message", "账户已创建");
             }
         }
         return created == null ? Map.of("displayName", name) : created;
@@ -873,7 +860,7 @@ public class OpsAuthService {
 
     public static String personnelTypeLabel(String personnelType) {
         return switch (normalizePersonnelType(personnelType)) {
-            case PERSONNEL_EDITOR -> "剪辑师";
+            case PERSONNEL_EDITOR -> "执行成员";
             case PERSONNEL_OPTIMIZER -> "优化师";
             case PERSONNEL_MANAGEMENT -> "管理";
             default -> "未标记";
@@ -900,7 +887,6 @@ public class OpsAuthService {
         if (!enabled) {
             revokeCredentials(name);
         }
-        syncAgencyAccount(name);
     }
 
     public void changeAccountPassword(String displayName, String newPassword, String operator) {
@@ -914,7 +900,6 @@ public class OpsAuthService {
             throw new IllegalArgumentException("改密失败：" + name);
         }
         revokeCredentials(name);
-        syncAgencyAccount(name);
     }
 
     public Map<String, Object> resetAccountPassword(String displayName, String operator) {
@@ -928,10 +913,9 @@ public class OpsAuthService {
         String hint = initials + passwordSuffix;
         System.out.println("账户口令已重置为默认规则：name=" + name + "，操作人=" + operator);
         Map<String, Object> out = new LinkedHashMap<>();
-        attachAgencySync(out, syncAgencyAccount(name));
         out.put("displayName", name);
         out.put("defaultPasswordHint", hint);
-        out.put("message", buildAccountMutationMessage("已重置为默认口令（拼音首字母 + 后缀）", out));
+        out.put("message", "已重置为默认口令（拼音首字母 + 后缀）");
         return out;
     }
 
@@ -958,9 +942,8 @@ public class OpsAuthService {
             out.put("defaultPasswordHint", init + passwordSuffix);
             out.put("message", "首字母已更新，默认口令已变更");
         }
-        attachAgencySync(out, syncAgencyAccount(name));
         if (out.get("message") != null && Boolean.FALSE.equals(out.get("agencySyncSuccess"))) {
-            out.put("message", buildAccountMutationMessage(String.valueOf(out.get("message")), out));
+            
         }
         return out;
     }
@@ -995,31 +978,6 @@ public class OpsAuthService {
             return;
         }
         throw new IllegalArgumentException(opsTenantService.loginDeniedMessage(accountOrg, requestMode));
-    }
-
-    private OpsAccountAgencySync.AccountSyncResult syncAgencyAccount(String displayName) {
-        return opsAccountAgencySync.syncAccount(displayName);
-    }
-
-    private static void attachAgencySync(Map<String, Object> out, OpsAccountAgencySync.AccountSyncResult sync) {
-        if (out == null || sync == null) {
-            return;
-        }
-        out.put("agencySyncAttempted", sync.attempted());
-        out.put("agencySyncSuccess", sync.success());
-        out.put("agencySyncChannel", sync.channel());
-        out.put("agencySyncMessage", sync.message());
-    }
-
-    private static String buildAccountMutationMessage(String base, Map<String, Object> out) {
-        if (!Boolean.TRUE.equals(out.get("agencySyncAttempted"))) {
-            return base;
-        }
-        if (Boolean.TRUE.equals(out.get("agencySyncSuccess"))) {
-            return base;
-        }
-        String detail = String.valueOf(out.getOrDefault("agencySyncMessage", "未知错误"));
-        return base + "；但代投库同步失败：" + detail;
     }
 
     private static String accountOrgType(Map<String, Object> account) {
@@ -1177,80 +1135,9 @@ public class OpsAuthService {
 
     private static Map<String, String> buildNameInitials() {
         Map<String, String> map = new LinkedHashMap<>();
-        // 剪辑
-        put(map, "马一然", "MYR");
-        put(map, "文雪", "WX");
-        put(map, "余德鑫", "YDX");
-        put(map, "蒋志鹏", "JZP");
-        put(map, "余金金", "YJJ");
-        put(map, "黄春苗", "HCM");
-        put(map, "周龙娟", "ZLJ");
-        put(map, "余尔涵", "YEH");
-        put(map, "罗佳", "LJ");
-        put(map, "周纾意", "ZSY");
-        put(map, "任曦晨", "RXC");
-        put(map, "姜成胜", "JCS");
-        put(map, "舒浩", "SH");
-        put(map, "林魏魏", "LWW");
-        put(map, "张朝辉", "ZCH");
-        put(map, "申时吉", "SSJ");
-        put(map, "张琪", "ZQ");
-        put(map, "赵萍", "ZP");
-        put(map, "李彬", "LB");
-        put(map, "王同庆", "WTQ");
-        put(map, "李燕华", "LYH");
-        put(map, "刘豪武", "LHW");
-        put(map, "郑涛", "ZT");
-        put(map, "邹欣雨", "ZXY");
-        put(map, "程志远", "CZY");
-        put(map, "崔书瑞", "CSR");
-        put(map, "谭椅文", "TYW");
-        put(map, "袁世宇", "YSY");
-        put(map, "么孝天", "MXT");
-        put(map, "韩铁峰", "HTF");
-        put(map, "王梓洋", "WZY");
-        put(map, "吕炎炎", "LYY");
-        put(map, "刘宏宇", "LHY");
-        put(map, "江昕桐", "JXT");
-        put(map, "胡艳虹", "HYH");
-        // 2026-09 正式剪辑名单；缺失账号按默认口令规则创建。
-        put(map, "张力予", "ZLY"); put(map, "谭星雨", "TXY"); put(map, "刘婷瑜", "LTY");
-        put(map, "郭鹏", "GP"); put(map, "赵鑫同", "ZXT"); put(map, "闫俊宇", "YJY");
-        put(map, "李闯", "LC"); put(map, "高雨欣", "GYX"); put(map, "徐柏霖", "XBL");
-        put(map, "陈奕言", "CYY"); put(map, "秦椰子", "QYZ"); put(map, "雷远航", "LYH");
-        put(map, "袁媛", "YY"); put(map, "魏清玲", "WQL"); put(map, "潘馨鑫", "PXX");
-        put(map, "林世奇", "LSQ"); put(map, "金媛", "JY"); put(map, "李洁", "LJ");
-        put(map, "王逍", "WX"); put(map, "张承志", "ZCZ"); put(map, "陈鹏宇", "CPY");
-        put(map, "李照湘", "LZX"); put(map, "刘帅", "LS"); put(map, "杨瑞鑫", "YRX");
-        put(map, "王鸿运", "WHY"); put(map, "王禹棋", "WYQ"); put(map, "廖雄鹏", "LXP");
-        put(map, "陈威", "CW"); put(map, "汪奇凡", "WQF"); put(map, "胡成云", "HCY");
-        put(map, "罗志远", "LZY"); put(map, "蒋涛", "JT"); put(map, "徐扬宇", "XYY");
-        put(map, "王琦", "WQ"); put(map, "朱胡敏", "ZHM"); put(map, "徐银彤", "XYT");
-        put(map, "宿邵晗", "XSH"); put(map, "李小利", "LXL");
-        // 投放测试（不含「不可投放」状态项）
-        put(map, "周群博", "ZQB");
-        put(map, "舒芯男", "SXN");
-        put(map, "李姓亮", "LXL");
-        put(map, "谢琴祖", "XQZ");
-        put(map, "刘国权", "LGQ");
-        put(map, "仇星星", "QXX");
-        put(map, "仇庆庆", "QQQ");
-        put(map, "李世龙", "LSL");
-        put(map, "何泽鹏", "HZP");
-        put(map, "杨静雯", "YJW");
-        put(map, "张琳杰", "ZLJ");
-        put(map, "卜晓鹏", "BXP");
-        // 新增人员
-        put(map, "陈柱全", "CZQ");
-        put(map, "小陈", "XC");
-        put(map, "老陈", "LC");
-        put(map, "黎文康", "LWK");
-        put(map, "张恒", "ZH");
-        put(map, "陈子悦", "CZY");
-        put(map, "陈延涛", "CYT");
-        // 挑剧（筛剧评级人名，去掉 -S/-A/-B/-C 后缀后可登录）
-        put(map, "王宇鹏", "WYP");
-        put(map, "华宁峰", "HNF");
+        // 中文备注：演示账户；缺失账号按默认口令规则（拼音首字母 + 后缀）创建。
+        put(map, "张三", "ZS");
+        put(map, "李四", "LS");
         return Map.copyOf(map);
     }
 

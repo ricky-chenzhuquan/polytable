@@ -1,0 +1,22 @@
+# 更新日志
+
+本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 约定，
+版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+## [0.1.0] - 2026-11-18
+
+首个开源版本。以下能力从长期真实生产负载的内部系统中整理而来（详见 docs/）。
+
+### 新增
+
+- Canvas 大表引擎：10 万行级虚拟滚动、列宽/行高拖拽、单元格选择与编辑
+- 三条数据加载协议：JSON 全量 / 稀疏列式 gzip + payloadNonce / NDJSON 流式
+- 公式引擎：119 函数 + 14 运算符（飞书多维表格公式兼容目录，含官方文档溯源），
+  AST 求值、依赖图级联、有界结果缓存、官方示例 golden test
+- 实时协作：SSE 单元格推送 + 心跳、在场状态（表 / 行 / 列 / 模式）、行级操作日志
+- 视图：筛选 / 排序 / 分组 / 多视图共享（`ops_table_views`）
+- 行操作：批量粘贴（含撤销批次）、软删除 / 恢复、乐观锁版本守卫
+- 账户与权限：HMAC token 登录、角色菜单权限、账户管理面板（`/ops/admin.html`）
+- 多租户分域雏形（按 Host 区分，默认关闭）
+- 首次启动种子：演示账户（张三 / 李四）与示例项目表
+- 官网（`website/`）与全套开源文档（architecture / performance / guardrails / design / roadmap）

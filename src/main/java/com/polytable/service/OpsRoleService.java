@@ -11,12 +11,12 @@ import java.util.UUID;
 @Service
 public class OpsRoleService {
 
-    public static final String DEFAULT_ROLE_KEY = "drama-data";
+    public static final String DEFAULT_ROLE_KEY = "data-user";
     public static final List<String> MENU_CODES = List.of(
-            OpsMenuPermissions.DRAMA_DATA, OpsMenuPermissions.CLIPS, OpsMenuPermissions.ACCOUNTS);
+            OpsMenuPermissions.DATA_USER, OpsMenuPermissions.CLIPS, OpsMenuPermissions.ACCOUNTS);
     public static final List<String> ASSIGNABLE_MENUS = List.of(
             OpsMenuPermissions.CLIPS, OpsMenuPermissions.ACCOUNTS);
-    public static final List<String> ADMIN_MENUS = List.of("home", "drama-data", "clips", "accounts", "scripts", "rules");
+    public static final List<String> ADMIN_MENUS = List.of("home", "data-user", "clips", "accounts", "scripts", "rules");
 
     private final OpsRoleRepository repository;
 
@@ -116,11 +116,11 @@ public class OpsRoleService {
 
     private static List<String> normalizeRoleMenus(List<String> menus) {
         List<String> normalized = OpsMenuPermissions.normalize(menus);
-        if (!normalized.contains(OpsMenuPermissions.DRAMA_DATA)) {
-            List<String> withDramaData = new ArrayList<>();
-            withDramaData.add(OpsMenuPermissions.DRAMA_DATA);
-            withDramaData.addAll(normalized);
-            return List.copyOf(withDramaData);
+        if (!normalized.contains(OpsMenuPermissions.DATA_USER)) {
+            List<String> withDataUser = new ArrayList<>();
+            withDataUser.add(OpsMenuPermissions.DATA_USER);
+            withDataUser.addAll(normalized);
+            return List.copyOf(withDataUser);
         }
         return normalized;
     }

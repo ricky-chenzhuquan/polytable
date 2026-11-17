@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      # 公式引擎目录覆盖率 + golden test 是核心资产，每次提交必须全绿
+      - name: Run tests
+        run: mvn -B test
+
+      - name: Package (skip tests, already run)
+        run: mvn -B package -DskipTests
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: polytable-jar
+          path: target/polytable-*.jar
+          retention-days: 7

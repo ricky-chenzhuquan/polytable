@@ -1,11 +1,7 @@
 package com.polytable.controller;
 
-import com.polytable.service.OpsAccountAgencySync;
 import com.polytable.service.OpsAccountFeatureFlags;
 import com.polytable.service.OpsAuthService;
-import com.polytable.service.OpsEditorGroupMemberService;
-import com.polytable.service.OpsLeaderGroupAssignRuleService;
-import com.polytable.service.OpsLeaderGroupService;
 import com.polytable.service.OpsRoleService;
 import com.polytable.service.OpsTenantService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,25 +25,13 @@ import java.util.Map;
 public class OpsAdminController {
 
     private final OpsAuthService opsAuthService;
-    private final OpsAccountAgencySync opsAccountAgencySync;
     private final OpsTenantService opsTenantService;
-    private final OpsLeaderGroupAssignRuleService leaderGroupAssignRuleService;
-    private final OpsEditorGroupMemberService editorGroupMemberService;
-    private final OpsLeaderGroupService leaderGroupService;
     private OpsRoleService roleService;
 
     public OpsAdminController(OpsAuthService opsAuthService,
-                              OpsAccountAgencySync opsAccountAgencySync,
-                              OpsTenantService opsTenantService,
-                              OpsLeaderGroupAssignRuleService leaderGroupAssignRuleService,
-                              OpsEditorGroupMemberService editorGroupMemberService,
-                              OpsLeaderGroupService leaderGroupService) {
+                              OpsTenantService opsTenantService) {
         this.opsAuthService = opsAuthService;
-        this.opsAccountAgencySync = opsAccountAgencySync;
         this.opsTenantService = opsTenantService;
-        this.leaderGroupAssignRuleService = leaderGroupAssignRuleService;
-        this.editorGroupMemberService = editorGroupMemberService;
-        this.leaderGroupService = leaderGroupService;
     }
 
     @Autowired(required = false)
@@ -148,18 +131,6 @@ public class OpsAdminController {
                 created.put("personnelType", personnelType);
                 created.put("personnelTypeLabel", OpsAuthService.personnelTypeLabel(personnelType));
             }
-            if ("editor".equals(personnelType)
-                    && Boolean.TRUE.equals(created.get("enabled"))
-                    && Boolean.TRUE.equals(created.get("screeningAssignEnabled"))) {
-                created = new LinkedHashMap<>(created);
-                try {
-                    Map<String, Object> poolRefresh = leaderGroupService.afterEditorJoinedCreateAssignPool();
-                    created.put("screeningAssignOptionsSync", poolRefresh.get("createEditorAssignField"));
-                    created.put("screeningAssignSchedule", poolRefresh);
-                } catch (RuntimeException e) {
-                    created.put("screeningAssignSchedule", Map.of("error", e.getMessage() == null ? "登记失败" : e.getMessage()));
-                }
-            }
             return ApiResult.ok(created);
         } catch (IllegalArgumentException e) {
             return ApiResult.fail("A0400", e.getMessage());
@@ -209,33 +180,6 @@ public class OpsAdminController {
         }
     }
 
-    /** 手动将代投账户推送到代投库（单账户或全部 org_type=agency）。 */
-    @PostMapping("/accounts/sync-to-agency")
-    public ApiResult<Map<String, Object>> syncAccountsToAgency(HttpServletRequest request,
-                                                               @RequestBody(required = false) NameRequest body) {
-        try {
-            requireAdmin(request);
-            String name = body == null ? null : trim(body.displayName());
-            if (name != null && !name.isBlank()) {
-                OpsAccountAgencySync.AccountSyncResult result = opsAccountAgencySync.syncAccount(name);
-                Map<String, Object> data = new LinkedHashMap<>();
-                data.put("displayName", name);
-                data.put("agencySyncAttempted", result.attempted());
-                data.put("agencySyncSuccess", result.success());
-                data.put("agencySyncChannel", result.channel());
-                data.put("agencySyncMessage", result.message());
-                data.put("remotePushEnabled", opsAccountAgencySync.remotePushEnabled());
-                if (result.attempted() && !result.success()) {
-                    return ApiResult.fail("A0500", "代投库同步失败：" + result.message(), data);
-                }
-                return ApiResult.ok(data);
-            }
-            return ApiResult.ok(opsAccountAgencySync.syncAllAgencyAccounts());
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
     @PostMapping("/accounts/org-type")
     public ApiResult<Map<String, Object>> updateOrgType(HttpServletRequest request, @RequestBody OrgTypeRequest body) {
         try {
@@ -264,22 +208,6 @@ public class OpsAdminController {
                     body == null ? null : body.personnelType(),
                     body == null ? null : body.screeningAssignEnabled(),
                     admin.displayName());
-            if (Boolean.TRUE.equals(result.get("screeningAssignmentEnabledTransitionedToEnabled"))) {
-                try {
-                    Map<String, Object> poolRefresh = leaderGroupService.afterEditorJoinedCreateAssignPool();
-                    result.put("screeningAssignOptionsSync", poolRefresh.get("createEditorAssignField"));
-                    result.put("screeningAssignSchedule", poolRefresh);
-                } catch (RuntimeException e) {
-                    result.put("screeningAssignOptionsSync", Map.of("error", e.getMessage() == null ? "同步失败" : e.getMessage()));
-                    result.put("screeningAssignSchedule", Map.of("error", e.getMessage() == null ? "登记失败" : e.getMessage()));
-                }
-            } else {
-                try {
-                    result.put("screeningAssignOptionsSync", leaderGroupService.ensureCreateEditorAssignFieldOptions());
-                } catch (RuntimeException e) {
-                    result.put("screeningAssignOptionsSync", Map.of("error", e.getMessage() == null ? "同步失败" : e.getMessage()));
-                }
-            }
             return ApiResult.ok(result);
         } catch (IllegalArgumentException e) {
             return ApiResult.fail("A0400", e.getMessage());
@@ -320,151 +248,6 @@ public class OpsAdminController {
                     admin.displayName()
             );
             return ApiResult.ok(result);
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @GetMapping("/leader-group/assign-rules")
-    public ApiResult<Map<String, Object>> listAssignRules(HttpServletRequest request,
-                                                          @RequestParam(required = false) String from,
-                                                          @RequestParam(required = false) String to,
-                                                          @RequestParam(required = false) String assignBy) {
-        try {
-            requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            return ApiResult.ok(leaderGroupAssignRuleService.listRules(parseDate(from), parseDate(to), assignBy));
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @PostMapping("/leader-group/assign-rules/create")
-    public ApiResult<Map<String, Object>> createAssignRule(HttpServletRequest request,
-                                                           @RequestBody AssignRuleRequest body) {
-        try {
-            OpsAuthService.Session admin = requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            Map<String, Object> created = leaderGroupAssignRuleService.createRule(
-                    parseRequiredDate(body == null ? null : body.deliveryDate()),
-                    body == null ? null : body.assignBy(),
-                    body == null ? List.of() : body.excludedGroups(),
-                    body == null ? null : body.expectedDramaCount(),
-                    body == null ? null : body.remark(),
-                    body == null || body.enabled() == null || body.enabled(),
-                    admin.displayName()
-            );
-            return ApiResult.ok(created);
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @PostMapping("/leader-group/assign-rules/update")
-    public ApiResult<Map<String, Object>> updateAssignRule(HttpServletRequest request,
-                                                           @RequestBody AssignRuleUpdateRequest body) {
-        try {
-            OpsAuthService.Session admin = requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            if (body == null || body.id() == null) {
-                return ApiResult.fail("A0400", "缺少规则 id");
-            }
-            Map<String, Object> updated = leaderGroupAssignRuleService.updateRule(
-                    body.id(),
-                    parseRequiredDate(body.deliveryDate()),
-                    body.assignBy(),
-                    body.excludedGroups() == null ? List.of() : body.excludedGroups(),
-                    body.expectedDramaCount(),
-                    body.remark(),
-                    body.enabled() == null || body.enabled(),
-                    admin.displayName()
-            );
-            return ApiResult.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @PostMapping("/leader-group/assign-rules/delete")
-    public ApiResult<Map<String, Object>> deleteAssignRule(HttpServletRequest request,
-                                                           @RequestBody AssignRuleDeleteRequest body) {
-        try {
-            requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            if (body == null || body.id() == null) {
-                return ApiResult.fail("A0400", "缺少规则 id");
-            }
-            leaderGroupAssignRuleService.deleteRule(body.id());
-            return ApiResult.ok(Map.of("ok", true, "id", body.id()));
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @PostMapping("/leader-group/assign-rules/rebalance")
-    public ApiResult<Map<String, Object>> rebalanceAssignDay(HttpServletRequest request,
-                                                             @RequestBody AssignRuleRebalanceRequest body) {
-        try {
-            requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            LocalDate day = parseRequiredDate(body == null ? null : body.deliveryDate());
-            return ApiResult.ok(leaderGroupAssignRuleService.rebalanceDay(day, body == null ? null : body.assignBy()));
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @GetMapping("/leader-group/editor-members")
-    public ApiResult<Map<String, Object>> listEditorMembers(HttpServletRequest request) {
-        try {
-            requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            return ApiResult.ok(editorGroupMemberService.listMembers());
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @PostMapping("/leader-group/editor-members/update")
-    public ApiResult<Map<String, Object>> updateEditorMember(HttpServletRequest request,
-                                                              @RequestBody EditorMemberUpdateRequest body) {
-        try {
-            OpsAuthService.Session admin = requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            Map<String, Object> updated = editorGroupMemberService.updateMember(
-                    body == null ? null : body.editorName(),
-                    body == null ? null : body.groupName(),
-                    admin.displayName()
-            );
-            String group = body == null ? "" : trim(body.groupName());
-            if (!group.isBlank() && !OpsEditorGroupMemberService.GROUP_DEFERRED.equals(group)) {
-                Map<String, Object> poolRefresh = leaderGroupService.afterEditorJoinedCreateAssignPool();
-                updated = new LinkedHashMap<>(updated);
-                updated.put("createAssignPoolRefresh", poolRefresh);
-            }
-            return ApiResult.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    @PostMapping("/leader-group/sync-editor-groups")
-    public ApiResult<Map<String, Object>> syncEditorGroups(HttpServletRequest request) {
-        try {
-            requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            return ApiResult.ok(leaderGroupService.syncGroupsFromAssignedEditors());
-        } catch (IllegalArgumentException e) {
-            return ApiResult.fail("A0400", e.getMessage());
-        }
-    }
-
-    /** 暂停恢复上线：同步剪辑→小组，再补空位（不挪动已手动分配/已填剪辑的行）。 */
-    @PostMapping("/leader-group/resume-after-pause")
-    public ApiResult<Map<String, Object>> resumeAfterPause(HttpServletRequest request,
-                                                           @RequestBody(required = false) ResumeAfterPauseRequest body) {
-        try {
-            requireMenu(request, OpsRoleService.MENU_CODES.get(1));
-            LocalDate start = parseOptionalDate(body == null ? null : body.startDate());
-            LocalDate end = parseOptionalDate(body == null ? null : body.endDate());
-            if (body != null && body.deliveryDate() != null && !body.deliveryDate().isBlank()) {
-                LocalDate day = parseRequiredDate(body.deliveryDate());
-                start = day;
-                end = day;
-            }
-            return ApiResult.ok(leaderGroupService.resumeAfterPause(start, end));
         } catch (IllegalArgumentException e) {
             return ApiResult.fail("A0400", e.getMessage());
         }
@@ -536,26 +319,6 @@ public class OpsAdminController {
         return value == null ? "" : value.trim();
     }
 
-    private static LocalDate parseDate(String text) {
-        String v = trim(text);
-        if (v.isBlank()) {
-            return null;
-        }
-        return LocalDate.parse(v);
-    }
-
-    private static LocalDate parseRequiredDate(String text) {
-        LocalDate day = parseDate(text);
-        if (day == null) {
-            throw new IllegalArgumentException("请选择日期");
-        }
-        return day;
-    }
-
-    private static LocalDate parseOptionalDate(String text) {
-        return parseDate(text);
-    }
-
     public record LoginRequest(String displayName, String password) {
     }
 
@@ -585,32 +348,4 @@ public class OpsAdminController {
     public record FeatureFlagsRequest(String displayName, Boolean promoTable) {
     }
 
-    public record AssignRuleRequest(String deliveryDate,
-                                    String assignBy,
-                                    List<String> excludedGroups,
-                                    Integer expectedDramaCount,
-                                    String remark,
-                                    Boolean enabled) {
-    }
-
-    public record AssignRuleUpdateRequest(Long id,
-                                          String deliveryDate,
-                                          String assignBy,
-                                          List<String> excludedGroups,
-                                          Integer expectedDramaCount,
-                                          String remark,
-                                          Boolean enabled) {
-    }
-
-    public record AssignRuleDeleteRequest(Long id) {
-    }
-
-    public record AssignRuleRebalanceRequest(String deliveryDate, String assignBy) {
-    }
-
-    public record EditorMemberUpdateRequest(String editorName, String groupName) {
-    }
-
-    public record ResumeAfterPauseRequest(String deliveryDate, String startDate, String endDate) {
-    }
 }

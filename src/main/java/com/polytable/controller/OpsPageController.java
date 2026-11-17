@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @ConditionalOnProperty(name = "ops.enabled", havingValue = "true", matchIfMissing = true)
-public class DramaOpsPageController {
+public class OpsPageController {
 
     @GetMapping({"/ops", "/ops/"})
     public void opsPage(HttpServletResponse response) {

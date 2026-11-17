@@ -1,0 +1,37 @@
+# PolyTable 一键部署
+# 用法：cp .env.example .env && 修改 .env 中的口令 && docker compose up -d
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请在 .env 中设置 MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: polytable
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/polytable?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      DB_USERNAME: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # —— 必填安全配置（详见 README / SECURITY.md）——
+      OPS_AUTH_PASSWORD_SUFFIX: ${OPS_AUTH_PASSWORD_SUFFIX:?请在 .env 中设置 OPS_AUTH_PASSWORD_SUFFIX}
+      OPS_AUTH_TOKEN_SECRET: ${OPS_AUTH_TOKEN_SECRET:?请在 .env 中设置 OPS_AUTH_TOKEN_SECRET}
+      OPS_ADMIN_USERNAME: ${OPS_ADMIN_USERNAME:-admin}
+      OPS_ADMIN_PASSWORD: ${OPS_ADMIN_PASSWORD:?请在 .env 中设置 OPS_ADMIN_PASSWORD}
+
+volumes:
+  mysql-data:

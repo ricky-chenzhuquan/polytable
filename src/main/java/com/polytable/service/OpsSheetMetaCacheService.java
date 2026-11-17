@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
- * 中文备注：协作表读路径元数据缓存（飞书式「表级 revision 计数器」的轻量实现）。
+ * 中文备注：协作表读路径元数据缓存（「表级 revision 计数器」的轻量实现）。
  * 轮询/首屏每次都要 contentSyncToken（COUNT+SUM+MAX）与 countActive（COUNT），
  * 大表上是两次全表扫描；100 人在线时轮询会把 MySQL CPU 打满（112 实测 100 用户 p50 2.8s）。
  * 这里按 tableId 缓存：水位 1s、总数 1s、字段 2s；行写入时主动失效，读侧最多容忍对应 TTL 的陈旧。

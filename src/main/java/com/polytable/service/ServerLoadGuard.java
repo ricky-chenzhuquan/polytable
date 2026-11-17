@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 中文备注：按系统负载做重接口降级；登录 / me / logout / save 永不拦。
- * elevated：拉长轮询、跳过可延后的 ADX 静默刷新。
+ * elevated：拉长轮询、跳过可延后的后台静默刷新。
  * critical：协作列表自动缩小分批（游标补页），不用 A0401 挡人；超大单次拉齐仍排队。
  */
 @Component
@@ -24,25 +25,41 @@ public class ServerLoadGuard {
         NORMAL, ELEVATED, CRITICAL
     }
 
+    /** 中文备注：堆内存压力（内联实现）——used/max 越高越紧张；与 CPU 闸门取更严一档。 */
+    enum MemoryLevel {
+        NORMAL, ELEVATED, CRITICAL;
+
+        static MemoryLevel of(double usedRatio) {
+            if (usedRatio >= 0.92D) {
+                return CRITICAL;
+            }
+            if (usedRatio >= 0.80D) {
+                return ELEVATED;
+            }
+            return NORMAL;
+        }
+    }
+
+    record MemorySnapshot(MemoryLevel level, long availableBytes) {
+        static final MemorySnapshot EMPTY = new MemorySnapshot(MemoryLevel.NORMAL, 0L);
+    }
+
     private final boolean enabled;
     private final double elevatedLoadPerCpu;
     private final double criticalLoadPerCpu;
     private final long sampleTtlMs;
     private final int heavyPermits;
     private final long heavyWaitMs;
-    private final SystemMemoryPressure memoryPressure;
     private final Semaphore heavyQueryPermits;
     private final AtomicReference<Sample> sampleRef = new AtomicReference<>(Sample.EMPTY);
     private final AtomicLong lastCleanupHintAt = new AtomicLong(0L);
 
-    public ServerLoadGuard(SystemMemoryPressure memoryPressure,
-                           @Value("${ops.load-guard.enabled:true}") boolean enabled,
+    public ServerLoadGuard(@Value("${ops.load-guard.enabled:true}") boolean enabled,
                            @Value("${ops.load-guard.elevated-load-per-cpu:1.2}") double elevatedLoadPerCpu,
                            @Value("${ops.load-guard.critical-load-per-cpu:2.0}") double criticalLoadPerCpu,
                            @Value("${ops.load-guard.sample-ttl-ms:2000}") long sampleTtlMs,
                            @Value("${ops.load-guard.heavy-permits:4}") int heavyPermits,
                            @Value("${ops.load-guard.heavy-wait-ms:5000}") long heavyWaitMs) {
-        this.memoryPressure = memoryPressure;
         this.enabled = enabled;
         this.elevatedLoadPerCpu = Math.max(0.3, elevatedLoadPerCpu);
         this.criticalLoadPerCpu = Math.max(this.elevatedLoadPerCpu, criticalLoadPerCpu);
@@ -69,16 +86,24 @@ public class ServerLoadGuard {
         return level() == Level.CRITICAL;
     }
 
-    /** 中文备注：内存或 CPU 偏高时推迟 ADX 静默整表；near/新剧相关不推迟，保证及时可见。登录永不拦。 */
+    /** 中文备注：内存或 CPU 偏高时推迟可延后的后台整表刷新。登录永不拦。 */
     public boolean shouldDeferBackgroundRefresh(String type) {
-        String t = type == null ? "" : type.trim().toLowerCase();
-        if (!"adx".equals(t)) {
-            return false;
+        return memoryPressure().level() != MemoryLevel.NORMAL || critical();
+    }
+
+    private MemorySnapshot memoryPressure() {
+        try {
+            MemoryMXBean mx = ManagementFactory.getMemoryMXBean();
+            long max = mx.getHeapMemoryUsage().getMax();
+            long used = mx.getHeapMemoryUsage().getUsed();
+            if (max <= 0) {
+                return MemorySnapshot.EMPTY;
+            }
+            double ratio = (double) used / (double) max;
+            return new MemorySnapshot(MemoryLevel.of(ratio), Math.max(0L, max - used));
+        } catch (Exception e) {
+            return MemorySnapshot.EMPTY;
         }
-        if (memoryPressure.elevated()) {
-            return true;
-        }
-        return critical();
     }
 
     /**
@@ -144,7 +169,7 @@ public class ServerLoadGuard {
 
     public Map<String, Object> snapshot() {
         Sample sample = current();
-        SystemMemoryPressure.Snapshot memory = memoryPressure.current();
+        MemorySnapshot memory = memoryPressure();
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("loadLevel", sample.level().name().toLowerCase());
         data.put("systemLoadAverage", sample.loadAverage());
@@ -183,7 +208,7 @@ public class ServerLoadGuard {
                 cpuLevel = Level.ELEVATED;
             }
         }
-        Level level = max(cpuLevel, map(memoryPressure.level()));
+        Level level = max(cpuLevel, map(memoryPressure().level()));
         return new Sample(now, level, load < 0 ? 0D : load, processors);
     }
 
@@ -192,7 +217,7 @@ public class ServerLoadGuard {
         return Math.max(1, os.getAvailableProcessors());
     }
 
-    private static Level map(SystemMemoryPressure.Level level) {
+    private static Level map(MemoryLevel level) {
         return switch (level) {
             case NORMAL -> Level.NORMAL;
             case ELEVATED -> Level.ELEVATED;

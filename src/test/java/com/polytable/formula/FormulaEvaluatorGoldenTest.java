@@ -24,7 +24,7 @@ class FormulaEvaluatorGoldenTest {
 
     @Test
     void evaluatesPublicGoldenExamples() throws Exception {
-        try (InputStream stream = getClass().getResourceAsStream("/formula/feishu-bitable-golden.json")) {
+        try (InputStream stream = getClass().getResourceAsStream("/formula/bitable-formula-golden.json")) {
             assertNotNull(stream);
             JsonNode cases = mapper.readTree(stream);
             for (JsonNode testCase : cases) {
@@ -56,7 +56,7 @@ class FormulaEvaluatorGoldenTest {
     @Test
     void registryRecognizesEveryFunctionInTheFrozenPublicCatalog() throws Exception {
         JsonNode catalog = mapper.readTree(java.nio.file.Path.of(
-                "docs/superpowers/specs/2026-11-04-feishu-bitable-formula-catalog.json").toFile());
+                "src/main/resources/formula/bitable-formula-catalog.json").toFile());
         var registry = new FormulaFunctionRegistry();
         var missing = new java.util.ArrayList<String>();
         for (JsonNode function : catalog.path("functions")) {

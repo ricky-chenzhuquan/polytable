@@ -55,7 +55,7 @@ public class OpsAccountRepository {
     }
 
     /**
-     * 启用中的协作账户 display_name（用于剪辑下拉与均分名单；不含 admin）。
+     * 启用中的协作账户 display_name（用于下拉与名单；不含 admin）。
      */
     public List<String> listEnabledAssigneeNames() {
         return listEnabledAssigneeNames("hq");
@@ -81,7 +81,7 @@ public class OpsAccountRepository {
         }, args.toArray()).stream().filter(s -> !s.isBlank()).toList();
     }
 
-    /** 筛剧池账号：启用的总部剪辑师，历史 NULL 继续按默认允许处理。 */
+    /** 分配池账号：启用的成员，历史 NULL 继续按默认允许处理。 */
     public List<String> listScreeningAssignableEditorNames() {
         return jdbcTemplate.query("""
                 SELECT display_name

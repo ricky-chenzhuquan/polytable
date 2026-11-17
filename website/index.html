@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  PolyTable 官网 · 单页静态站点（README / 使用说明）
+  ============================================================
+  纯静态站点：无构建步骤、无外部 JS 依赖、无 CDN、无外部图片，
+  所有图形均为内联 SVG / CSS 实现，可直接部署到 GitHub Pages。
+
+  TODO 上线前检查清单：
+    1. 全局搜索替换 YOUR_GITHUB_NAME  →  你的 GitHub 用户名或组织名；
+    2. 若仓库名不是 polytable，同步替换所有仓库地址；
+    3. 有正式域名时：替换 <head> 中 canonical / og:url 的占位地址，
+       以及 404.html 中"返回首页"链接（改为绝对地址）；
+    4. docker-compose 示例中的镜像地址 ghcr.io/YOUR_GITHUB_NAME/polytable:latest；
+    5. 页脚文档链接当前指向 GitHub 仓库内的 docs/*.md，确认文件存在。
+  ============================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PolyTable — 开源自托管多维表格</title>
+  <meta name="description" content="PolyTable 是一款开源自托管多维表格：Canvas 渲染 10 万行级大表、119 个飞书多维表格兼容公式、SSE 实时协作与字段级权限，单个 Spring Boot JAR + 一个 MySQL，Docker 一键部署。">
+  <!-- TODO: 替换为正式域名 -->
+  <link rel="canonical" href="https://YOUR_GITHUB_NAME.github.io/polytable/">
+  <meta property="og:title" content="PolyTable — 开源自托管多维表格">
+  <meta property="og:description" content="Canvas 大表引擎 · 119 个飞书兼容公式 · SSE 实时协作 · MySQL 存储 · Docker 一键部署">
+  <meta property="og:type" content="website">
+  <!-- TODO: 替换为正式域名 -->
+  <meta property="og:url" content="https://YOUR_GITHUB_NAME.github.io/polytable/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- ======== 顶部导航 ======== -->
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="PolyTable 首页">
+        <svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="lgNav" x1="6" y1="4" x2="42" y2="44" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#4d7cff"/>
+              <stop offset="1" stop-color="#14b48f"/>
+            </linearGradient>
+          </defs>
+          <rect x="2.5" y="2.5" width="43" height="43" rx="10.5" fill="url(#lgNav)"/>
+          <rect x="10.5" y="13" width="27" height="6" rx="1.5" fill="#ffffff" fill-opacity="0.92"/>
+          <rect x="10.5" y="21" width="27" height="14" rx="1.5" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.8"/>
+          <path d="M10.5 25.5h27M10.5 30h27" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
+          <path d="M19.5 21v14M28.5 21v14" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
+          <rect x="19.5" y="25.5" width="9" height="4.5" fill="#ffffff" fill-opacity="0.38"/>
+        </svg>
+        PolyTable
+      </a>
+      <p class="nav-tagline">The open-source data grid for your own server</p>
+      <nav class="nav-links" aria-label="页面导航">
+        <a href="#features">特性</a>
+        <a href="#performance">性能</a>
+        <a href="#compare">对比</a>
+        <a href="#quickstart">快速开始</a>
+        <!-- TODO: 替换为正式 GitHub 仓库地址 -->
+        <a class="nav-cta" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6 2 12l6 6"/><path d="m16 6 6 6-6 6"/></svg>
+          GitHub 源码
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ======== Hero ======== -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div>
+          <svg class="hero-logo logo-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="lgHero" x1="6" y1="4" x2="42" y2="44" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#4d7cff"/>
+                <stop offset="1" stop-color="#14b48f"/>
+              </linearGradient>
+            </defs>
+            <rect x="2.5" y="2.5" width="43" height="43" rx="10.5" fill="url(#lgHero)"/>
+            <rect x="10.5" y="13" width="27" height="6" rx="1.5" fill="#ffffff" fill-opacity="0.92"/>
+            <rect x="10.5" y="21" width="27" height="14" rx="1.5" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.8"/>
+            <path d="M10.5 25.5h27M10.5 30h27" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
+            <path d="M19.5 21v14M28.5 21v14" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
+            <rect x="19.5" y="25.5" width="9" height="4.5" fill="#ffffff" fill-opacity="0.38"/>
+          </svg>
+
+          <h1>开源自托管多维表格<br>
+            <span class="grad">把「飞书多维表格」装进你自己的服务器</span>
+          </h1>
+
+          <p class="hero-sub">
+            PolyTable 基于 Spring Boot 3 + MySQL 构建：Canvas 渲染 10 万行级大表，
+            内置 119 个飞书兼容公式函数与 SSE 实时协作，Docker 一键部署，
+            数据完全留在你自己的服务器上。
+          </p>
+
+          <div class="hero-badges" aria-label="核心能力">
+            <span class="badge"><i class="dot dot-b"></i>Canvas 大表</span>
+            <span class="badge"><i class="dot dot-t"></i>飞书兼容公式</span>
+            <span class="badge"><i class="dot dot-y"></i>实时协作</span>
+            <span class="badge"><i class="dot dot-v"></i>MySQL 存储</span>
+          </div>
+
+          <div class="hero-actions">
+            <!-- TODO: 替换为正式 GitHub 仓库地址 -->
+            <a class="btn btn-primary" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6 2 12l6 6"/><path d="m16 6 6 6-6 6"/></svg>
+              GitHub 源码
+            </a>
+            <a class="btn btn-ghost" href="#quickstart">
+              快速开始
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- 表格示意（纯 CSS + 内联 SVG） -->
+        <div class="mock-wrap" aria-hidden="true">
+          <div class="mock">
+            <div class="mock-bar">
+              <i></i><i></i><i></i>
+              <span class="mock-title">任务总表（100,000 行）</span>
+              <span class="mock-avatars">
+                <span class="av av-lin">林</span>
+                <span class="av av-chen">陈</span>
+              </span>
+            </div>
+            <div class="formula-bar">
+              <span class="fx-chip">fx</span>
+              <code><span class="ff">IF</span>(<span class="fv">进度</span> &gt;= 1, <span class="fs">"已完成"</span>, <span class="ff">CONCATENATE</span>(<span class="ff">ROUND</span>(<span class="fv">进度</span> * 100, 0), <span class="fs">"%"</span>))</code>
+            </div>
+            <div class="mock-grid">
+              <div class="mcell mhead mc-gut">#</div>
+              <div class="mcell mhead">任务</div>
+              <div class="mcell mhead">负责人</div>
+              <div class="mcell mhead">状态</div>
+              <div class="mcell mhead mc-due">截止日期</div>
+              <div class="mcell mhead">进度</div>
+
+              <div class="mcell mc-gut mrow">1</div>
+              <div class="mcell">官网改版上线</div>
+              <div class="mcell"><span class="av av-lin">林</span></div>
+              <div class="mcell"><span class="tag tag-doing"><i></i>进行中</span></div>
+              <div class="mcell mc-due">05-20</div>
+              <div class="mcell"><span class="bar"><i style="width:72%"></i></span><span class="bar-pct">72%</span></div>
+
+              <div class="mcell mc-gut mrow">2</div>
+              <div class="mcell">数据导入工具</div>
+              <div class="mcell"><span class="av av-chen">陈</span></div>
+              <div class="mcell"><span class="tag tag-done"><i></i>已完成</span></div>
+              <div class="mcell mc-due">05-12</div>
+              <div class="mcell"><span class="bar"><i style="width:100%"></i></span><span class="bar-pct">100%</span></div>
+
+              <div class="mcell mc-gut mrow">3</div>
+              <div class="mcell">权限中心联调</div>
+              <div class="mcell"><span class="av av-su">苏</span></div>
+              <div class="mcell sel">
+                <span class="presence"><i></i>苏正在编辑</span>
+                <span class="tag tag-review"><i></i>待评审</span>
+              </div>
+              <div class="mcell mc-due">05-25</div>
+              <div class="mcell"><span class="bar"><i style="width:45%"></i></span><span class="bar-pct">45%</span></div>
+
+              <div class="mcell mc-gut mrow">4</div>
+              <div class="mcell">公式迁移校验</div>
+              <div class="mcell"><span class="av av-lin">林</span></div>
+              <div class="mcell"><span class="tag tag-block"><i></i>阻塞</span></div>
+              <div class="mcell mc-due">05-30</div>
+              <div class="mcell"><span class="bar"><i style="width:30%"></i></span><span class="bar-pct">30%</span></div>
+
+              <div class="mcell mc-gut mrow">5</div>
+              <div class="mcell">移动端适配</div>
+              <div class="mcell"><span class="av av-chen">陈</span></div>
+              <div class="mcell"><span class="tag tag-doing"><i></i>进行中</span></div>
+              <div class="mcell mc-due">06-02</div>
+              <div class="mcell"><span class="bar"><i style="width:18%"></i></span><span class="bar-pct">18%</span></div>
+            </div>
+          </div>
+          <div class="mock-chip">
+            <span class="bolt">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"/></svg>
+            </span>
+            50k 行 × 70 列 · 滚动 p95 <span class="p95">8.7ms</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== 特性区 ======== -->
+    <section id="features" class="section">
+      <div class="container">
+        <p class="eyebrow">核心特性</p>
+        <h2>一张表该有的能力，都在一个 JAR 里</h2>
+        <p class="lead">从渲染、公式到协作与权限，PolyTable 把多维表格的核心能力做进单个 Spring Boot 应用，依赖只有一个 MySQL。</p>
+
+        <div class="feature-grid">
+          <!-- 1 Canvas 大表引擎 -->
+          <article class="fcard">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                <path d="M3 9.5h18M9 9.5V20M15 9.5V20"/>
+                <rect x="9.75" y="11.25" width="4.5" height="3" rx="1" fill="currentColor" stroke="none" opacity="0.35"/>
+              </svg>
+            </div>
+            <h3>Canvas 大表引擎</h3>
+            <p>自研 Canvas 渲染管线，10 万行级数据滚动依旧流畅；稀疏列式 + gzip 传输压缩带宽，键集分页让翻页深度不再拖慢查询。</p>
+            <ul>
+              <li>10 万行级滚动流畅</li>
+              <li>稀疏列式 gzip 传输</li>
+              <li>键集分页（Keyset Pagination）</li>
+            </ul>
+          </article>
+
+          <!-- 2 公式引擎 -->
+          <article class="fcard">
+            <div class="ficon t">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17 5H7l6 7-6 7h10"/>
+              </svg>
+            </div>
+            <h3>公式引擎</h3>
+            <p>内置 119 个与飞书多维表格目录兼容的公式函数，命名与行为对齐其公开文档，从成熟产品迁移的表格可以低成本过渡。</p>
+            <ul>
+              <li>119 个飞书兼容函数</li>
+              <li>依赖图驱动级联重算</li>
+              <li>golden test 全量回归覆盖</li>
+            </ul>
+          </article>
+
+          <!-- 3 实时协作 -->
+          <article class="fcard">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="9" cy="8" r="3.2"/>
+                <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/>
+                <circle cx="17" cy="9" r="2.6"/>
+                <path d="M16.6 14.6c2.3.4 3.8 2 4.3 4.4"/>
+              </svg>
+            </div>
+            <h3>实时协作</h3>
+            <p>基于 SSE 的单元格级推送：谁改了哪格、谁正在编辑哪格一目了然。完整操作日志可追溯，轻量实现不依赖额外中间件。</p>
+            <ul>
+              <li>SSE 单元格推送</li>
+              <li>在场状态（谁在编辑哪格）</li>
+              <li>操作日志</li>
+            </ul>
+          </article>
+
+          <!-- 4 视图与字段 -->
+          <article class="fcard">
+            <div class="ficon t">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.6 13.3l-7.3 7.3a2 2 0 0 1-2.8 0L4 14.2V4h10.2l6.4 6.4a2 2 0 0 1 0 2.9z"/>
+                <circle cx="8" cy="8" r="1.6"/>
+              </svg>
+            </div>
+            <h3>视图与字段</h3>
+            <p>文本、数值、日期、单选 / 多选、成员、公式等常用字段类型开箱即用；筛选、排序、分组与多视图组合，把一张表按需切成不同切面。</p>
+            <ul>
+              <li>常用字段类型齐全</li>
+              <li>筛选 / 排序 / 分组</li>
+              <li>多视图并存</li>
+            </ul>
+          </article>
+
+          <!-- 5 安全与权限 -->
+          <article class="fcard">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3l7 2.8v5.4c0 4.3-2.9 7.3-7 8.8-4.1-1.5-7-4.5-7-8.8V5.8L12 3z"/>
+                <path d="M9.2 11.8l2 2 3.6-3.9"/>
+              </svg>
+            </div>
+            <h3>安全与权限</h3>
+            <p>接口走 HMAC token 校验，菜单与操作按角色收敛；数据库口令、签名密钥等敏感配置全部通过环境变量注入，不落盘、不进仓库。</p>
+            <ul>
+              <li>HMAC token 校验</li>
+              <li>角色菜单权限</li>
+              <li>字段级权限</li>
+            </ul>
+          </article>
+
+          <!-- 6 轻量自托管 -->
+          <article class="fcard">
+            <div class="ficon t">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 8.2 12 3 3 8.2v7.6L12 21l9-5.2V8.2z"/>
+                <path d="M3 8.2l9 5.2 9-5.2"/>
+                <path d="M12 13.4V21"/>
+              </svg>
+            </div>
+            <h3>轻量自托管</h3>
+            <p>一个 Spring Boot JAR 加一个 MySQL 就是全部依赖，Docker Compose 一键拉起；数据完全留在你自己的服务器上。</p>
+            <ul>
+              <li>单 JAR + 单 MySQL</li>
+              <li>Docker Compose 一键启动</li>
+              <li>数据完全自持</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== 性能数字带 ======== -->
+    <section id="performance" class="section perf">
+      <div class="container">
+        <p class="eyebrow">性能表现</p>
+        <h2>为大数据量而生</h2>
+        <p class="lead">以下数字来自真实合成压测：50k 行 × 70 列滚动零超 16ms 帧，公式在 5 万行规模下仍是亚秒级体验。</p>
+
+        <div class="perf-grid">
+          <div class="stat">
+            <div class="num">5.4<small>ms</small><span class="dim"> / </span>8.7<small>ms</small></div>
+            <p class="cap">Canvas 滚动帧耗时 p50 / p95<br>（50k 行 × 70 列，零超 16ms 帧）</p>
+          </div>
+          <div class="stat">
+            <div class="num">9.4<small>ms</small></div>
+            <p class="cap">首屏记录缓存命中耗时<br>（未命中 228ms）</p>
+          </div>
+          <div class="stat">
+            <div class="num">0.47<small>s</small></div>
+            <p class="cap">100 人并发 meta 轮询 p95</p>
+          </div>
+          <div class="stat">
+            <div class="num">253<small>ms</small></div>
+            <p class="cap">5 万行公式求值中位耗时</p>
+          </div>
+        </div>
+
+        <p class="perf-note">
+          <!-- TODO: 确认仓库内存在 docs/performance.md -->
+          以上为合成基准测试结果，测试环境与数据集详见
+          <a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/performance.md" target="_blank" rel="noopener">docs/performance.md</a>。
+        </p>
+      </div>
+    </section>
+
+    <!-- ======== 对比表 ======== -->
+    <section id="compare" class="section section-alt">
+      <div class="container">
+        <p class="eyebrow">同类对比</p>
+        <h2>PolyTable 与其他选择</h2>
+        <p class="lead">没有全能冠军，只有适合的场景。这里基于公开资料诚实对比，帮你判断 PolyTable 是否适合你的团队。</p>
+
+        <div class="table-wrap">
+          <table class="cmp">
+            <thead>
+              <tr>
+                <th scope="col">维度</th>
+                <th scope="col" class="is-poly">PolyTable<span class="chip">本项目</span></th>
+                <th scope="col">飞书多维表格</th>
+                <th scope="col">NocoDB</th>
+                <th scope="col">Baserow</th>
+                <th scope="col">Teable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">开源与许可</th>
+                <td class="is-poly">MIT，完全开源</td>
+                <td>闭源 SaaS</td>
+                <td>AGPLv3（企业功能另售）</td>
+                <td>核心 MIT，高级功能付费</td>
+                <td>AGPLv3 + 商业版</td>
+              </tr>
+              <tr>
+                <th scope="row">自托管</th>
+                <td class="is-poly"><span class="mk yes">✓</span>单 JAR + MySQL</td>
+                <td><span class="mk no">—</span>云端 SaaS</td>
+                <td><span class="mk yes">✓</span></td>
+                <td><span class="mk yes">✓</span></td>
+                <td><span class="mk yes">✓</span></td>
+              </tr>
+              <tr>
+                <th scope="row">存储引擎</th>
+                <td class="is-poly">MySQL</td>
+                <td>云端托管</td>
+                <td>复用已有库（MySQL / Postgres / SQLite 等）</td>
+                <td>PostgreSQL</td>
+                <td>PostgreSQL</td>
+              </tr>
+              <tr>
+                <th scope="row">大数据量渲染</th>
+                <td class="is-poly">Canvas，10 万行级</td>
+                <td>云端实现，体验流畅</td>
+                <td>虚拟滚动</td>
+                <td>虚拟滚动</td>
+                <td>虚拟滚动</td>
+              </tr>
+              <tr>
+                <th scope="row">公式兼容性</th>
+                <td class="is-poly">飞书目录兼容（119 函数）</td>
+                <td>原生公式目录</td>
+                <td>自有方言</td>
+                <td>自有方言</td>
+                <td>自有方言</td>
+              </tr>
+              <tr>
+                <th scope="row">部署复杂度</th>
+                <td class="is-poly">1 个 JAR + 1 个 MySQL，Compose 一键</td>
+                <td>无需部署（SaaS）</td>
+                <td>单容器即可，较轻</td>
+                <td>多服务组合，较重</td>
+                <td>应用 + Postgres，中等</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="cmp-note">
+          <strong>诚实说明：</strong>PolyTable 目前以表格视图为主，视图类型少于成熟产品，项目也处于社区早期，
+          接口与功能仍在快速演进。对比基于各产品公开资料整理，如有出入以官方文档为准。
+        </p>
+      </div>
+    </section>
+
+    <!-- ======== 快速开始 ======== -->
+    <section id="quickstart" class="section">
+      <div class="container">
+        <p class="eyebrow">快速开始</p>
+        <h2>两分钟跑起来</h2>
+        <p class="lead">推荐 Docker Compose 一键启动；也可以拉源码用 Maven 直接运行。所有口令均通过环境变量注入，不要写进文件或仓库。</p>
+
+        <div class="qs-grid">
+          <div class="qcard">
+            <div class="qhead">
+              <span class="step">1</span>
+              <h3>Docker Compose 一键启动</h3>
+              <span class="hint">需要 Docker + Compose v2</span>
+            </div>
+            <div class="code">
+<code><span class="tok-c"># docker-compose.yml —— 新建空目录，保存为该文件</span>
+<span class="tok-k">services</span>:
+  <span class="tok-k">mysql</span>:
+    <span class="tok-k">image</span>: <span class="tok-s">mysql:8.4</span>
+    <span class="tok-k">environment</span>:
+      <span class="tok-k">MYSQL_ROOT_PASSWORD</span>: <span class="tok-s">${POLYTABLE_DB_PASSWORD:?请在 .env 中设置}</span>
+      <span class="tok-k">MYSQL_DATABASE</span>: <span class="tok-s">polytable</span>
+    <span class="tok-k">volumes</span>:
+      - <span class="tok-s">mysql-data:/var/lib/mysql</span>
+    <span class="tok-k">healthcheck</span>:
+      <span class="tok-k">test</span>: [<span class="tok-s">"CMD"</span>, <span class="tok-s">"mysqladmin"</span>, <span class="tok-s">"ping"</span>, <span class="tok-s">"-h"</span>, <span class="tok-s">"localhost"</span>]
+      <span class="tok-k">interval</span>: <span class="tok-s">5s</span>
+      <span class="tok-k">retries</span>: <span class="tok-s">30</span>
+
+  <span class="tok-k">polytable</span>:
+    <span class="tok-c"># TODO: 替换为正式镜像地址</span>
+    <span class="tok-k">image</span>: <span class="tok-s">ghcr.io/YOUR_GITHUB_NAME/polytable:latest</span>
+    <span class="tok-k">depends_on</span>:
+      <span class="tok-k">mysql</span>:
+        <span class="tok-k">condition</span>: <span class="tok-s">service_healthy</span>
+    <span class="tok-k">ports</span>:
+      - <span class="tok-s">"8080:8080"</span>
+    <span class="tok-k">environment</span>:
+      <span class="tok-k">POLYTABLE_DB_URL</span>: <span class="tok-s">"jdbc:mysql://mysql:3306/polytable?useUnicode=true&amp;characterEncoding=utf8"</span>
+      <span class="tok-k">POLYTABLE_DB_USERNAME</span>: <span class="tok-s">root</span>
+      <span class="tok-k">POLYTABLE_DB_PASSWORD</span>: <span class="tok-s">${POLYTABLE_DB_PASSWORD}</span>
+      <span class="tok-k">POLYTABLE_AUTH_SECRET</span>: <span class="tok-s">${POLYTABLE_AUTH_SECRET:?请在 .env 中设置}</span>
+
+<span class="tok-k">volumes</span>:
+  <span class="tok-k">mysql-data</span>:</code>
+            </div>
+            <div class="qfoot">
+              <strong>然后执行</strong>
+              <div class="code" style="flex:1; padding:10px 14px;">
+<code><span class="tok-f">$</span> docker compose up -d</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="qcard">
+            <div class="qhead">
+              <span class="step">2</span>
+              <h3>源码运行</h3>
+              <span class="hint">需要 JDK 17+ 与 Maven</span>
+            </div>
+            <div class="code">
+<code><span class="tok-c"># 克隆并启动（首次运行会自动下载依赖）</span>
+<span class="tok-f">$</span> git clone <span class="tok-u">https://github.com/YOUR_GITHUB_NAME/polytable.git</span>  <span class="tok-c"># TODO: 替换为正式仓库地址</span>
+<span class="tok-f">$</span> cd polytable
+<span class="tok-f">$</span> mvn spring-boot:run</code>
+            </div>
+            <div class="qfoot">
+              <strong>默认入口</strong>
+              <code>http://localhost:8080/ops/</code>
+              <span>数据库口令、HMAC 密钥等敏感配置通过环境变量注入。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======== 页脚 ======== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">
+            <svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="lgFoot" x1="6" y1="4" x2="42" y2="44" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#4d7cff"/>
+                  <stop offset="1" stop-color="#14b48f"/>
+                </linearGradient>
+              </defs>
+              <rect x="2.5" y="2.5" width="43" height="43" rx="10.5" fill="url(#lgFoot)"/>
+              <rect x="10.5" y="13" width="27" height="6" rx="1.5" fill="#ffffff" fill-opacity="0.92"/>
+              <rect x="10.5" y="21" width="27" height="14" rx="1.5" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.8"/>
+              <path d="M10.5 25.5h27M10.5 30h27" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
+              <path d="M19.5 21v14M28.5 21v14" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4"/>
+              <rect x="19.5" y="25.5" width="9" height="4.5" fill="#ffffff" fill-opacity="0.38"/>
+            </svg>
+            PolyTable
+          </p>
+          <p>开源自托管多维表格：Canvas 大表、飞书兼容公式、SSE 实时协作，一个 JAR 加一个 MySQL 就能跑。</p>
+        </div>
+
+        <div>
+          <h4>文档</h4>
+          <!-- TODO: 替换为正式仓库地址，并确认对应 docs 文件存在 -->
+          <ul class="footer-links">
+            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/architecture.md" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>docs/architecture.md</a></li>
+            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/performance.md" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>docs/performance.md</a></li>
+            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/formula-functions.md" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>docs/formula-functions.md</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>社区</h4>
+          <!-- TODO: 替换为正式 GitHub 仓库地址 -->
+          <ul class="footer-links">
+            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6 2 12l6 6"/><path d="m16 6 6 6-6 6"/></svg>GitHub 仓库</a></li>
+            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/issues" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5v.5"/></svg>问题反馈（Issues）</a></li>
+            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/releases" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 8v6c0 1.7 4 3 9 3s9-1.3 9-3V8"/></svg>版本发布（Releases）</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        <p class="footer-meta">
+          <span>基于 MIT License 开源发布</span>
+          <span>&copy; 2026 PolyTable contributors</span>
+        </p>
+        <p>
+          免责声明：PolyTable 为独立开源项目，与飞书、Airtable 无隶属或合作关系。
+          「飞书多维表格」字样仅用于描述公式兼容性目标，其公式目录来自对应公开文档的独立整理；
+          飞书、Airtable 及相关商标归其权利人所有。本页面所述压测数据均为合成基准测试结果。
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

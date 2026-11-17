@@ -17,7 +17,7 @@ class FormulaCatalogCoverageTest {
     @Test
     void parsesAndExecutesAnOfficialExampleForEveryCatalogFunction() throws Exception {
         JsonNode catalog = new ObjectMapper().readTree(Path.of(
-                "docs/superpowers/specs/2026-11-04-feishu-bitable-formula-catalog.json").toFile());
+                "src/main/resources/formula/bitable-formula-catalog.json").toFile());
         FormulaParser parser = new FormulaParser();
         FormulaEvaluator evaluator = new FormulaEvaluator(new FormulaFunctionRegistry());
         List<String> failures = new ArrayList<>();

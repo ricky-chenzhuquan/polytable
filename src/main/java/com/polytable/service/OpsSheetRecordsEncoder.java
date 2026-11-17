@@ -13,7 +13,7 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * 飞书式协作表 records 块：列式 JSON → gzip → Base64（encoding=0）。
+ * 协作表 records 块：列式 JSON → gzip → Base64（encoding=0）。
  */
 @Component
 public class OpsSheetRecordsEncoder {

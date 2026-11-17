@@ -40,7 +40,7 @@ public final class OpsUndoSupport {
             "editorAssignee", "deliveryTest", "deliveryAssignee"
     );
     private static final Set<String> TIME_KEYS = Set.of(
-            "estimatePublishTime", "publishTime", "changduCreateTime"
+            "estimatePublishTime", "publishTime"
     );
     private static final Set<String> NON_UNDO_PREFIXES = Set.of(
             "FIELD_OPTION:", "FIELD_CREATE:", "FIELD_CONFIG:", "FIELD_DELETE:"
@@ -258,35 +258,18 @@ public final class OpsUndoSupport {
 
     private static Map<String, FieldTarget> buildFieldTargets() {
         Map<String, FieldTarget> map = new LinkedHashMap<>();
-        put(map, "剧名", Kind.OPS_FIELD, "seriesName");
+        put(map, "名称", Kind.OPS_FIELD, "seriesName");
         put(map, "剧目类型", Kind.OPS_FIELD, "dramaTypeLabel");
         put(map, "版权", Kind.OPS_FIELD, "copyrightOwner");
-        put(map, "筛剧评级", Kind.OPS_FIELD, "screeningRating");
+        put(map, "初审评级", Kind.OPS_FIELD, "screeningRating");
         put(map, "最终评级", Kind.OPS_FIELD, "finalRating");
-        put(map, "剪辑", Kind.OPS_FIELD, "editorAssignee");
+        put(map, "执行人", Kind.OPS_FIELD, "editorAssignee");
         put(map, "素材数", Kind.OPS_FIELD, "materialCount");
-        put(map, "投放测试", Kind.OPS_FIELD, "deliveryTest");
+        put(map, "测试分配", Kind.OPS_FIELD, "deliveryTest");
         put(map, "网盘链接", Kind.OPS_FIELD, "cloudDiskUrl");
         put(map, "优先级", Kind.OPS_FIELD, "priorityLevel");
-        put(map, "投手评级", Kind.OPS_FIELD, "bidderRating");
-        put(map, "投手", Kind.OPS_FIELD, "deliveryAssignee");
-
-        put(map, "IAA链接(默认)", Kind.PROMO_FIELD, "iaaDefaultUrl");
-        put(map, "IAA链接(卡2)", Kind.PROMO_FIELD, "iaaCard2Url");
-        put(map, "IAA链接（第2集）", Kind.PROMO_FIELD, "iaaEpisode2Url");
-        for (int i = 1; i <= 7; i++) {
-            put(map, "IAP面板" + i, Kind.PROMO_FIELD, "iapPanel" + i);
-            put(map, "IAP链接" + i, Kind.PROMO_FIELD, "iapLink" + i);
-        }
-
-        put(map, "预估投放时间", Kind.SERIES_FIELD, "estimatePublishTime");
-        put(map, "预估发布时间", Kind.SERIES_FIELD, "publishTime");
-        put(map, "常读创建时间", Kind.SERIES_FIELD, "changduCreateTime");
-        put(map, "总集数", Kind.SERIES_FIELD, "episodeAmount");
-        put(map, "描述类型", Kind.SERIES_FIELD, "categoryText");
-        put(map, "抖音作品id", Kind.SERIES_FIELD, "douyinWorkId");
-        put(map, "发布抖音号", Kind.SERIES_FIELD, "publishAwemeUser");
-        put(map, "版权(主表)", Kind.SERIES_FIELD, "copyrightOwner");
+        put(map, "协作评级", Kind.OPS_FIELD, "bidderRating");
+        put(map, "协作成员", Kind.OPS_FIELD, "deliveryAssignee");
         return Map.copyOf(map);
     }
 
@@ -298,34 +281,4 @@ public final class OpsUndoSupport {
         return value == null ? "" : value.trim();
     }
 
-    /** 中文备注：运营主表列名白名单，供批量撤回 SQL 使用。 */
-    public static String opsFieldDbColumn(String saveKey) {
-        if (saveKey == null || saveKey.isBlank()) {
-            return null;
-        }
-        return switch (saveKey) {
-            case "dramaTypeLabel" -> "drama_type_label";
-            case "screeningRating" -> "screening_rating";
-            case "finalRating" -> "final_rating";
-            case "editorAssignee" -> "editor_assignee";
-            case "materialCount" -> "material_count";
-            case "deliveryTest" -> "delivery_test";
-            case "cloudDiskUrl" -> "cloud_disk_url";
-            case "priorityLevel" -> "priority_level";
-            case "bidderRating" -> "bidder_rating";
-            case "deliveryAssignee" -> "delivery_assignee";
-            default -> null;
-        };
-    }
-
-    /** 中文备注：填充柄/粘贴批次多为单列 OPS 字段；可走批量 UPDATE，跳过 500 次逐条 save。 */
-    public static boolean supportsFastBatchUndo(FieldTarget target) {
-        if (target == null || target.kind() != Kind.OPS_FIELD) {
-            return false;
-        }
-        if ("seriesName".equals(target.saveKey()) || "copyrightOwner".equals(target.saveKey())) {
-            return false;
-        }
-        return opsFieldDbColumn(target.saveKey()) != null;
-    }
 }

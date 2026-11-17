@@ -73,7 +73,7 @@ public class OpsTenantFeatureService {
         if ("adx".equals(type)) {
             return canSeeAgencyHqMirrorAdx(tenantMode);
         }
-        if (OpsDramaListService.AGENCY_PROMO_TYPE.equals(type)) {
+        if ("agency-promo".equals(type)) {
             return canSeeAgencyAsPromoTable(tenantMode);
         }
         return false;

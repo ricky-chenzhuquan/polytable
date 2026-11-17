@@ -1,6 +1,5 @@
 package com.polytable.service;
 
-import com.polytable.repository.DramaOperationRepository;
 import com.polytable.repository.OpsFieldConfigRepository;
 import com.polytable.repository.OpsFieldOptionRepository;
 import com.polytable.repository.OpsSheetFieldRepository;
@@ -26,44 +25,6 @@ public class OpsSheetLookupService {
     public static final int MAX_SOURCE_ROWS = 2000;
     public static final int MAX_RESULT_ELEMENTS = 1000;
     public static final String LIMIT_MESSAGE = "公式计算结果中的元素数量已超出上限1000个，请重新筛选条件。";
-    /** 中文备注：查找引用与协作台「近三天」窗口一致；条件在内存里筛（展示值），不下推 SQL。 */
-    private static final int LOOKUP_SOURCE_RANGE_DAYS = 3;
-    private static final String DEFAULT_COPYRIGHT_OWNER = "番茄";
-
-    private static final Set<String> BUILTIN_TABLE_IDS = Set.of("tbl_all", "tbl_created", "tbl_near", "tbl_promo", "tbl_adx");
-    private static final Map<String, String> BUILTIN_TABLE_LABELS = Map.of(
-            "tbl_all", "全部剧目",
-            "tbl_created", "当日创建剧目",
-            "tbl_near", "剧目时间临近发布采集表",
-            "tbl_promo", "当日剧目推广链接参考",
-            "tbl_adx", "ADX抖音热播榜top采集表"
-    );
-    private static final Map<String, String> BUILTIN_TABLE_TYPES = Map.of(
-            "tbl_all", "all",
-            "tbl_created", "created",
-            "tbl_near", "near",
-            "tbl_promo", "promo",
-            "tbl_adx", "adx"
-    );
-    /** 与前端 COLUMN_DEFS / linkableMasterFields 对齐，供查找条件值控件渲染类型。 */
-    private static final Map<String, String> BUILTIN_FIELD_TYPES = Map.ofEntries(
-            Map.entry("seriesName", "text"),
-            Map.entry("dramaTypeLabel", "select"),
-            Map.entry("copyrightOwner", "select"),
-            Map.entry("estimatePublishTime", "date"),
-            Map.entry("publishTime", "date"),
-            Map.entry("episodeAmount", "number"),
-            Map.entry("screeningRating", "select"),
-            Map.entry("finalRating", "select"),
-            Map.entry("editorAssignee", "multi"),
-            Map.entry("materialCount", "number"),
-            Map.entry("deliveryTest", "multi"),
-            Map.entry("cloudDiskUrl", "text"),
-            Map.entry("priorityLevel", "number"),
-            Map.entry("bidderRating", "text"),
-            Map.entry("deliveryAssignee", "multi")
-    );
-
     /** 引用表筛选条件：源表字段 + 运算符 + 固定值（同视图筛选，非本表字段比对）。 */
     public record LookupCondition(String sourceFieldKey, String op, String value) {
     }
@@ -93,33 +54,28 @@ public class OpsSheetLookupService {
         }
     }
 
+    /** 本表用于逐行匹配的列（对齐「名称列 + 编号列」约定；协作表按 key/标题识别）。 */
+    public record MatchColumns(String seriesNameFieldKey, String bookIdFieldKey) {
+    }
+
     private final OpsSheetRowRepository sheetRowRepository;
     private final OpsSheetFieldRepository sheetFieldRepository;
     private final OpsTableRegistryRepository tableRegistryRepository;
-    private final OpsDramaListService opsDramaListService;
-    private final OpsMasterFieldLinkService masterFieldLinkService;
     private final OpsFieldConfigRepository fieldConfigRepository;
     private final OpsFieldOptionRepository fieldOptionRepository;
-    private final DramaOperationRepository dramaOperationRepository;
     private final ObjectMapper objectMapper;
 
     public OpsSheetLookupService(OpsSheetRowRepository sheetRowRepository,
                                  OpsSheetFieldRepository sheetFieldRepository,
                                  OpsTableRegistryRepository tableRegistryRepository,
-                                 OpsDramaListService opsDramaListService,
-                                 OpsMasterFieldLinkService masterFieldLinkService,
                                  OpsFieldConfigRepository fieldConfigRepository,
                                  OpsFieldOptionRepository fieldOptionRepository,
-                                 DramaOperationRepository dramaOperationRepository,
                                  ObjectMapper objectMapper) {
         this.sheetRowRepository = sheetRowRepository;
         this.sheetFieldRepository = sheetFieldRepository;
         this.tableRegistryRepository = tableRegistryRepository;
-        this.opsDramaListService = opsDramaListService;
-        this.masterFieldLinkService = masterFieldLinkService;
         this.fieldConfigRepository = fieldConfigRepository;
         this.fieldOptionRepository = fieldOptionRepository;
-        this.dramaOperationRepository = dramaOperationRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -172,27 +128,9 @@ public class OpsSheetLookupService {
         return out;
     }
 
-    public List<Map<String, Object>> builtinMatchFieldMetas() {
-        List<Map<String, Object>> out = new ArrayList<>();
-        out.add(Map.of("fieldKey", "seriesName", "fieldTitle", "剧名"));
-        out.add(Map.of("fieldKey", "bookId", "fieldTitle", "book_id"));
-        return out;
-    }
-
-    public static boolean isBuiltinTableId(String tableId) {
-        return BUILTIN_TABLE_IDS.contains(trim(tableId));
-    }
-
     public List<Map<String, String>> listLinkableTables(String currentTableId) {
         List<Map<String, String>> out = new ArrayList<>();
         String current = trim(currentTableId);
-        for (Map.Entry<String, String> e : BUILTIN_TABLE_LABELS.entrySet()) {
-            Map<String, String> item = new LinkedHashMap<>();
-            item.put("tableId", e.getKey());
-            item.put("label", e.getValue());
-            item.put("kind", "builtin");
-            out.add(item);
-        }
         for (Map<String, Object> row : tableRegistryRepository.listActive()) {
             if (row == null) continue;
             if (!"blank".equalsIgnoreCase(trim(String.valueOf(row.getOrDefault("kind", ""))))) continue;
@@ -211,15 +149,6 @@ public class OpsSheetLookupService {
         String tid = trim(tableId);
         if (tid.isBlank()) return List.of();
         List<Map<String, Object>> out = new ArrayList<>();
-        if (BUILTIN_TABLE_IDS.contains(tid)) {
-            for (Map<String, String> field : masterFieldLinkService.linkableMasterFields()) {
-                if (field == null) continue;
-                Map<String, Object> item = new LinkedHashMap<>(field);
-                enrichLookupFieldMeta(item);
-                out.add(item);
-            }
-            return out;
-        }
         for (Map<String, Object> field : sheetFieldRepository.listActive(tid)) {
             if (field == null) continue;
             String key = trim(String.valueOf(field.getOrDefault("fieldKey", "")));
@@ -264,8 +193,6 @@ public class OpsSheetLookupService {
     private String resolveLookupFieldType(String fieldKey) {
         String key = trim(fieldKey);
         if (key.isBlank()) return "text";
-        String builtin = BUILTIN_FIELD_TYPES.get(key);
-        if (builtin != null) return builtin;
         Map<String, Object> cfg = fieldConfigRepository == null ? null : fieldConfigRepository.find(key);
         if (cfg != null) {
             String fromCfg = trim(String.valueOf(cfg.getOrDefault("fieldType", "")));
@@ -407,7 +334,7 @@ public class OpsSheetLookupService {
         }
         List<Map<String, Object>> sourceRows = loadSourceRows(config.sourceTableId(), config.conditions());
         List<Map<String, Object>> hits = filterSourceHits(config.sourceTableId(), sourceRows, config.conditions());
-        OpsMasterFieldLinkService.MatchColumns match = detectMatchColumns(fieldMetas);
+        MatchColumns match = detectMatchColumns(fieldMetas);
         if (canPerRowLookup(match)) {
             SourceIndex index = SourceIndex.fromHits(hits);
             int count = 0;
@@ -453,7 +380,7 @@ public class OpsSheetLookupService {
             return syncOut;
         }
         Set<String> forceKeys = forceFillFieldKeys == null ? Set.of() : forceFillFieldKeys;
-        OpsMasterFieldLinkService.MatchColumns match = detectMatchColumns(fieldMetas);
+        MatchColumns match = detectMatchColumns(fieldMetas);
         boolean perRow = canPerRowLookup(match);
         List<Map<String, Object>> lookupFields = new ArrayList<>();
         for (Map<String, Object> field : fieldMetas) {
@@ -531,14 +458,27 @@ public class OpsSheetLookupService {
         return syncOut;
     }
 
-    private OpsMasterFieldLinkService.MatchColumns detectMatchColumns(List<Map<String, Object>> fieldMetas) {
-        if (masterFieldLinkService == null) {
-            return new OpsMasterFieldLinkService.MatchColumns("", "");
+    /** 中文备注：在本表列里识别逐行匹配列——名称列（key/标题=seriesName/剧名）与编号列（bookId/book_id）。 */
+    private MatchColumns detectMatchColumns(List<Map<String, Object>> fieldMetas) {
+        String seriesKey = "";
+        String bookKey = "";
+        for (Map<String, Object> field : fieldMetas == null ? List.<Map<String, Object>>of() : fieldMetas) {
+            if (field == null) continue;
+            String key = trim(String.valueOf(field.getOrDefault("fieldKey", "")));
+            String title = trim(String.valueOf(field.getOrDefault("fieldTitle",
+                    field.getOrDefault("label", ""))));
+            if (seriesKey.isBlank() && ("seriesName".equalsIgnoreCase(key) || "剧名".equals(title))) {
+                seriesKey = key;
+            }
+            if (bookKey.isBlank() && ("bookId".equalsIgnoreCase(key) || "book_id".equalsIgnoreCase(key)
+                    || "bookId".equalsIgnoreCase(title) || "book_id".equalsIgnoreCase(title))) {
+                bookKey = key;
+            }
         }
-        return masterFieldLinkService.detectMatchColumns(fieldMetas);
+        return new MatchColumns(seriesKey, bookKey);
     }
 
-    private static boolean canPerRowLookup(OpsMasterFieldLinkService.MatchColumns match) {
+    private static boolean canPerRowLookup(MatchColumns match) {
         return match != null
                 && (!trim(match.seriesNameFieldKey()).isBlank() || !trim(match.bookIdFieldKey()).isBlank());
     }
@@ -546,8 +486,6 @@ public class OpsSheetLookupService {
     private static final class SourceIndex {
         private final Map<String, Map<String, Object>> byBookId = new LinkedHashMap<>();
         private final Map<String, List<Map<String, Object>>> bySeriesName = new LinkedHashMap<>();
-        private static final List<String> TYPE_ORDER = List.of("drama", "douyin", "real");
-
         static SourceIndex fromHits(List<Map<String, Object>> hits) {
             SourceIndex index = new SourceIndex();
             if (hits == null) return index;
@@ -568,7 +506,7 @@ public class OpsSheetLookupService {
             return index;
         }
 
-        Map<String, Object> match(OpsMasterFieldLinkService.MatchColumns columns,
+        Map<String, Object> match(MatchColumns columns,
                                   String seriesName,
                                   String bookId) {
             boolean hasBookIdColumn = columns != null && !trim(columns.bookIdFieldKey()).isBlank();
@@ -601,13 +539,6 @@ public class OpsSheetLookupService {
                     }
                 }
             }
-            for (String dramaType : TYPE_ORDER) {
-                for (Map<String, Object> candidate : candidates) {
-                    if (dramaType.equals(trim(String.valueOf(candidate.getOrDefault("dramaType", ""))))) {
-                        return candidate;
-                    }
-                }
-            }
             return candidates.get(0);
         }
     }
@@ -620,7 +551,7 @@ public class OpsSheetLookupService {
                                                     int matchedRows,
                                                     boolean perRow,
                                                     String sampleValue,
-                                                    OpsMasterFieldLinkService.MatchColumns match) {
+                                                    MatchColumns match) {
         String localKey = trim(String.valueOf(field.getOrDefault("fieldKey", "")));
         int matchCount = hits == null ? 0 : hits.size();
         Map<String, Object> sync = new LinkedHashMap<>();
@@ -643,10 +574,10 @@ public class OpsSheetLookupService {
         } else if (!perRow) {
             sync.put("status", "ok");
             sync.put("value", sampleValue == null ? "" : sampleValue);
-            sync.put("message", "未找到「剧名/book_id」列，全表填同一值；请添加剧名列后重新保存");
+            sync.put("message", "未找到匹配列（名称/编号），全表填同一值；请添加匹配列后重新保存");
         } else if (perRow && matchedRows <= 0) {
             sync.put("status", "no_row_match");
-            sync.put("message", "引用表有数据，但本表行未匹配到剧名/book_id，请检查列名或内容");
+            sync.put("message", "引用表有数据，但本表行未匹配到名称/编号列，请检查列名或内容");
         } else if (filledCount <= 0 && (sampleValue == null || sampleValue.isBlank())) {
             sync.put("status", "empty_value");
             sync.put("message", "已命中 " + matchCount + " 条，但引用字段值为空");
@@ -690,12 +621,7 @@ public class OpsSheetLookupService {
     private String resolveSourceFieldValue(Map<String, Object> source, String fieldKey) {
         String key = trim(fieldKey);
         if (key.isBlank()) return "";
-        return switch (key) {
-            // 中文备注：list 接口已对 dramaTypeLabel 做过 attachOps（空=刻意清空）；勿再 effective 回落。
-            case "dramaTypeLabel" -> cellText(source, "dramaTypeLabel");
-            case "copyrightOwner" -> cellText(source, "copyrightOwner");
-            default -> cellText(source, key);
-        };
+        return cellText(source, key);
     }
 
     private List<Map<String, Object>> filterSourceHits(String tableId,
@@ -744,10 +670,7 @@ public class OpsSheetLookupService {
 
     private boolean matchesSourceCondition(Map<String, Object> source, LookupCondition cond) {
         String op = cond.op() == null || cond.op().isBlank() ? "eq" : cond.op().trim();
-        String text = switch (cond.sourceFieldKey()) {
-            case "dramaTypeLabel", "copyrightOwner" -> cellText(source, cond.sourceFieldKey());
-            default -> cellText(source, cond.sourceFieldKey());
-        };
+        String text = cellText(source, cond.sourceFieldKey());
         List<String> wants = parseFilterValues(cond.value());
 
         if ("empty".equals(op)) {
@@ -916,10 +839,7 @@ public class OpsSheetLookupService {
         if (local == null || localKey.isBlank()) {
             return false;
         }
-        if (isBuiltinTableId(tableId)) {
-            return isBlankCell(cellText(local, localKey));
-        }
-        // 中文备注：空白表仅从未落库的单元格自动同步；用户手动清空("")后不再覆盖。
+        // 中文备注：协作表仅从未落库的单元格自动同步；用户手动清空("")后不再覆盖。
         return !local.containsKey(localKey);
     }
 
@@ -949,9 +869,6 @@ public class OpsSheetLookupService {
                                       String value) {
         if (tableId == null || tableId.isBlank()) {
             return false;
-        }
-        if (isBuiltinTableId(tableId)) {
-            return persistBuiltinLookupCell(tableId, operator, row, fieldKey, value);
         }
         if (sheetRowRepository == null) {
             return true;
@@ -990,45 +907,6 @@ public class OpsSheetLookupService {
         } catch (Exception ignored) {
             return false;
         }
-    }
-
-    private boolean persistBuiltinLookupCell(String tableId,
-                                             String operator,
-                                             Map<String, Object> row,
-                                             String fieldKey,
-                                             String value) {
-        if (dramaOperationRepository == null || row == null || fieldKey == null || fieldKey.isBlank()) {
-            return false;
-        }
-        String dramaType = cellText(row, "dramaType");
-        if (dramaType.isBlank()) {
-            dramaType = BUILTIN_TABLE_TYPES.getOrDefault(trim(tableId), "all");
-        }
-        String bookId = cellText(row, "bookId");
-        if (bookId.isBlank()) {
-            bookId = cellText(row, "opsKey");
-        }
-        if (bookId.isBlank()) {
-            return false;
-        }
-        String op = trim(operator);
-        if (op.isBlank()) {
-            op = "lookup-sync";
-        }
-        boolean saved = dramaOperationRepository.mergeBlankLookupField(
-                dramaType,
-                bookId,
-                cellText(row, "seriesName"),
-                cellText(row, "dramaTypeLabel"),
-                fieldKey,
-                value,
-                op);
-        if (saved) {
-            Integer ver = row.get("version") instanceof Number n ? n.intValue() : 0;
-            row.put(fieldKey, value);
-            row.put("version", ver + 1);
-        }
-        return saved;
     }
 
     private Map<String, Object> parseCellsJson(String cellsJson) {
@@ -1094,29 +972,6 @@ public class OpsSheetLookupService {
     private List<Map<String, Object>> loadSourceRows(String tableId, List<LookupCondition> conditions) {
         String tid = trim(tableId);
         if (tid.isBlank()) return List.of();
-        if (BUILTIN_TABLE_IDS.contains(tid)) {
-            String type = BUILTIN_TABLE_TYPES.getOrDefault(tid, "all");
-            try {
-                // 中文备注：版权/剧目类型等「展示值 ≠ 原始列值」，下推 SQL 会筛成 0 条；先拉窗口内行再内存匹配。
-                Map<String, Object> payload = opsDramaListService.list(
-                        null, null, LOOKUP_SOURCE_RANGE_DAYS, type, MAX_SOURCE_ROWS,
-                        null, null, null, true);
-                Object raw = payload == null ? null : payload.get("rows");
-                if (!(raw instanceof List<?> list)) return List.of();
-                List<Map<String, Object>> out = new ArrayList<>();
-                for (Object item : list) {
-                    if (item instanceof Map<?, ?> m) {
-                        Map<String, Object> row = new LinkedHashMap<>();
-                        m.forEach((k, v) -> row.put(String.valueOf(k), v));
-                        out.add(row);
-                        if (out.size() >= MAX_SOURCE_ROWS) break;
-                    }
-                }
-                return out;
-            } catch (Exception e) {
-                return List.of();
-            }
-        }
         Map<String, Object> table = tableRegistryRepository.findActive(tid);
         if (table == null || !"blank".equalsIgnoreCase(trim(String.valueOf(table.getOrDefault("kind", ""))))) {
             return List.of();

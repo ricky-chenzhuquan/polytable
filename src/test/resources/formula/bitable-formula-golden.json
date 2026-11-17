@@ -1,0 +1,23 @@
+[
+  {
+    "id": "official-if-false-branch",
+    "expression": "IF(1=2, \"相同\", \"不相同\")",
+    "fields": {},
+    "expectedValue": "不相同",
+    "sourceIds": ["feishu-if-ifs"]
+  },
+  {
+    "id": "official-concatenate-text",
+    "expression": "CONCATENATE(\"多维\", \"表格\")",
+    "fields": {},
+    "expectedValue": "多维表格",
+    "sourceIds": ["lark-function-catalog"]
+  },
+  {
+    "id": "official-ifs-no-match-error",
+    "expression": "IFS(FALSE, \"命中\")",
+    "fields": {},
+    "expectedError": "#N/A",
+    "sourceIds": ["feishu-if-ifs"]
+  }
+]

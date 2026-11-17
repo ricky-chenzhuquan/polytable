@@ -1626,7 +1626,7 @@
       color: #1456f0;
       border-color: #1456f0;
     }
-    /* 剧目目录只读：绝不展示代投协作表后台采链（防旧缓存 JS 误绑表） */
+    /* 目录表只读：绝不展示协作实例协作表后台采链（防旧缓存 JS 误绑表） */
     body.hq-catalog-active .view-toolbar .link-collect-mount {
       display: none !important;
     }
@@ -1681,9 +1681,9 @@
     .scope-hint {
       color: #8f959e; font-size: 11px; white-space: nowrap;
     }
-    /* 中文备注：空白协作表与剧目日期窗口无关，切到空白表时整段隐藏。 */
+    /* 中文备注：空白协作表与主表日期窗口无关，切到空白表时整段隐藏。 */
     body.blank-table-active .scope-controls { display: none !important; }
-    /* 中文备注：代投且无协作表时，勿展示总部缓存的系统表/视图/工具栏。 */
+    /* 中文备注：协作实例且无协作表时，勿展示主实例缓存的系统表/视图/工具栏。 */
     .agency-empty-main {
       flex: 1 1 auto; display: none; flex-direction: column; align-items: center; justify-content: center;
       gap: 8px; min-height: 280px; padding: 24px; color: #646a73; font-size: 14px; text-align: center;
@@ -1696,7 +1696,7 @@
     body.agency-no-tables-active .row-pager,
     body.agency-no-tables-active .table-bottom-spacer { display: none !important; }
     body.agency-no-tables-active .agency-empty-main { display: flex !important; }
-    /* 代投：右下角一键滚到表底（仅当前已加载行）。 */
+    /* 协作实例：右下角一键滚到表底（仅当前已加载行）。 */
     .agency-scroll-bottom-btn {
       display: none;
       position: fixed;
@@ -1717,7 +1717,7 @@
       transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
     }
     body.agency-tenant-active .agency-scroll-bottom-btn { display: inline-flex; }
-    /* 代投：工具栏只展示「总数」，不展示可见/已加载/补页进度（多维表格式静默灌池）。 */
+    /* 协作实例：工具栏只展示「总数」，不展示可见/已加载/补页进度（多维表格式静默灌池）。 */
     body.agency-tenant-active .stats .stat:not(:first-child) { display: none !important; }
     body.agency-no-tables-active .agency-scroll-bottom-btn,
     body.login-screen-active .agency-scroll-bottom-btn { display: none !important; }
@@ -2911,8 +2911,8 @@
         <select id="type" title="业务线">
           <option value="all" selected>全部类型</option>
           <option value="near">临近上线</option>
-          <option value="promo">推广链接</option>
-          <option value="adx">ADX 榜单</option>
+          <option value="promo">分享链接</option>
+          <option value="adx">ADX 排行</option>
         </select>
       </div>
       <span class="vt-sep"></span>
@@ -3205,7 +3205,7 @@
         <span class="loc-ico" aria-hidden="true">!</span>
         <div class="loc-text">
           <h3 class="loc-title" id="logoutConfirmTitle">确认退出登录吗？</h3>
-          <p class="loc-desc">退出登录后，你将无法收到新剧、夜间与剧排名等提醒通知。</p>
+          <p class="loc-desc">退出登录后，你将无法收到变更、夜间与排名等提醒通知。</p>
         </div>
       </div>
       <div class="loc-foot">
@@ -3266,7 +3266,7 @@
       <h3>新建表格</h3>
       <div class="rc-label">表格名称</div>
       <input class="rc-input" id="tableCreateName" maxlength="30" placeholder="未命名表格" />
-      <div class="rc-hint">独立空白表，内容与剧目数据无关</div>
+      <div class="rc-hint">独立空白表，内容与主表数据无关</div>
       <div class="rc-actions">
         <button type="button" class="rc-cancel" id="tableCreateCancel">取消</button>
         <button type="button" class="rc-ok" id="tableCreateOk">创建</button>
@@ -3528,14 +3528,14 @@
         <button class="secondary" type="button" id="reminderCloseBtn">关闭</button>
       </div>
       <div class="log-toolbar">
-        <div class="meta" id="reminderMeta">含新剧、夜间、剧排名榜单；网页可查</div>
+        <div class="meta" id="reminderMeta">含变更、夜间、热度排行；网页可查</div>
         <div class="actions">
           <select id="reminderType" style="width:auto;min-width:140px;padding:4px 8px;font-size:12px" title="提醒类型">
             <option value="" selected>全部</option>
-            <option value="new">新剧提醒</option>
+            <option value="new">变更提醒</option>
             <option value="evening">夜间提醒</option>
-            <option value="rank">剧排名榜单</option>
-            <option value="focus">重点剧提醒</option>
+            <option value="rank">热度排行</option>
+            <option value="focus">重点变更提醒</option>
           </select>
           <button id="reminderRefreshBtn" class="ghost" type="button">刷新</button>
         </div>
@@ -3552,7 +3552,7 @@
   <div id="rankDrawer" class="drawer">
     <div class="drawer-panel" style="width:min(720px, 96vw)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px">
-        <h3 style="margin:0" id="rankDrawerTitle">剧排名榜单</h3>
+        <h3 style="margin:0" id="rankDrawerTitle">热度排行</h3>
         <button class="secondary" type="button" id="rankCloseBtn">关闭</button>
       </div>
       <div class="meta" id="rankDrawerMeta" style="margin-bottom:10px"></div>
@@ -3644,7 +3644,7 @@
       { key: "iapPanel10", label: "IAP面板10", type: "text", width: 100, copyBtn: true }, { key: "iapLink10", label: "IAP10", type: "text", width: 150, copyBtn: true },
       { key: "actions", label: "操作", locked: true, type: "action", width: 110 }
     ];
-    // 中文备注：ADX 榜单采集表默认列；字段选项默认复用主表。
+    // 中文备注：ADX 排行采集表默认列；字段选项默认复用主表。
     const ADX_DEFAULT_COLUMN_ORDER = [
       "bookId", "seriesName", "dramaTypeLabel", "account", "screeningRating",
       "editorAssignee", "finalRating", "playCountAdd", "playCount", "publishAwemeUser",
@@ -3669,7 +3669,7 @@
       "materialCount", "deliveryTest", "cloudDiskUrl", "priorityLevel", "bidderRating",
       "deliveryAssignee", "actions"
     ];
-    // 中文备注：推广链接参考默认列 ≈ 主表；负责人与 IAA/IAP 列前置。
+    // 中文备注：分享链接参考默认列 ≈ 主表；负责人与 IAA/IAP 列前置。
     const PROMO_DEFAULT_COLUMN_ORDER = [
       "bookId", "seriesName", "editorAssignee", "dramaTypeLabel", "copyrightOwner",
       "estimatePublishTime", "publishTime", "episodeAmount", "publishAwemeUser", "workId",
@@ -3714,12 +3714,12 @@
         const n = Number(localStorage.getItem("ops.blankSheetSyncPollMs"));
         if (Number.isFinite(n) && n >= 2000 && n <= 120000) return Math.round(n);
       } catch (_) {}
-      // 中文备注：代投大表静默同步放慢，对齐主流多维表格「协同 patch 低优、不抢滚动」。
+      // 中文备注：协作实例大表静默同步放慢，对齐主流多维表格「协同 patch 低优、不抢滚动」。
       if (isAgencyTenant() && isBlankTable(currentTableId())) return 12000;
       return DEFAULT_BLANK_SHEET_SYNC_POLL_MS;
     }
     const PROMO_DAY_SILENT_REFRESH_MS = 45000;
-    /** 代投 A/S 推广链在 agency 库，与 HQ listVersion 不同步；须高频 delta 合并 IAA/IAP。 */
+    /** 协作实例 A/S 分享链存于协作实例库，与主库 listVersion 不同步；须高频 delta 合并 IAA/IAP。 */
     const AGENCY_PROMO_LINK_POLL_MS = 5000;
     const ONLINE_POLL_MS = 30000;
     // 中文备注：后台标签页只需续命，拉长到 60s（服务端在线 TTL=90s，仍有余量）。
@@ -3761,7 +3761,7 @@
     function isProgressiveStyle() {
       return true;
     }
-    /** 中文备注：空白表后台补页间隔；101 本机库可略快补满，124 目录在 drain 循环里单独 120ms。 */
+    /** 中文备注：空白表后台补页间隔；本地协作库可略快补满，目录表在 drain 循环里单独 120ms。 */
     function blankSheetDrainGapMs() {
       if (isAgencyLocalSheetTable()) {
         if (currentTableId() === AGENCY_LINK_COLLECT_TABLE_ID) {
@@ -3876,10 +3876,10 @@
       } catch (_) {}
       return !!(window.OpsSheetRecords && typeof window.OpsSheetRecords.normalizeSheetRecordsApiData === "function");
     }
-    /** 中文备注：系统表 tbl_all 等走 /dramas?records=1（同 encoding=2）；ops.dramaRecords=0 回退 JSON rows。 */
+    /** 中文备注：内置主表等走 /dramas?records=1（同 encoding=2）；ops.dramaRecords=0 回退 JSON rows。 */
     function dramaListUseRecordsProtocol(tableId = currentTableId()) {
       if (isBlankTable(tableId)) return false;
-      // 中文备注：A/S 推广表行数少但 IAA/IAP 为代投库后合并字段；gzip+列投影会导致首屏 IAA 空列、数秒后才出现。
+      // 中文备注：A/S 分享表行数少但 IAA/IAP 为协作实例库后合并字段；gzip+列投影会导致首屏 IAA 空列、数秒后才出现。
       if (isAgencyPromoTable(tableId)) return false;
       if (!isProgressiveStyle() || !isPagedDateWindow()) return false;
       try {
@@ -4018,7 +4018,7 @@
         if (state.loading && listLoadingMayRelease()) releaseListLoadingMask(epoch, null);
       } catch (_) {}
     }
-    /** 中文备注：全部剧目等指定日分页表——与 HQ 目录同样先 limit=1 拿 total，避免首屏千行与 COUNT 串行。 */
+    /** 中文备注：主表等指定日分页表——与 HQ 目录同样先 limit=1 拿 total，避免首屏千行与 COUNT 串行。 */
     async function ensureOpsPagedListTotal() {
       if (state._serverListTotalConfirmed) return;
       if (isBlankTable() || isHqCatalogTable()) return;
@@ -4057,7 +4057,7 @@
     function agencyLinkCollectTableActive() {
       return isAgencyTenant() && currentTableId() === AGENCY_LINK_COLLECT_TABLE_ID;
     }
-    /** 中文备注：代投采链表首屏先本地 cells，idle 再 HQ 主表对表（多维表格式二阶段）。 */
+    /** 中文备注：协作实例采链表首屏先本地 cells，idle 再主表对表（多维表格式二阶段）。 */
     function agencyBlankSheetDeferMasterLink() {
       return agencyLinkCollectTableActive();
     }
@@ -4074,7 +4074,7 @@
     function isBlankSheetScrolling() {
       return isSheetScrolling();
     }
-    /** 中文备注：推广链接采集轮询——滚动时略停即可；列表 loading/补页不挡 job 状态同步。 */
+    /** 中文备注：分享链接采集轮询——滚动时略停即可；列表 loading/补页不挡 job 状态同步。 */
     function linkCollectPollPaused() {
       return isSheetScrolling();
     }
@@ -4125,7 +4125,7 @@
       if (tid === "tbl_near") return true;
       return listTypeForTable(tid) === "near";
     }
-    /** 中文备注：临近发布含大量推广关联，加载久；此表遮罩只用固定一句，不切换统计/解压等文案。 */
+    /** 中文备注：临近发布含大量分享关联，加载久；此表遮罩只用固定一句，不切换统计/解压等文案。 */
     function listLoadingMaskText(tableId = currentTableId(), { progressiveCtx = false, recordsLoad = false, pageLoading = false } = {}) {
       if (isNearTableId(tableId)) return NEAR_LIST_LOADING_TEXT;
       if (progressiveCtx) return recordsLoad ? "正在加载并解压表格..." : "正在统计总数...";
@@ -4137,7 +4137,7 @@
     function isPromoTableActive() {
       return currentTableType() === "promo";
     }
-    // 中文备注：推广/临近/创建/ADX 必须按服务端日期窗重拉；不能用近三天内存池切片冒充指定日。
+    // 中文备注：分享/临近/创建/ADX 必须按服务端日期窗重拉；不能用近三天内存池切片冒充指定日。
     function prefersServerListOnDateSwitch() {
       const t = currentTableType();
       return t === "promo" || t === "agency-promo" || t === "near" || t === "created" || t === "adx" || t === "hq-catalog";
@@ -4245,7 +4245,7 @@
       return filterOpsForKind(filterFieldKind(field));
     }
     function filterFieldDefs(typeHint) {
-      // 中文备注：全部剧目 / 临近发布 / 推广链接 / ADX 各自只出现本表可见字段。
+      // 中文备注：主表 / 临近发布 / 分享链接 / ADX 各自只出现本表可见字段。
       // typeHint：规范化「非当前表」的视图筛选时必须传入，否则 ADX 的 playCount 会被当成非法字段打回名称。
       const type = String(typeHint || currentTableType() || "").trim();
       return allColumnDefs().filter((c) => {
@@ -6061,7 +6061,7 @@
       if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null;
       return { start: day, end: day, preset: "absolute" };
     }
-    /** 自投 HQ 主表前3后5窗口按当前日历日滚动。 */
+    /** 主表前3后5窗口按当前日历日滚动。 */
     const HQ_MAIN_ROLL_PRESET = "roll_3_before_5_after";
     function isHqMainTableForRollDate(tableId = currentTableId()) {
       if (isAgencyTenant()) return false;
@@ -6189,13 +6189,13 @@
       return false;
     }
     function isPagedDateWindow() {
-      // 中文备注：#type 对代投 A/S 等无对应 option，长期停在 all；须以 currentTableId 路由类型为准。
+      // 中文备注：#type 对协作实例 A/S 等无对应 option，长期停在 all；须以 currentTableId 路由类型为准。
       const type = currentTableType() || $("type")?.value || "all";
       return !isNearThreeLocalPool()
         // 中文备注：near 有独立的受限查询链路，尚未消费 filters；留在前端对已加载近发布池筛，不能静默丢条件。
         && ["all", "drama", "real", "shortplay"].includes(type);
     }
-    /** 中文备注：总部剧目目录分页加载，筛选/关键字必须走 SQL 全窗口，不能只在已加载行里本地筛。 */
+    /** 中文备注：主实例记录目录分页加载，筛选/关键字必须走 SQL 全窗口，不能只在已加载行里本地筛。 */
     function usesServerSideListFilters() {
       return isPagedDateWindow() || isHqCatalogTable(currentTableId() || "");
     }
@@ -6205,7 +6205,7 @@
       if (type === "hq-catalog") return cursor ? 1000 : 400;
       // 中文备注：当日创建表最多七个选择日且无补页，首包按后端硬顶一次拉全，禁止 8000 截断藏行。
       if (type === "created") return 50000;
-      // 中文备注：主剧目日期窗口一次性全量流式加载(gzip 后十余 MB,批处理 RAF 化)——
+      // 中文备注：主表日期窗口一次性全量流式加载(gzip 后十余 MB,批处理 RAF 化)——
       // 用户口径:不要「可见 N」分阶段计数,要持续加载直接结束;>6 万行余量仍走游标补页兜底。
       if (["all", "drama", "real", "shortplay"].includes(type)) return 60000;
       // 中文备注：其它近三天本地池首屏 8000、游标增量 500。
@@ -6263,7 +6263,7 @@
       }
       return activeToolbarDateWindow();
     }
-    /** 中文备注：推广表只有「指定日期」语义；须读 toolbarDateStart，不能只看可能被清空的 #date。 */
+    /** 中文备注：分享表只有「指定日期」语义；须读 toolbarDateStart，不能只看可能被清空的 #date。 */
     function promoTableListDate() {
       const win = activeListDateWindow();
       if (win?.start) return win.start;
@@ -6662,7 +6662,7 @@
       return serverFilterPayload().length > 0;
     }
     function liveApplyFilter({ reload = false, immediate = false } = {}) {
-      // 中文备注：总部目录仅「可走 SQL 的条件」重拉首屏；纯本地列仍在已加载行内筛。
+      // 中文备注：主实例目录仅「可走 SQL 的条件」重拉首屏；纯本地列仍在已加载行内筛。
       if (canEditViewConfig() && isFilterPanelOpen()) readFilterRulesFromDom();
       const catalogFilterReload = isHqCatalogTable(currentTableId())
         && (immediate || reload)
@@ -6852,7 +6852,7 @@
         && rules.length > 0
         && serverFilters.length === 0
         && !keyword;
-      // 中文备注：近三天自投=本地池；指定日/总部目录=服务端 SQL 全窗口 + 游标分页。
+      // 中文备注：近三天默认=本地池；指定日/主实例目录=服务端 SQL 全窗口 + 游标分页。
       if (forceReload || scopeChanged || (reloadIfKeyword && keyword) || serverFilterChanged) {
         state._serverFilterSig = nextServerSig;
         state.pager.page = 1;
@@ -7358,11 +7358,11 @@
         return "";
       }
     }
-    /** 中文备注：代投系统表目录来自 /ops/tables，须等 loadCustomTables 后再 apply 视图，否则会误落 tbl_hq_catalog。 */
+    /** 中文备注：协作实例系统表目录来自 /ops/tables，须等 loadCustomTables 后再 apply 视图，否则会误落内置目录表。 */
     function shouldDeferStartupViewApply() {
       const tid = urlTableParam();
       if (tid.startsWith("tbl_u_")) return true;
-      // 中文备注：登录前 isAgencyTenant 仍为 false，但 URL 已带 tbl_agency_promo；早 apply 会误落 tbl_all 并改地址栏。
+      // 中文备注：登录前 isAgencyTenant 仍为 false，但 URL 已带协作分享表深链；早 apply 会误落内置主表并改地址栏。
       if (tid && !isTableVisible(tid)) return true;
       return isAgencyTenant();
     }
@@ -7375,7 +7375,7 @@
       if (tid === "tbl_promo") return "promo";
       return "";
     }
-    /** 中文备注：刷新时优先保留 ?table=tbl_u_* 深链，避免 reconcile 落回总部目录主表。 */
+    /** 中文备注：刷新时优先保留 ?table=tbl_u_* 深链，避免 reconcile 落回主实例目录主表。 */
     function preferUrlTableIfVisible() {
       const tid = urlTableParam();
       if (!tid || !isTableVisible(tid)) return false;
@@ -7395,12 +7395,12 @@
     const HQ_LINK_COLLECT_TABLE_ID = "tbl_u_85f6bab6cf07";
     const HQ_CATALOG_TABLE_ID = "tbl_hq_catalog";
     const HQ_CATALOG_MAIN_VIEW_ID = "vew_hq_catalog_main";
-    /** 代投剧目目录 API 必须标明读 124 HQ schema，禁止误用本机协作库 drama_*。 */
-    const HQ_CATALOG_EXPECTED_SOURCE = "auto_play";
+    /** 协作实例目录 API 必须标明读取远端主库 schema，禁止误用本地协作库。 */
+    const HQ_CATALOG_EXPECTED_SOURCE = "master";
     function isHqCatalogTable(tableId = currentTableId()) {
       return String(tableId || "").trim() === HQ_CATALOG_TABLE_ID;
     }
-    /** 代投侧栏 HQ 只读镜像（目录 / 快上线 / ADX），数据必须来自 124 auto_play。 */
+    /** 协作实例侧栏主库只读镜像（目录 / 快上线 / ADX），数据必须来自远端主库。 */
     function isAgencyHqMirrorBuiltinTable(tableId = currentTableId()) {
       if (!isAgencyTenant()) return false;
       const tid = String(tableId || "").trim();
@@ -7408,11 +7408,11 @@
       const hit = allTableDefs().find((t) => t.tableId === tid);
       return !!(hit && (hit.hqMirror || hit.catalog));
     }
-    /** 代投「剧目目录」：只读 124 HQ（auto_play），走 /dramas hq-catalog + 隧道 JDBC。 */
+    /** 协作实例「记录目录」：只读远端主库，走 /dramas hq-catalog 只读链路。 */
     function isAgencyHqCatalogDataTable(tableId = currentTableId()) {
       return isAgencyTenant() && isHqCatalogTable(tableId);
     }
-    /** 代投协作表 / 空白表：101 本机 auto_play_agency（ops_sheet_row），与目录数据源分离。 */
+    /** 协作实例协作表 / 空白表：本地协作库（ops_sheet_row），与目录数据源分离。 */
     function isAgencyLocalSheetTable(tableId = currentTableId()) {
       return isAgencyTenant() && isBlankTable(tableId) && !isHqCatalogTable(tableId);
     }
@@ -7457,7 +7457,7 @@
     }
     function isTableReadOnly(tableId = currentTableId()) {
       if (isCatalogReadOnlyTable(tableId)) return true;
-      // 中文备注：空白协作表可编辑；勿沿用剧目目录 /dramas?readOnly 的残留标志。
+      // 中文备注：空白协作表可编辑；勿沿用目录 /dramas?readOnly 的残留标志。
       if (isBlankTable(tableId)) return false;
       return !!(state.tableReadOnly && tidMatchesCurrent(tableId));
     }
@@ -7475,7 +7475,7 @@
     function isAgencyPromotionFieldHidden(key) {
       const k = String(key || "").trim();
       if (!k || !isAgencyTenant() || !isAgencyHqMirrorBuiltinTable()) return false;
-      // 代投 A/S 推广表就是用于展示代投本地采链结果，不能套用普通 HQ 镜像的长链脱敏。
+      // 协作实例 A/S 分享表就是用于展示协作实例本地采链结果，不能套用普通主库镜像的长链脱敏。
       if (isAgencyPromoTable()) return false;
       if (PROMOTION_FIELDS.includes(k)) return true;
       const title = catalogHiddenFieldTitle(k);
@@ -7488,7 +7488,7 @@
     function isCatalogHiddenFieldKey(key) {
       const k = String(key || "").trim();
       if (!k || !isCatalogReadOnlyTable()) return false;
-      // 中文备注：A/S 表必须始终展示 IAA/IAP 列；勿沿用剧目目录 catalogHiddenFieldKeys 导致表头晚到。
+      // 中文备注：A/S 表必须始终展示 IAA/IAP 列；勿沿用目录 catalogHiddenFieldKeys 导致表头晚到。
       if (isAgencyPromoTable()) return false;
       if (isAgencyPromotionFieldHidden(k)) return true;
       if (Array.isArray(state.catalogHiddenFieldKeys) && state.catalogHiddenFieldKeys.includes(k)) return true;
@@ -7502,7 +7502,7 @@
     function isAgencyPromoTable(tableId = currentTableId()) {
       return isAgencyTenant() && String(tableId || "").trim() === AGENCY_PROMO_TABLE_ID;
     }
-    /** 当前页是否为采链空白表（代投仅协作表；总部仅指定 HQ 表）。A/S 推广表走后台 scheduler，无手动采链按钮。 */
+    /** 当前页是否为采链空白表（协作实例仅协作表；主实例仅指定 HQ 表）。A/S 分享表走后台 scheduler，无手动采链按钮。 */
     function linkCollectTableId() {
       const tid = String(currentTableId() || "").trim();
       if (!tid || isHqCatalogTable(tid) || isCatalogReadOnlyTable(tid)) return "";
@@ -7520,7 +7520,7 @@
     }
     /** 空白表采链均走游标 bulk：按表顺序一批，链接已齐则跳过。 */
     const LINK_COLLECT_BULK_BATCH = 600;
-    const LINK_COLLECT_QUIET_HOURS_MSG = "0-4点禁用采集，避免与自投冲突";
+    const LINK_COLLECT_QUIET_HOURS_MSG = "0-4点禁用采集，避开主抓取窗口";
     function linkCollectShanghaiHour() {
       try {
         const parts = new Intl.DateTimeFormat("en-US", {
@@ -7585,10 +7585,10 @@
       if (linkCollectBulkModeEnabled()) {
         const pending = Number(backlog?.actionableMissing || 0);
         if (pending > 0) {
-          return `同步推广链 · 剩 ${pending}`;
+          return `同步分享链 · 剩 ${pending}`;
         }
       }
-      return "同步推广链";
+      return "同步分享链";
     }
     function initLinkCollectBtn() {
       if (linkCollectVm || !$("linkCollectBtnMount")) return;
@@ -7602,7 +7602,7 @@
           return {
             visible: false,
             loading: false,
-            label: "同步推广链",
+            label: "同步分享链",
             pollTimer: null,
             activePollTimer: null,
             jobId: "",
@@ -7657,14 +7657,14 @@
               this.stopActivePoll();
               this.jobId = "";
               this.loading = false;
-              this.label = "同步推广链";
+              this.label = "同步分享链";
               this.backlog = null;
               return;
             }
             if (linkCollectBulkModeEnabled()) {
               void this.refreshBacklog(tableId, true);
             } else {
-              this.label = "同步推广链";
+              this.label = "同步分享链";
             }
             this.startActivePoll(tableId);
           },
@@ -7764,7 +7764,7 @@
                     } else {
                       toast(`同步完成：写入 ${Number(data.updated || 0)} 行`
                         + (meta > 0 ? `（含 metadata ${meta}）` : "")
-                        + (skipped > 0 ? `，跳过 ${skipped}（总部无匹配或已填）` : "")
+                        + (skipped > 0 ? `，跳过 ${skipped}（主实例无匹配或已填）` : "")
                         + (failed > 0 ? `，失败 ${failed}` : "")
                         + (remaining > 0 ? `，剩余 ${remaining}` : ""));
                     }
@@ -7776,7 +7776,7 @@
                     this.loading = false;
                     this.label = formatLinkCollectLabel(data, this.backlog);
                   } else if (status === "failed") {
-                    toast(data.error || "推广链同步失败", true);
+                    toast(data.error || "分享链同步失败", true);
                     this.loading = false;
                     this.label = "采链失败";
                   } else {
@@ -7813,7 +7813,7 @@
               if (!data) {
                 toast("启动采链失败", true);
                 this.loading = false;
-                this.label = "同步推广链";
+                this.label = "同步分享链";
                 return;
               }
               if (data.status === "empty" || Number(data.candidates || 0) === 0) {
@@ -7822,7 +7822,7 @@
                   : "近24小时无待同步行（链接已齐则跳过）";
                 toast(data.skipReason || hint);
                 this.loading = false;
-                this.label = "同步推广链";
+                this.label = "同步分享链";
                 return;
               }
               if (data.alreadyRunning) {
@@ -7835,7 +7835,7 @@
             } catch (e) {
               toast(String(e?.message || e) || "启动采链失败", true);
               this.loading = false;
-              this.label = "同步推广链";
+              this.label = "同步分享链";
             }
           },
           async startHqBulkCollect(tableId) {
@@ -7854,7 +7854,7 @@
               this.loading = true;
               this.label = "启动中…";
               const batchLimit = linkCollectBulkBatchSize();
-              // 中文备注：总部 bulk 顺带补全表详情（时间/作品ID）；代投仍跳过以免拖慢大批采链。
+              // 中文备注：主实例 bulk 顺带补全表详情（时间/作品ID）；协作实例仍跳过以免拖慢大批采链。
               const body = {
                 bulk: true,
                 skipTimeBackfill: !!isAgencyTenant(),
@@ -7899,7 +7899,7 @@
           async onClick() {
             const tableId = linkCollectTableId();
             if (!tableId || !isLinkCollectTable(tableId)) {
-              toast("请在代投协作表使用同步推广链", true);
+              toast("请在协作实例协作表使用同步分享链", true);
               return;
             }
             await this.startHqBulkCollect(tableId);
@@ -7930,7 +7930,7 @@
       const el = $("agencyEmptyMain");
       if (el) el.hidden = !empty;
     }
-    // 中文备注：代投无系统表；登录后须清掉 localStorage 里残留的 tbl_all 视图，避免误显总部表头。
+    // 中文备注：协作实例无系统表；登录后须清掉 localStorage 里残留的内置主表视图，避免误显主实例表头。
     function reconcileTenantTableState() {
       // 中文备注：仅冷启动一次按 URL 钉表；日常 reconcile 不能抢当前 active，否则侧栏切表后 URL 写回旧表、整页点不动。
       if (state._opsPinUrlTable && urlTableParam() && isTableVisible(urlTableParam())) {
@@ -7981,14 +7981,14 @@
       try { render(); } catch (_) {}
     }
     // 中文备注：写入/列表按固定 tableId+type（tbl_*），侧栏改名只改 label，不影响路由与主视图。
-    // ADX→tbl_adx；新剧/夜间→tbl_near（并推送 tbl_all）；推广→tbl_promo。
+    // ADX→ADX 排行表；变更/夜间→临近发布表（并推送主表）；分享→分享链接表。
     // 自定义筛选表走 ops_table_registry（tbl_u_*），list 复用 baseType（本期=all）。
     const TABLE_DEFS = [
       { type: "all", tableId: "tbl_all", label: "全部数据", kind: "builtin", builtin: true },
       { type: "created", tableId: "tbl_created", label: "当日新建", kind: "builtin", builtin: true },
       { type: "near", tableId: "tbl_near", label: "临近上线采集表", kind: "builtin", builtin: true },
-      { type: "promo", tableId: "tbl_promo", label: "推广链接参考", kind: "builtin", builtin: true },
-      { type: "adx", tableId: "tbl_adx", label: "ADX 榜单采集表", kind: "builtin", builtin: true }
+      { type: "promo", tableId: "tbl_promo", label: "分享链接参考", kind: "builtin", builtin: true },
+      { type: "adx", tableId: "tbl_adx", label: "ADX 排行采集表", kind: "builtin", builtin: true }
     ];
     const BUILTIN_TABLE_IDS = new Set(TABLE_DEFS.map((t) => t.tableId));
     function mapServerBuiltinRow(t) {
@@ -8043,7 +8043,7 @@
       const custom = (state.customTables || []).map((t) => {
         const kind = t.kind || "filter";
         // 中文备注：空白表 kind/baseType=blank 仅表示协作表形态；视图 type 仍走 all，
-        // 否则 realign/layoutDefaults 会把 tableId 改写成 tbl_all，viewId 反复重生、填色丢失。
+        // 否则 realign/layoutDefaults 会把 tableId 改写成内置主表，viewId 反复重生、填色丢失。
         const routeType = (kind === "blank" || t.baseType === "blank" || t.type === "blank")
           ? "all"
           : (t.baseType || t.type || "all");
@@ -8241,7 +8241,7 @@
       colorStyleCacheRuleSig: "",
       blankCanManageMeta: false,
       blankCanManageMeta: false,
-      // 中文备注：当前侧栏表；自定义表与 tbl_all 同 type=all，必须靠 tableId 区分。
+      // 中文备注：当前侧栏表；自定义表与内置主表同 type=all，必须靠 tableId 区分。
       activeTableId: "",
       // 中文备注：本地视图迁移水位；必须随 persistViews 落盘，否则会重复跑迁移冲掉用户日期模式。
       viewMigrations: { v3: true, v4: true, v5: true, v6: true, v7: true },
@@ -8471,7 +8471,7 @@
       return id;
     }
     function currentTableId() {
-      // 中文备注：代投无协作表时勿回落 tbl_all（本地缓存/ type 下拉会误触）。
+      // 中文备注：协作实例无协作表时勿回落内置主表（本地缓存/ type 下拉会误触）。
       if (isAgencyTenant() && !hasVisibleTables()) return "";
       // 中文备注：优先显式 activeTableId（自定义筛选表与 all 同 type）。
       if (state.activeTableId && isTableVisible(state.activeTableId)) {
@@ -8809,7 +8809,7 @@
     function applyBlankModeUi() {
       const blank = isBlankTable(currentTableId());
       document.body.classList.toggle("blank-table-active", blank);
-      // 中文备注：代投 HQ 只读镜像（目录/快上线/ADX）与目录同样隐藏采链工具栏。
+      // 中文备注：协作实例 HQ 只读镜像（目录/快上线/ADX）与目录同样隐藏采链工具栏。
       document.body.classList.toggle("hq-catalog-active", isCatalogReadOnlyTable(currentTableId()));
       applyAgencyEmptyUi();
       const addBtn = $("addRowBtn");
@@ -9160,8 +9160,8 @@
       if (!canManageCustomTable(tableId)) return toast("仅创建人或管理员可删除此表格", true);
       const name = tableLabelById(tableId);
       const desc = isBlankTable(tableId)
-        ? "将删除本表全部行列，不影响剧目数据。"
-        : "仅移除工作表入口，不会删除剧目数据。";
+        ? "将删除本表全部行列，不影响主表数据。"
+        : "仅移除工作表入口，不会删除主表数据。";
       const ok = await openDeleteTableConfirm(name, desc);
       if (!ok) return;
       try {
@@ -9397,7 +9397,7 @@
       }
       state.activeTableId = tableId;
       syncHiddenTypeSelect(tableId);
-      // 中文备注：catalog 的 readOnly 不能带到空白协作表，否则无法改剧目类型/分类。
+      // 中文备注：catalog 的 readOnly 不能带到空白协作表，否则无法改记录类型/分类。
       state.tableReadOnly = isCatalogReadOnlyTable(tableId);
       if (isAgencyPromoTable(tableId)) state.catalogHiddenFieldKeys = [];
       else if (!isCatalogReadOnlyTable(tableId)) state.catalogHiddenFieldKeys = [];
@@ -9533,7 +9533,7 @@
       let type = TABLE_TYPES.includes(raw?.type)
         ? raw.type
         : (typeByTableId(rawTableId) || "");
-      // 中文备注：旧版单业务线表已下线，统一归并到「全部剧目」。
+      // 中文备注：旧版单业务线表已下线，统一归并到主表（全部类型）。
       if (REMOVED_TABLE_IDS.has(rawTableId) || ["drama", "real", "shortplay"].includes(raw?.type)) {
         type = "all";
         rawTableId = "tbl_all";
@@ -9544,7 +9544,7 @@
       if (!TABLE_TYPES.includes(type)) type = "all";
       const viewId = String(raw?.viewId || raw?.id || newViewId());
       const dateMode = raw?.dateMode === "day" ? "day" : "range";
-      // 中文备注：自定义表 id 在目录未就绪时也必须保留，绝不能回落成 tbl_all。
+      // 中文备注：自定义表 id 在目录未就绪时也必须保留，绝不能回落成内置主表。
       const resolvedTableId = (typeByTableId(rawTableId) || isCustomTableId(rawTableId)
         || rawTableId === AGENCY_PROMO_TABLE_ID || isHqCatalogTable(rawTableId))
         ? rawTableId
@@ -10098,17 +10098,17 @@
         : (typeByTableId(originalTableId) || "all");
       const type = TABLE_TYPES.includes(typeRaw) ? typeRaw : "all";
       view.type = type;
-      // 中文备注：自定义/空白表必须钉死原 tableId；绝不能 tableIdByType("all")→tbl_all。
+      // 中文备注：自定义/空白表必须钉死原 tableId；绝不能 tableIdByType("all")→内置主表。
       if (isCustomTableId(originalTableId)) {
         view.tableId = originalTableId;
       } else if (originalTableId && typeByTableId(originalTableId)) {
-        // 中文备注：代投 tbl_agency_promo / tbl_hq_catalog 等须钉死 tableId，不能 tableIdByType("all")→tbl_all。
+        // 中文备注：协作实例的分享表 / 目录表等须钉死 tableId，不能 tableIdByType("all")→内置主表。
         view.tableId = originalTableId;
         view.type = typeByTableId(originalTableId);
       } else {
         view.tableId = tableIdByType(type);
       }
-      // 中文备注：自定义表与全部剧目不跑 near/promo/adx 列布局纠正。
+      // 中文备注：自定义表与主表不跑 near/promo/adx 列布局纠正。
       if (type === "all" || isCustomTableId(view.tableId)) return false;
       // 中文备注：已有列序=用户配置，禁止合并/轮询路径打回默认（拖拽后立刻弹回的根因）。
       if (!force && Array.isArray(view.columnOrder) && view.columnOrder.length) return false;
@@ -10118,7 +10118,7 @@
         ...defaultColumnLabelsForType(type),
         ...((view.columnLabels && typeof view.columnLabels === "object") ? view.columnLabels : {})
       };
-      // 中文备注：非推荐列默认隐藏，避免三张表看起来和「全部剧目」一样长；可在字段配置打开。
+      // 中文备注：非推荐列默认隐藏，避免三张表看起来和主表一样长；可在字段配置打开。
       view.hiddenFields = defaultHiddenFieldsForType(type);
       if (type === "adx") {
         // 中文备注：ADX 默认近三天；同剧在不同 crawl_day 各占一行，勿强制 day。
@@ -10180,7 +10180,7 @@
       // 中文备注：自定义/空白表禁止跑系统表 realign，否则会改写 tableId / 重生 viewId 冲掉填色。
       if (!tid || isHqCatalogTable(tid) || isCustomTableId(tid) || isBlankTable(tid)) return false;
       if (!typeByTableId(tid) || typeByTableId(tid) === "all") {
-        // 中文备注：全部剧目也要跑「主视图勿藏已评级」纠正。
+        // 中文备注：主表也要跑「主视图勿藏已评级」纠正。
         if (tid === "tbl_all") return detachScreeningEmptyFromPublicMain(tid);
         return false;
       }
@@ -10190,7 +10190,7 @@
         if (applyTableViewLayoutDefaults(v)) changed = true;
       });
       if (detachScreeningEmptyFromPublicMain(tid)) changed = true;
-      // 中文备注：跨表 viewId 撞号（历史整表拷贝遗留，如 tbl_all 与 tbl_agency_promo 共用
+      // 中文备注：跨表 viewId 撞号（历史整表拷贝遗留，如内置主表与协作分享表共用
       // 3 个 viewId）不是本表视图可以被清空的理由。任何纠正只要敢删 view，一律回滚。
       if (before.length && !tableViewsStillIntact(tid, before)) {
         restoreTableViews(tid, before);
@@ -10786,7 +10786,7 @@
       });
       return fresh.length;
     }
-    // 中文备注：空白表新增行=直接建空行写入 sheet_row，无需走剧目新增行弹层。
+    // 中文备注：空白表新增行=直接建空行写入 sheet_row，无需走主表新增行弹层。
     async function addBlankRow() {
       if (state._blankAddRowInFlight) return;
       if (!getToken()) return showLogin("请先登录后再新增行");
@@ -11288,7 +11288,7 @@
         groupRules: isCreated ? defaultGroupRulesForType("created") : [],
         page: 1,
         pageSize: Number(ls.get("ops.pageSize", "50")) || 50,
-        // 中文备注：字段配置可再打开隐藏列；默认只展示本表推荐列，避免三表与全部剧目同款长表。
+        // 中文备注：字段配置可再打开隐藏列；默认只展示本表推荐列，避免三表与主表同款长表。
         hiddenFields: defaultHiddenFieldsForType(safeType),
         columnLabels: defaultColumnLabelsForType(safeType),
         columnWidths: {},
@@ -16136,7 +16136,7 @@
       if (dateEl && mode === "day" && !dateEl.value && !(isAdx && mode === "range")) {
         ensureToolbarDayDefault();
       }
-      // 中文备注：推广表用单日选择器；主表「指定日期」用开始~结束区间选择器。
+      // 中文备注：分享表用单日选择器；主表「指定日期」用开始~结束区间选择器。
       syncPromoDatePicker(promoDateOnly);
       syncMainDateRangePicker(!promoDateOnly && !!mainRange);
     }
@@ -16216,7 +16216,7 @@
       });
       const filterWin = activeListDateWindow();
       if (type === "created") {
-        // 中文备注：当日创建剧目由后端固定锚日 18:00 至次日 23:59:59，不传日期跨度。
+        // 中文备注：当日创建表由后端固定锚日 18:00 至次日 23:59:59，不传日期跨度。
       } else if (type === "agency-promo" || type === "promo") {
         qs.set("date", promoTableListDate());
       } else if (filterWin) {
@@ -16237,12 +16237,12 @@
       const filters = serverFilterPayload();
       if (filters.length) qs.set("filters", JSON.stringify(filters));
       if (cursor) qs.set("cursor", cursor);
-      // 中文备注：瘦包仅 bench（opsBench=1 / ops.listBench）启用；正常指定日必须带推广链，否则表格空白。
+      // 中文备注：瘦包仅 bench（opsBench=1 / ops.listBench）启用；正常指定日必须带分享链，否则表格空白。
       if (type === "hq-catalog") qs.set("lite", "1");
       if (isHqCatalogTable(tableId)) qs.set("tableId", HQ_CATALOG_TABLE_ID);
       else if (tableId && tableId.startsWith("tbl_")) qs.set("tableId", tableId);
       if (isListBenchMode() && isProgressiveStyle() && isPagedDateWindow()) qs.set("lite", "1");
-      // 中文备注：近三天大窗瘦包（去掉 IAA/IAP 长链），首屏 JSON 更小；推广表仍要全链。
+      // 中文备注：近三天大窗瘦包（去掉 IAA/IAP 长链），首屏 JSON 更小；分享表仍要全链。
       if (!totalOnly && state.dateMode === "range" && ["all", "drama", "real", "shortplay"].includes(type)) {
         qs.set("lite", "1");
       }
@@ -16255,7 +16255,7 @@
       return qs;
     }
     function serverFilterPayload() {
-      // 中文备注：near/promo/adx 走独立列表查询链路，暂不消费通用 filters；总部目录分页加载，筛选必须走后端。
+      // 中文备注：near/promo/adx 走独立列表查询链路，暂不消费通用 filters；主实例目录分页加载，筛选必须走后端。
       const tableId = currentTableId() || "";
       if (!isPagedDateWindow() && !isHqCatalogTable(tableId)) return [];
       return effectiveFilterRules()
@@ -16598,7 +16598,7 @@
       const agency = state.tenant.enabled && state.tenant.mode === "agency";
       document.body.classList.toggle("agency-tenant-active", agency);
       requestAnimationFrame(() => syncAgencyScrollEdgeBtn());
-      const label = String(state.tenant.label || "").trim() || (agency ? "代投协作台" : "协作台");
+      const label = String(state.tenant.label || "").trim() || (agency ? "协作空间" : "工作台");
       document.title = `${label} · ${OPS_STATIC_REV}`;
       const showReminders = state.tenant.remindersEnabled !== false && !agency;
       const reminderBtn = $("reminderBtn");
@@ -16612,7 +16612,7 @@
       }
       const onlineEl = $("onlineUsers");
       if (onlineEl && agency && state.tenant.label) {
-        onlineEl.title = `代投在线（${state.tenant.label}，与总部分开统计）`;
+        onlineEl.title = `协作实例在线（${state.tenant.label}，与主实例分开统计）`;
       } else if (onlineEl) {
         onlineEl.title = "实时在线用户";
       }
@@ -16786,7 +16786,7 @@
     }
     function baseDraft(row) {
       if (isBlankTable(currentTableId())) {
-        // 中文备注：空白表草稿只含 col_* 字段，不套用剧目主表的固定字段集。
+        // 中文备注：空白表草稿只含 col_* 字段，不套用主表的固定字段集。
         const blankDraft = { version: row.version || 0 };
         for (const f of state.sheetFields || []) {
           const key = f.key || f.fieldKey;
@@ -17632,7 +17632,7 @@
     }
 	    function dataWindowKey() {
 	      const type = $("type")?.value || "all";
-	      // 中文备注：当日创建剧目整天都是昨天 18:00 至今日结束，次日 0 点才换窗。
+	      // 中文备注：当日创建表整天都是昨天 18:00 至今日结束，次日 0 点才换窗。
 	      if (isTodayCreatedTable(type)) {
 	        const anchor = addDaysIso(today(), -1);
 	        return [type, "created-fixed", anchor, today()].join("|");
@@ -18087,7 +18087,7 @@
         && (tableType !== "created" || !createdListPoolDayStale(snap))
         && (tableType !== "adx" || adxSnapshotUsable(snap))
         && (!isHqCatalogTable(tableId) || hqCatalogSnapshotValid(snap))
-        // 中文备注：A/S 表 IAA/IAP 来自代投库后合并，秒开旧缓存会先空链再等轮询，宁可直拉。
+        // 中文备注：A/S 表 IAA/IAP 来自协作实例库后合并，秒开旧缓存会先空链再等轮询，宁可直拉。
         && !isAgencyPromoTable(tableId);
       if (usable) {
         applyListSnapshot(snap);
@@ -18366,12 +18366,12 @@
               try { renderStats(); } catch (_) {}
             }
             if (!silent) {
-              const label = isHqCatalogTable(requestTableId) ? "剧目目录" : tableLabelById(requestTableId);
+              const label = isHqCatalogTable(requestTableId) ? "记录目录" : tableLabelById(requestTableId);
               toast(
                 src !== HQ_CATALOG_EXPECTED_SOURCE
-                  ? `${label}未接通总部库 auto_play，请配置 AGENCY_HQ_DATASOURCE_ENABLED 与隧道`
+                  ? `${label}未接通主实例数据源，请检查 AGENCY_HQ_DATASOURCE_ENABLED 配置`
                   : isHqCatalogTable(requestTableId)
-                    ? "剧目目录数据异常（疑似代投协作表），已拒绝展示"
+                    ? "记录目录数据异常（疑似协作实例协作表），已拒绝展示"
                     : `${label}数据异常（类型或来源不匹配），已拒绝展示`,
                 true
               );
@@ -18442,7 +18442,7 @@
           syncDateModeUi();
         }
         if (data.type === "adx" && data.adxEmptyDay && !silent && !append) {
-          toast(`ADX 榜单「${data.date || today()}」暂无数据`, true);
+          toast(`ADX 排行「${data.date || today()}」暂无数据`, true);
         }
         updateSortHeaders();
         state.listCursor = data.nextCursor || "";
@@ -18792,14 +18792,14 @@
         const data = await api(`/api/v1/ops/dramas/delta?${buildDeltaQuery().toString()}`);
         noteServerLoad(data);
         if (data.deferredByLoad) {
-          // 中文备注：仅 ADX 在 critical 时可能推迟；near/新剧不会走这里。
+          // 中文备注：仅 ADX 在 critical 时可能推迟；near/变更不会走这里。
           return;
         }
         const nextVersion = data.listVersion != null
           ? (Number(data.listVersion) || prevVersion)
           : prevVersion;
         // 中文备注：near/adx 的 delta 只回水位，版本升高时整表静默刷新（防抖）。
-        // near 始终刷新（新剧及时进表）；仅 ADX 在 critical 时推迟。
+        // near 始终刷新（变更及时进表）；仅 ADX 在 critical 时推迟。
         if (FULL_REFRESH_TYPES.has(type)) {
           if (requestEpoch !== state.listEpoch || currentTableId() !== requestTableId) return;
           await applyNearAdxVersionRefresh(type, prevVersion, nextVersion);
@@ -18815,7 +18815,7 @@
             mergeDeltaRows(rows, data.deletedKeys || []);
           }
         } else {
-          // 中文备注：全部剧目 / 推广链接：只合并变更行与删除键，已加载页保留。
+          // 中文备注：主表 / 分享链接：只合并变更行与删除键，已加载页保留。
           const rows = mapDeltaRowsFromServer(data.rows || []);
           if (data.listVersion != null) state.listVersion = nextVersion;
           if ((rows.length || (data.deletedKeys || []).length) && !state.loading) {
@@ -18826,12 +18826,12 @@
               state.tableUsage[currentTableId()] = state.pager.total;
             }
             // 中文备注：可见计数已移除,总数是唯一口径——增量有变更时重置确认标记并异步重取总数
-            // (新水印→COUNT 缓存自动失效),不堵塞当前视图。
+            // (新水位→COUNT 缓存自动失效),不堵塞当前视图。
             state._serverListTotalConfirmed = false;
             kickListTotalPrefetch(requestTableId);
           }
         }
-        // 中文备注：推广表指定日定期静默首屏刷新；代投还需让“指定时间到点”在无 DB 更新时自动入表。
+        // 中文备注：分享表指定日定期静默首屏刷新；协作实例还需让“指定时间到点”在无 DB 更新时自动入表。
         if ((type === "promo" || type === "agency-promo") && state.dateMode === "day") {
           const now = Date.now();
           const refreshMs = type === "agency-promo" ? 15000 : PROMO_DAY_SILENT_REFRESH_MS;
@@ -18864,7 +18864,7 @@
      *  断线握手：服务端 op 帧带 id(seq)，EventSource 重连自动回传 Last-Event-ID，服务端回放缺口。 */
     function ensureBlankSheetSyncStream() {
       const tableId = currentTableId();
-      // 中文备注：协作表 + 系统表(tbl_all/created/near/promo/adx)都支持订阅;自定义表仍走轮询。
+      // 中文备注：协作表 + 内置表(all/created/near/promo/adx)都支持订阅;自定义表仍走轮询。
       if (!tableId || (!isBlankTable(tableId) && !typeByTableId(tableId)) || typeof EventSource !== "function") return;
       if (state.blankSyncEs && state.blankSyncEs.tableId === tableId) return;
       closeBlankSheetSyncStream();
@@ -19065,7 +19065,7 @@
         for (const field of ["seriesName", ...SERIES_MASTER_EDIT_FIELDS]) {
           if (data[field] != null) row[field] = data[field];
         }
-        // 中文备注：推广字段以服务端「基线+覆盖」为准，保证清空后不会被本地旧值/省略键冲回。
+        // 中文备注：分享字段以服务端「基线+覆盖」为准，保证清空后不会被本地旧值/省略键冲回。
         for (const field of PROMOTION_FIELDS) {
           if (Object.prototype.hasOwnProperty.call(data, field)) {
             row[field] = data[field] == null ? "" : String(data[field]);
@@ -19116,7 +19116,7 @@
       }
     }
 
-    // 中文备注：空白表保存走 /sheets/{id}/rows/save，payload 只含 cells，无剧目字段。
+    // 中文备注：空白表保存走 /sheets/{id}/rows/save，payload 只含 cells，无主表字段。
     async function saveBlankRow(row, key, d, { silent = false, batchId = "" } = {}) {
       const tableId = currentTableId();
       const cells = {};
@@ -20520,7 +20520,7 @@
       const h = Number(hour);
       if (!Number.isFinite(h) || h < 0 || h > 23) return;
       if (!getToken()) {
-        showLogin("请先登录后查看榜单");
+        showLogin("请先登录后查看排行");
         return;
       }
       const drawer = $("rankDrawer");
@@ -20528,7 +20528,7 @@
       const title = $("rankDrawerTitle");
       const meta = $("rankDrawerMeta");
       if (!drawer || !body) return;
-      title.textContent = `剧排名榜单 ${day} ${String(h).padStart(2, "0")}:00`;
+      title.textContent = `热度排行 ${day} ${String(h).padStart(2, "0")}:00`;
       meta.textContent = "加载中...";
       body.innerHTML = `<div class="empty">加载中...</div>`;
       drawer.classList.add("show");
@@ -20537,12 +20537,12 @@
         const items = data.items || [];
         meta.textContent = `命中 ${data.itemCount || items.length} 部`
           + (data.createTime ? ` · 生成于 ${data.createTime}` : "")
-          + (data.hasImage ? " · 含榜单图" : " · 暂无图片（可看明细）");
+          + (data.hasImage ? " · 含排行图" : " · 暂无图片（可看明细）");
         let imgHtml = "";
         if (data.hasImage) {
           const blobUrl = await fetchRankImageBlobUrl(day, h);
           if (blobUrl) {
-            imgHtml = `<img class="rank-img" alt="剧排名榜单" src="${blobUrl}" />`;
+            imgHtml = `<img class="rank-img" alt="热度排行" src="${blobUrl}" />`;
           }
         }
         const rows = items.length
@@ -20561,7 +20561,7 @@
           ${imgHtml}
           <table class="rank-table">
             <thead>
-              <tr><th>#</th><th>名称</th><th>剧目类型</th><th>上线时间</th><th>累计播放</th><th>日增</th><th>小时增速</th></tr>
+              <tr><th>#</th><th>名称</th><th>类型</th><th>上线时间</th><th>累计播放</th><th>日增</th><th>小时增速</th></tr>
             </thead>
             <tbody>${rows}</tbody>
           </table>`;
@@ -20660,8 +20660,8 @@
       badge.textContent = unread > 99 ? "99+" : String(unread);
       const parts = [];
       if (evening > 0) parts.push(`夜间${evening}`);
-      if (newDrama > 0) parts.push(`新剧${newDrama}`);
-      if (rank > 0) parts.push(`榜单${rank}`);
+      if (newDrama > 0) parts.push(`变更${newDrama}`);
+      if (rank > 0) parts.push(`排行${rank}`);
       const other = unread - evening - newDrama - rank;
       if (other > 0) parts.push(`其他${other}`);
       const label = parts.join(" · ") || `${unread}条未读`;
@@ -20688,8 +20688,8 @@
         if (!silent && state.reminders.unread > 0) {
           const parts = [];
           if (state.reminders.evening > 0) parts.push(`晚间${state.reminders.evening}`);
-          if (state.reminders.newDrama > 0) parts.push(`新剧${state.reminders.newDrama}`);
-          if (state.reminders.rank > 0) parts.push(`榜单${state.reminders.rank}`);
+          if (state.reminders.newDrama > 0) parts.push(`变更${state.reminders.newDrama}`);
+          if (state.reminders.rank > 0) parts.push(`排行${state.reminders.rank}`);
           toast(`有新提醒：${parts.join(" · ") || state.reminders.unread + "条"}`);
         }
       } catch (_) {
@@ -21198,7 +21198,7 @@
         state.reminders.total = data.total || 0;
         state.reminders.totalPages = data.totalPages || 0;
         state.reminders.page = data.page || state.reminders.page;
-        $("reminderMeta").textContent = `共 ${state.reminders.total} 条 · 含新剧 / 夜间 / 榜单提醒`;
+        $("reminderMeta").textContent = `共 ${state.reminders.total} 条 · 含变更 / 夜间 / 排行提醒`;
         $("reminderList").innerHTML = items.length
           ? items.map((item) => {
               const meta = parseRankReminderMeta(item.content);
@@ -21207,8 +21207,8 @@
                 ? `播放量小时榜已生成，命中 ${meta.count} 条（${meta.day} ${String(meta.hour).padStart(2, "0")}:00）`
                 : String(item.content || item.title || "").replace(/\[EDITED_COMIC_RANK[^\]]*\]/gi, "").trim();
               const link = isRank && meta
-                ? `<div class="rank-link">查看 ${escapeHtml(meta.day)} ${String(meta.hour).padStart(2, "0")}:00 榜单 →</div>`
-                : (isRank ? `<div class="rank-link">查看榜单 →</div>` : "");
+                ? `<div class="rank-link">查看 ${escapeHtml(meta.day)} ${String(meta.hour).padStart(2, "0")}:00 排行 →</div>`
+                : (isRank ? `<div class="rank-link">查看排行 →</div>` : "");
               const dataAttrs = meta
                 ? ` data-rank-day="${escapeAttr(meta.day)}" data-rank-hour="${escapeAttr(String(meta.hour))}"`
                 : "";
@@ -22572,7 +22572,7 @@
       }, { passive: false });
     })();
 
-    // 中文备注：代投右下角触顶/触底切换（仅当前已加载行）。
+    // 中文备注：协作实例右下角触顶/触底切换（仅当前已加载行）。
     function agencyScrollExtents() {
       const slack = 6;
       try {
@@ -22716,7 +22716,7 @@
     $("type").addEventListener("change", () => {
       if (state.applyingView) return;
       // 中文备注：自定义表（含空白表）不挂业务线下拉；此下拉本就隐藏，防御性避免误把
-      // 自定义表强制拉回 tbl_all。
+      // 自定义表强制拉回内置主表。
       if (isCustomTableId(currentTableId())) {
         renderSidebar();
         renderViewTabs();
@@ -24085,7 +24085,7 @@
     applySidebarWidth(ls.get(SIDEBAR_WIDTH_KEY, String(SIDEBAR_DEFAULT_WIDTH)), { persistLocal: false });
     setSidebarCollapsed(ls.get(SIDEBAR_COLLAPSED_KEY, "0") === "1", { syncCloud: false });
     loadViewsFromStorage();
-    // 中文备注：代投 / 协作表深链须等 loadCustomTables 后再 apply，否则会误落总部目录。
+    // 中文备注：协作实例 / 协作表深链须等 loadCustomTables 后再 apply，否则会误落主实例目录。
     if (!shouldDeferStartupViewApply()) {
       applyViewToUi(resolveStartupViewFromUrl(), { reload: false });
     }
@@ -24162,7 +24162,7 @@
         startReminderPolling();
         startOnlinePolling();
         renderSidebar();
-        // 中文备注：深链打开某小时榜单（提醒点击后带的 ?rankDay=&rankHour=）。
+        // 中文备注：深链打开某小时排行（提醒点击后带的 ?rankDay=&rankHour=）。
         try {
           const params = new URLSearchParams(window.location.search || "");
           const rankDay = (params.get("rankDay") || "").trim();

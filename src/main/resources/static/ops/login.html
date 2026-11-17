@@ -138,13 +138,13 @@
       try {
         const cfg = await api("/api/v1/ops/auth/config");
         const agency = !!cfg?.tenantEnabled && String(cfg?.tenantMode || cfg?.orgType || "").trim() === "agency";
-        const label = String(cfg?.tenantLabel || "").trim() || (agency ? "代投协作台" : "协作台");
+        const label = String(cfg?.tenantLabel || "").trim() || (agency ? "协作空间" : "工作台");
         document.title = `登录 · ${label}`;
         const titleEl = $("loginTitle");
         if (titleEl) titleEl.textContent = `登录${label}`;
         const hintEl = $("loginHint");
         if (hintEl && agency) {
-          hintEl.textContent = "请输入代投账号与口令，登录后将进入代投协作表格。";
+          hintEl.textContent = "请输入协作账户与口令，登录后将进入协作空间。";
         }
       } catch (_) {}
     })();

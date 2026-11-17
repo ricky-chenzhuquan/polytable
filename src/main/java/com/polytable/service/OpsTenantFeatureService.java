@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 代投租户功能权限：总部剧目目录（只读）、当日推广参考表（按账户授权）。
+ * 协作空间租户功能权限：主实例记录目录（只读）、当日分享参考表（按账户授权）。
  */
 @Service
 public class OpsTenantFeatureService {
@@ -16,10 +16,10 @@ public class OpsTenantFeatureService {
     public static final String CATALOG_TABLE_ID = "tbl_hq_catalog";
     public static final String CATALOG_LIST_TYPE = "hq-catalog";
 
-    /** 代投只读镜像：总部快上线（tbl_near）、ADX 热榜（tbl_adx）。 */
+    /** 协作空间只读镜像：主实例临近发布（tbl_near）、ADX 排行（tbl_adx）。 */
     public static final String MIRROR_NEAR_TABLE_ID = "tbl_near";
     public static final String MIRROR_ADX_TABLE_ID = "tbl_adx";
-    /** 代投 A/S 当日推广链参考（读 HQ 主表 + 代投账号采链）。 */
+    /** 协作空间当日分享链参考（读主实例 + 协作账号采链）。 */
     public static final String AGENCY_AS_PROMO_TABLE_ID = "tbl_agency_promo";
 
     private final OpsAccountRepository accountRepository;

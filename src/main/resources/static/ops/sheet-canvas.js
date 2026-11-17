@@ -2108,7 +2108,7 @@
       return matrix;
     }
 
-    // 中文备注：重点剧场标记「是」的行整行铺淡紫底，便于扫表。
+    // 中文备注：重点标记「是」的行整行铺淡紫底，便于扫表。
     function isFocusRow(row) {
       if (!row || isGroupRow(row) || isGroupSpacer(row)) return false;
       const draft = hooks().getDraft?.(row) || {};
@@ -5228,7 +5228,7 @@
       scheduleDraw();
     }
 
-    /** 中文备注：滚到当前已加载数据的表顶/表底（代投快捷触顶·触底）。 */
+    /** 中文备注：滚到当前已加载数据的表顶/表底（协作实例快捷触顶·触底）。 */
     function scrollToTop() {
       closeEditor({ commit: true });
       syncSizerAndClampScroll();

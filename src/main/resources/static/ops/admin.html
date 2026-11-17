@@ -328,7 +328,7 @@
         <select id="orgFilter" class="filter-select" title="归属筛选">
           <option value="">全部归属</option>
           <option value="hq">自投</option>
-          <option value="agency">代投</option>
+          <option value="agency">协作</option>
         </select>
         <select id="personnelTypeFilter" class="filter-select" title="人员类型筛选">
           <option value="">全部人员类型</option>
@@ -337,7 +337,7 @@
           <option value="management">管理</option>
         </select>
         <button class="ghost" id="refreshBtn" type="button">刷新</button>
-        <button class="ghost" id="syncAgencyBtn" type="button" title="将全部代投账户推送到代投库">同步代投账户</button>
+        <button class="ghost" id="syncAgencyBtn" type="button" title="将全部协作账户同步到协作实例">同步协作账户</button>
         <button id="createBtn" type="button">新增账户</button>
         <span style="color:var(--muted);font-size:12px" id="totalHint"></span>
       </div>
@@ -437,7 +437,7 @@
       ? localStorage.getItem(TAB_STORAGE_KEY) : "accounts";
 
     function orgTypeLabel(orgType) {
-      return orgType === "agency" ? "代投" : "自投";
+      return orgType === "agency" ? "协作" : "自投";
     }
 
     function initDialog() {
@@ -463,7 +463,7 @@
               <el-form-item label="归属权限">
                 <el-radio-group v-model="form.orgType" size="small">
                   <el-radio-button label="hq">自投</el-radio-button>
-                  <el-radio-button label="agency">代投</el-radio-button>
+                  <el-radio-button label="agency">协作</el-radio-button>
                 </el-radio-group>
               </el-form-item>
 
@@ -499,9 +499,9 @@
               </el-form-item>
 
               <el-form-item v-if="form.orgType === 'agency'" label="功能权限">
-                <el-checkbox v-model="form.promoTable">当日推广参考表</el-checkbox>
+                <el-checkbox v-model="form.promoTable">当日分享参考表</el-checkbox>
               </el-form-item>
-              <div v-if="form.orgType === 'agency'" class="form-tip">代投默认仅可见「剧目目录」；勾选后额外开放当日推广参考表。</div>
+              <div v-if="form.orgType === 'agency'" class="form-tip">协作账户默认仅可见「记录目录」；勾选后额外开放当日分享参考表。</div>
 
               <el-form-item v-if="mode === 'edit' && !isAdmin" label="账户状态">
                 <el-radio-group v-model="form.enabledKey" size="small">
@@ -717,7 +717,7 @@
                 body: JSON.stringify({ displayName: name, promoTable: promoNext })
               });
               if (data && data.message) msgs.push(data.message);
-              else msgs.push(promoNext ? "已开放当日推广参考表" : "已关闭当日推广参考表");
+              else msgs.push(promoNext ? "已开放当日分享参考表" : "已关闭当日分享参考表");
             } else if (org === "agency" && nextOrg !== "agency" && promoWas) {
               await api("/api/v1/ops/admin/accounts/feature-flags", {
                 method: "POST",
@@ -1054,7 +1054,7 @@
     $("logoutBtn").onclick = requestLogout;
     $("refreshBtn").onclick = () => loadAccounts().catch(e => toast(e.message, true));
     $("syncAgencyBtn").onclick = async () => {
-      if (!confirm("将全部代投账户推送到代投库？（已配置 HTTP 同步时走 ad 域）")) return;
+      if (!confirm("将全部协作账户同步到协作实例？（已配置 HTTP 同步时生效）")) return;
       try {
         const data = await api("/api/v1/ops/admin/accounts/sync-to-agency", {
           method: "POST",
@@ -1064,9 +1064,9 @@
         const total = data && data.total != null ? data.total : "";
         const fail = data && data.fail != null ? data.fail : 0;
         if (fail > 0) {
-          toast(`代投同步完成：${ok}/${total} 成功，${fail} 失败`, true);
+          toast(`协作账户同步完成：${ok}/${total} 成功，${fail} 失败`, true);
         } else {
-          toast(total !== "" ? `代投同步完成：${ok}/${total}` : "代投同步完成");
+          toast(total !== "" ? `协作账户同步完成：${ok}/${total}` : "协作账户同步完成");
         }
       } catch (e) {
         toast(e.message, true);

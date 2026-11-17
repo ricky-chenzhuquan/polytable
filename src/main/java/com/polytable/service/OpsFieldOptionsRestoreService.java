@@ -28,7 +28,8 @@ public class OpsFieldOptionsRestoreService {
     }
 
     public Map<String, Object> restoreEditorAssigneeMissing(boolean dryRun) {
-        return restoreMissingOptions("editorAssignee", "multi", List.of("崔书瑞", "谭椅文"), dryRun);
+        // 开源版不内置任何真实名单：默认空列表，正式名单由部署方通过选项接口维护。
+        return restoreMissingOptions("editorAssignee", "multi", List.of(), dryRun);
     }
 
     public Map<String, Object> restoreMissingOptions(String fieldKey,

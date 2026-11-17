@@ -46,15 +46,15 @@ public class OpsTenantService {
             @Value("${ops.tenant.default-mode:hq}") String defaultMode,
             @Value("${ops.tenant.host-modes:}") String hostModesRaw,
             @Value("${ops.tenant.agency-tables:}") String agencyTablesRaw,
-            @Value("${ops.tenant.hq-label:协作台}") String hqLabel,
-            @Value("${ops.tenant.agency-label:代投协作台}") String agencyLabel,
+            @Value("${ops.tenant.hq-label:工作台}") String hqLabel,
+            @Value("${ops.tenant.agency-label:协作空间}") String agencyLabel,
             @Autowired(required = false) OpsTenantFeatureService tenantFeatureService) {
         this.enabled = enabled;
         this.defaultMode = normalizeOrg(defaultMode, ORG_HQ);
         this.hostModes = parseHostModes(hostModesRaw);
         this.agencyTableIds = parseIdSet(agencyTablesRaw, Set.of());
-        this.hqLabel = hqLabel == null || hqLabel.isBlank() ? "协作台" : hqLabel.trim();
-        this.agencyLabel = agencyLabel == null || agencyLabel.isBlank() ? "代投协作台" : agencyLabel.trim();
+        this.hqLabel = hqLabel == null || hqLabel.isBlank() ? "工作台" : hqLabel.trim();
+        this.agencyLabel = agencyLabel == null || agencyLabel.isBlank() ? "协作空间" : agencyLabel.trim();
         this.tenantFeatureService = tenantFeatureService;
     }
 
@@ -97,10 +97,10 @@ public class OpsTenantService {
         String account = normalizeOrg(accountOrg, ORG_HQ);
         String req = normalizeOrg(requestMode, ORG_HQ);
         if (ORG_AGENCY.equals(account) && ORG_HQ.equals(req)) {
-            return "该账户为代投账号，请使用代投专用入口登录";
+            return "该账户为协作空间账号，请使用协作空间入口登录";
         }
         if (ORG_HQ.equals(account) && ORG_AGENCY.equals(req)) {
-            return "该账户为总部账号，请使用总部协作台登录";
+            return "该账户为工作台账号，请使用工作台入口登录";
         }
         return "账户与当前入口不匹配，请联系管理员";
     }
@@ -184,7 +184,7 @@ public class OpsTenantService {
             Map<String, Object> catalog = new LinkedHashMap<>();
             catalog.put("tableId", OpsTenantFeatureService.CATALOG_TABLE_ID);
             catalog.put("type", OpsTenantFeatureService.CATALOG_LIST_TYPE);
-            catalog.put("label", "剧目目录");
+            catalog.put("label", "记录目录");
             catalog.put("kind", "builtin");
             catalog.put("baseType", OpsTenantFeatureService.CATALOG_LIST_TYPE);
             catalog.put("readOnly", true);

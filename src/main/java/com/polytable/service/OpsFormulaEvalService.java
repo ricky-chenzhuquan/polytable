@@ -35,7 +35,7 @@ public class OpsFormulaEvalService {
     private static final Pattern INNERMOST_CALL = Pattern.compile("\\b([A-Za-z_][A-Za-z0-9_]*)\\s*\\(");
     private static final Pattern BITABLE_REF = Pattern.compile("bitable::\\$t\\[\"([^\"]+)\"]");
     private static final Pattern FIELD_REF = Pattern.compile("\\[([^\\]]+)]");
-    /** 中文备注：字段替换后常见 `" + "-" + "番茄"`，须允许引号与 + 之间有空格（对齐前端 looksUnevaluated）。 */
+    /** 中文备注：字段替换后常见 `" + "-" + "选项"` 形态，须允许引号与 + 之间有空格（对齐前端 looksUnevaluated）。 */
     private static final Pattern UNEVALUATED_STRING_CONCAT = Pattern.compile("\"\\s*\\+|\\+\\s*\"");
     /** 中文备注：≥512 行并行 enrich，小表单线程避免 fork/join 开销。 */
     private static final int PARALLEL_ROW_THRESHOLD = 512;

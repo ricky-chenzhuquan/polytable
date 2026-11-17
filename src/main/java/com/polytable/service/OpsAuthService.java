@@ -560,7 +560,7 @@ public class OpsAuthService {
         if (name.isEmpty()) {
             return "?";
         }
-        // 中文备注：2 字全显；3 字及以上取后两字（马一然→一然）。
+        // 中文备注：2 字全显；3 字及以上取后两字（如示例三字名取后两字）。
         if (name.length() <= 2) {
             return name;
         }

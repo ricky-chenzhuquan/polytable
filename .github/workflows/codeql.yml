@@ -13,6 +13,9 @@ permissions:
 
 jobs:
   analyze:
+    # CodeQL 免费额度仅限公开仓库；私有仓库未购 Advanced Security 时跳过，
+    # 仓库转公开后自动恢复运行。
+    if: github.event.repository.private != true
     name: Analyze (java)
     runs-on: ubuntu-latest
     permissions:

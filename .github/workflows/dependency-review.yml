@@ -8,6 +8,8 @@ permissions:
 
 jobs:
   dependency-review:
+    # 依赖审查免费额度仅限公开仓库；私有期间跳过，转公开后自动恢复。
+    if: github.event.repository.private != true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

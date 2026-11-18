@@ -109,6 +109,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWOR
 | [docs/formula-catalog.md](docs/formula-catalog.md) | 119 函数兼容目录说明与溯源 |
 | [docs/roadmap.md](docs/roadmap.md) | 已完成能力与公开路线图 |
 | [migration/README.md](migration/README.md) | 数据迁移：从旧部署迁入协作表数据 / 版本升级说明（含 SQL 脚本与校验） |
+| [docs/donate.md](docs/donate.md) | 支持作者：收款码打赏 / 其他支持方式 |
 
 ## 官网
 
@@ -124,6 +125,19 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWOR
 ## 免责声明
 
 PolyTable 与飞书 / Airtable 无任何隶属或合作关系。「飞书多维表格公式兼容目录」来自其官方公开文档的独立整理（含溯源引用），仅用于兼容性描述。
+
+## 支持作者 ☕
+
+PolyTable 按 MIT 协议开源、永久免费。如果它帮到了你，欢迎请作者喝杯咖啡（金额随意，扫码即付）：
+
+<p align="center">
+  <img src="docs/imgs/donate-wechat.png" alt="微信收款码" width="220" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/imgs/donate-alipay.png" alt="支付宝收款码" width="220" />
+</p>
+<p align="center"><sub>左：微信支付 · 右：支付宝</sub></p>
+
+更多支持方式见 [docs/donate.md](docs/donate.md)。
 
 ## License
 

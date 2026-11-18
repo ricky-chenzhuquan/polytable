@@ -191,3 +191,7 @@ PolyTable 刻意不做、或尚未做以下事情。我们把这些差距当作�
 - 性能护栏（改热路径前必读）：[performance-guardrails.md](performance-guardrails.md)
 - 路线图：[roadmap.md](roadmap.md)
 - 公式兼容目录：[formula-catalog.md](formula-catalog.md)
+
+---
+
+觉得 PolyTable 有用？欢迎[支持作者](donate.md) ☕

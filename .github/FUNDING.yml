@@ -1,0 +1,4 @@
+# FUNDING.yml — GitHub 仓库页 Sponsor 按钮配置
+# 微信/支付宝没有 GitHub 官方赞助渠道，中文开发者通行做法是把收款码放在
+# README「支持作者」区与 docs/donate.md，用 custom 字段指向文档页。
+custom: ['https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/donate.md'] # TODO(仓库名确认后替换)

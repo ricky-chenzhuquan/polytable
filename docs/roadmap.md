@@ -79,3 +79,7 @@ PolyTable 按"先地基、后体验、再平台"的顺序演进。下面按主�
 ## 参与贡献
 
 路线图各项的设计依据都已在 [architecture.md](architecture.md) 中展开（含协作内核、字段类型、权限、视图、传输层的落地设计与工作量参考）。欢迎按主题认领：提 issue 讨论设计 → 按护栏（[performance-guardrails.md](performance-guardrails.md)）实现 → 附基准数据。
+
+---
+
+觉得 PolyTable 有用？欢迎[支持作者](donate.md) ☕

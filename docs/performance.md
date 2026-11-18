@@ -211,3 +211,7 @@ EXPLAIN 证实并修复两处存储层问题（在线 DDL，`ALGORITHM=INPLACE, 
 - 架构与协作机制：[architecture.md](architecture.md)
 - 性能护栏（改热路径前必读）：[performance-guardrails.md](performance-guardrails.md)
 - 公式引擎设计：[design/formula-engine.md](design/formula-engine.md)
+
+---
+
+觉得 PolyTable 有用？欢迎[支持作者](donate.md) ☕

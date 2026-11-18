@@ -45,3 +45,7 @@
 | `TEXT` | 按格式化规则转文本（含中文星期等本地化格式） | `TEXT(日期, "ddd")` |
 
 完整 119 函数 × 签名/示例请直接查阅目录 JSON；公式求值语义与缓存设计见 [design/formula-engine.md](design/formula-engine.md)，性能数据见 [performance.md](performance.md)。
+
+---
+
+觉得 PolyTable 有用？欢迎[支持作者](donate.md) ☕

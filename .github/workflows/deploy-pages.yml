@@ -12,6 +12,8 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  # enablement: true 需要管理权限，用于自动创建 Pages 站点（免手动去 Settings 配置）
+  administration: write
 
 concurrency:
   group: pages
@@ -24,10 +26,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # 仓库转公开后，本步骤自动启用 Pages（无需手动到 Settings → Pages 配置）
+          enablement: true
 
       - name: Upload website
         uses: actions/upload-pages-artifact@v3

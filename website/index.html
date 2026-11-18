@@ -12,7 +12,7 @@
   语言来源优先级：URL ?lang=zh|en > localStorage(polytable_site_lang) > 浏览器语言(zh* → 中文) > 英文。
 
   TODO 上线前检查清单：
-    1. 全局搜索替换 YOUR_GITHUB_NAME → 你的 GitHub 用户名/组织名；
+    1. ✅ GitHub 用户名已替换（ricky-chenzhuquan）；
     2. 若仓库名不是 polytable，同步替换所有仓库地址；
     3. 有正式域名时：替换 <head> 中 canonical / og:url 占位地址；
     4. 产品截图已在 assets/img/app-preview.png（更新截图：登录应用 → 全屏截图覆盖该文件）；
@@ -26,13 +26,11 @@
   <title data-i18n="title">PolyTable — Self-hosted multi-dimensional table · Canvas big-grid engine · Feishu-compatible formulas · Realtime collaboration</title>
   <meta name="description" data-i18n-meta="meta.desc" content="PolyTable is an open-source, self-hosted multi-dimensional table: Canvas-rendered grids at 100k-row scale, 119 Feishu Bitable-compatible formulas, SSE realtime collaboration, MySQL storage — one Spring Boot JAR, one-command Docker deployment.">
   <meta name="theme-color" content="#0b0d14">
-  <!-- TODO: 替换为正式域名 -->
-  <link rel="canonical" href="https://YOUR_GITHUB_NAME.github.io/polytable/">
+    <link rel="canonical" href="https://ricky-chenzhuquan.github.io/polytable/">
   <meta property="og:title" data-i18n-meta="og.title" content="PolyTable — Your multi-dimensional table, on your own server">
   <meta property="og:description" data-i18n-meta="og.desc" content="Canvas big-grid engine · 119 Feishu-compatible formulas · SSE realtime collaboration · MySQL storage · One-command Docker deploy">
   <meta property="og:type" content="website">
-  <!-- TODO: 替换为正式域名 -->
-  <meta property="og:url" content="https://YOUR_GITHUB_NAME.github.io/polytable/">
+    <meta property="og:url" content="https://ricky-chenzhuquan.github.io/polytable/">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -167,8 +165,7 @@
           <button type="button" data-lang="zh">中</button>
           <button type="button" data-lang="en" class="on">EN</button>
         </div>
-        <!-- TODO: 替换为正式 GitHub 仓库地址（全局替换 YOUR_GITHUB_NAME） -->
-        <a class="nav-cta" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">
+        <a class="nav-cta" href="https://github.com/ricky-chenzhuquan/polytable" target="_blank" rel="noopener">
           <svg aria-hidden="true" focusable="false"><use href="#gh"/></svg>
           GitHub
         </a>
@@ -202,8 +199,7 @@
         <button type="button" data-lang="zh">中</button>
         <button type="button" data-lang="en" class="on">EN</button>
       </div>
-      <!-- TODO: 替换为正式 GitHub 仓库地址 -->
-      <a class="menu-cta" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener" data-i18n="ctaGithub">Source on GitHub</a>
+      <a class="menu-cta" href="https://github.com/ricky-chenzhuquan/polytable" target="_blank" rel="noopener" data-i18n="ctaGithub">Source on GitHub</a>
     </nav>
   </div>
 
@@ -220,8 +216,7 @@
         </p>
 
         <div class="hero-cta">
-          <!-- TODO: 替换为正式 GitHub 仓库地址 -->
-          <a class="btn btn-primary" href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener">
+          <a class="btn btn-primary" href="https://github.com/ricky-chenzhuquan/polytable" target="_blank" rel="noopener">
             <svg aria-hidden="true" focusable="false"><use href="#gh"/></svg>
             <span data-i18n="ctaGithub">Source on GitHub</span>
           </a>
@@ -368,8 +363,7 @@
 
         <p class="band-note" data-i18n="bandNote">
           Synthetic benchmarks (Playwright headless, no throttling + JVM in-memory load) — methodology and boundaries in
-          <!-- TODO: 替换为正式 GitHub 仓库地址 -->
-          <a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/performance.md" target="_blank" rel="noopener">docs/performance.md</a>
+          <a href="https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/performance.md" target="_blank" rel="noopener">docs/performance.md</a>
           · Single synthetic runs, not a service guarantee
         </p>
       </div>
@@ -459,7 +453,7 @@
               <strong data-i18n="honestT">An honest note</strong>
               <p data-i18n="honestBody">
                 PolyTable currently offers fewer view types (table view first; kanban / calendar / form views are on the
-                <a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/roadmap.md" target="_blank" rel="noopener">roadmap</a>),
+                <a href="https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/roadmap.md" target="_blank" rel="noopener">roadmap</a>),
                 and the community is still early — plugins and ecosystem aren't as rich as mature projects. If you want an
                 out-of-the-box, everything-included experience, Feishu Bitable or NocoDB may suit you better; if you care about
                 data sovereignty, big-grid performance, and simple deployment, give PolyTable a try.
@@ -498,8 +492,7 @@
                 <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
                 <span class="code-name" data-i18n="qsTerm">Terminal</span>
               </figcaption>
-              <!-- TODO: 替换为正式 GitHub 仓库地址 -->
-              <pre><code><span class="tok-k">git clone</span> <span class="tok-s">https://github.com/YOUR_GITHUB_NAME/polytable.git</span>
+              <pre><code><span class="tok-k">git clone</span> <span class="tok-s">https://github.com/ricky-chenzhuquan/polytable.git</span>
 <span class="tok-k">cd</span> polytable
 <span class="tok-k">cp</span> .env.example .env      <span class="tok-c" data-i18n="qs1Cc"># edit the credentials inside</span>
 <span class="tok-k">docker compose up</span> -d</code></pre>
@@ -546,8 +539,7 @@
                 <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
                 <span class="code-name" data-i18n="qsTerm">Terminal</span>
               </figcaption>
-              <!-- TODO: 替换为正式 GitHub 仓库地址 -->
-              <pre><code><span class="tok-k">git clone</span> <span class="tok-s">https://github.com/YOUR_GITHUB_NAME/polytable.git</span>
+              <pre><code><span class="tok-k">git clone</span> <span class="tok-s">https://github.com/ricky-chenzhuquan/polytable.git</span>
 <span class="tok-k">cd</span> polytable
 <span class="tok-k">mvn spring-boot:run</span> \
   <span class="tok-v">-Dspring-boot.run.arguments</span>=<span class="tok-s" data-i18n="qs2Dbpass">"--DB_PASSWORD=your-password"</span></code></pre>
@@ -621,9 +613,9 @@
         <nav class="foot-col" aria-label="Project links" data-i18n-aria="footNav1Aria">
           <h4 data-i18n="footP">Project</h4>
           <ul>
-            <li><!-- TODO: 替换为正式 GitHub 仓库地址 --><a href="https://github.com/YOUR_GITHUB_NAME/polytable" target="_blank" rel="noopener" data-i18n="footRepo">GitHub repository</a></li>
-            <li><!-- TODO: 替换为正式 GitHub 仓库地址 --><a href="https://github.com/YOUR_GITHUB_NAME/polytable/issues" target="_blank" rel="noopener" data-i18n="footIssues">Issues <span class="ext">feedback</span></a></li>
-            <li><!-- TODO: 替换为正式 GitHub 仓库地址 --><a href="https://github.com/YOUR_GITHUB_NAME/polytable/releases" target="_blank" rel="noopener" data-i18n="footReleases">Releases <span class="ext">versions</span></a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable" target="_blank" rel="noopener" data-i18n="footRepo">GitHub repository</a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable/issues" target="_blank" rel="noopener" data-i18n="footIssues">Issues <span class="ext">feedback</span></a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable/releases" target="_blank" rel="noopener" data-i18n="footReleases">Releases <span class="ext">versions</span></a></li>
           </ul>
         </nav>
 
@@ -631,10 +623,10 @@
           <h4 data-i18n="footD">Docs</h4>
           <ul>
             <!-- TODO: 以下链接指向 GitHub 仓库内文档，确认文件存在 -->
-            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/architecture.md" target="_blank" rel="noopener" data-i18n="footD1">Architecture &amp; collaboration</a></li>
-            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/performance.md" target="_blank" rel="noopener" data-i18n="footD2">Performance benchmarks</a></li>
-            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/formula-catalog.md" target="_blank" rel="noopener" data-i18n="footD3">Formula compatibility catalog</a></li>
-            <li><a href="https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/roadmap.md" target="_blank" rel="noopener" data-i18n="footD4">Public roadmap</a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/architecture.md" target="_blank" rel="noopener" data-i18n="footD1">Architecture &amp; collaboration</a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/performance.md" target="_blank" rel="noopener" data-i18n="footD2">Performance benchmarks</a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/formula-catalog.md" target="_blank" rel="noopener" data-i18n="footD3">Formula compatibility catalog</a></li>
+            <li><a href="https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/roadmap.md" target="_blank" rel="noopener" data-i18n="footD4">Public roadmap</a></li>
           </ul>
         </nav>
       </div>
@@ -682,7 +674,7 @@
       f6t: "轻量自托管", f6a: "单个 Spring Boot JAR + 一个 MySQL 8", f6b: "Docker Compose 一键启动，健康检查内置", f6c: "首次启动自动建表并生成示例数据",
       bandTitle: "合成压测下的真实数字，不是营销口径",
       st1: "50k 行 × 70 列滚动绘制 p95", st2: "首屏 4000 行 · 缓存命中", st3: "100 人并发 meta 轮询 p95", st4: "公式求值 · 5 万行中位数",
-      bandNote: "合成基准（Playwright headless 无节流 + JVM 内存负载），测量口径与边界见 <a href=\"https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/performance.md\" target=\"_blank\" rel=\"noopener\">docs/performance.md</a> · 单次合成运行，不构成服务承诺",
+      bandNote: "合成基准（Playwright headless 无节流 + JVM 内存负载），测量口径与边界见 <a href=\"https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/performance.md\" target=\"_blank\" rel=\"noopener\">docs/performance.md</a> · 单次合成运行，不构成服务承诺",
       cmpKicker: "横向对比", cmpH2: "PolyTable 适合你吗？", cmpLead: "与主流方案的诚实对比——包括我们暂时做不到的部分。",
       cmpAria: "PolyTable 与同类产品对比表（窄屏可横向滚动）",
       cmpDim: "对比维度", cmpBadge: "本项目", cmpFeishu: "飞书多维表格",
@@ -694,7 +686,7 @@
       fxA: "119 个飞书兼容函数", fxAS: "目录机器可读 + 官方溯源", fxB: "原生公式", fxBS: "（兼容基准）", fxOwn: "自有公式体系", fxES: "兼容部分 Airtable 函数",
       depA: "一键 Compose", depAS: "单 JAR + 一个 MySQL", depB: "无需部署", depBS: "（SaaS，数据在云端）", depDocker: "Docker 多容器", depES: "（含 PG 等依赖）",
       tableHint: "← 左右滑动查看完整对比 →", honestT: "诚实说明",
-      honestBody: "PolyTable 目前视图类型较少（以表格视图为主，看板 / 日历 / 表单视图在 <a href=\"https://github.com/YOUR_GITHUB_NAME/polytable/blob/main/docs/roadmap.md\" target=\"_blank\" rel=\"noopener\">路线图</a> 中），社区也还处于早期阶段，插件与生态不及成熟项目丰富。如果你需要开箱即用的全场景体验，飞书多维表格或 NocoDB 可能更合适；如果你在意数据主权、大表性能与部署简单，欢迎试试 PolyTable。",
+      honestBody: "PolyTable 目前视图类型较少（以表格视图为主，看板 / 日历 / 表单视图在 <a href=\"https://github.com/ricky-chenzhuquan/polytable/blob/main/docs/roadmap.md\" target=\"_blank\" rel=\"noopener\">路线图</a> 中），社区也还处于早期阶段，插件与生态不及成熟项目丰富。如果你需要开箱即用的全场景体验，飞书多维表格或 NocoDB 可能更合适；如果你在意数据主权、大表性能与部署简单，欢迎试试 PolyTable。",
       cmpFootnote: "注：竞品信息基于各项目 / 产品 2026-11 前后的官方公开资料整理，许可与能力可能随版本变化，请以各官方文档为准；「约 5 万行上限」为飞书多维表格公开文档口径。",
       qsKicker: "快速开始", qsH2: "5 分钟跑起来", qsLead: "一条命令拉起服务，默认入口与演示账户开箱即用。",
       qsRec: "推荐", qs1Desc: "应用 + MySQL 一次拉起，首次启动自动建表。", qsTerm: "终端", qs1Cc: "# 修改其中的口令配置", qs1Yml: "docker-compose.yml（节选）",

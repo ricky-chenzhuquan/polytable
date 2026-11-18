@@ -4,8 +4,7 @@
 
 <div align="center">
 
-<!-- TODO(仓库名确认后替换 YOUR_GITHUB_NAME) -->
-[![CI](https://github.com/YOUR_GITHUB_NAME/polytable/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_NAME/polytable/actions/workflows/ci.yml)
+[![CI](https://github.com/ricky-chenzhuquan/polytable/actions/workflows/ci.yml/badge.svg)](https://github.com/ricky-chenzhuquan/polytable/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-4f46e5.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-17-4f46e5.svg)](https://adoptium.net/)
 
@@ -49,7 +48,7 @@ PolyTable 是一个**自托管的多维表格服务**，对标飞书多维表格
 ### 方式一：Docker Compose（推荐）
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_NAME/polytable.git   # TODO(仓库名确认后替换)
+git clone https://github.com/ricky-chenzhuquan/polytable.git
 cd polytable
 cp .env.example .env          # 修改其中的口令配置
 docker compose up -d
@@ -61,7 +60,7 @@ docker compose up -d
 依赖：JDK 17+、Maven 3.8+、MySQL 8。
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_NAME/polytable.git   # TODO(仓库名确认后替换)
+git clone https://github.com/ricky-chenzhuquan/polytable.git
 cd polytable
 mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWORD=你的密码"
 # 打开 http://localhost:8080/ops/

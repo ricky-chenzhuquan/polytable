@@ -157,6 +157,7 @@
 
       <nav class="nav-links" aria-label="Main navigation" data-i18n-aria="navAria">
         <a href="#features" data-i18n="navFeatures">Features</a>
+        <a href="#use-cases" data-i18n="navUseCases">Use cases</a>
         <a href="#performance" data-i18n="navPerformance">Performance</a>
         <a href="#compare" data-i18n="navCompare">Compare</a>
         <a href="#quickstart" data-i18n="navQuickstart">Quick start</a>
@@ -192,6 +193,7 @@
         </a>
       </div>
       <a class="menu-link" href="#features" data-i18n="menuFeatures">Core features</a>
+      <a class="menu-link" href="#use-cases" data-i18n="menuUseCases">Use cases</a>
       <a class="menu-link" href="#performance" data-i18n="menuPerformance">Benchmarks</a>
       <a class="menu-link" href="#compare" data-i18n="menuCompare">Comparison</a>
       <a class="menu-link" href="#quickstart" data-i18n="menuQuickstart">Quick start</a>
@@ -335,6 +337,54 @@
     </section>
 
     <!-- ======== 性能数字带（深色窄带） ======== -->
+    <section class="features use-cases" id="use-cases">
+      <div class="container">
+        <header class="sec-head">
+          <p class="kicker" data-i18n="ucKicker">Use cases</p>
+          <h2 data-i18n="ucH2">Who is PolyTable for</h2>
+          <p class="sec-lead" data-i18n="ucLead">Four situations where keeping a Bitable-style table on your own server pays off.</p>
+        </header>
+
+        <div class="feat-grid">
+          <article class="feat-card">
+            <div class="feat-ic"><svg aria-hidden="true" focusable="false"><use href="#i-lock"/></svg></div>
+            <h3 data-i18n="uc1t">Compliance &amp; data sovereignty</h3>
+            <ul class="feat-list">
+              <li data-i18n="uc1a">Sensitive ledgers, client lists and project trackers must stay inside your network</li>
+              <li data-i18n="uc1b">MySQL storage you control — data never leaves your server</li>
+            </ul>
+          </article>
+
+          <article class="feat-card">
+            <div class="feat-ic"><svg aria-hidden="true" focusable="false"><use href="#i-canvas"/></svg></div>
+            <h3 data-i18n="uc2t">Tens of thousands of rows</h3>
+            <ul class="feat-list">
+              <li data-i18n="uc2a">Excel sharing and DOM-based open-source grids get sluggish at this scale</li>
+              <li data-i18n="uc2b">Canvas rendering keeps 50k × 70 scrolling smooth (p95 8.7ms)</li>
+            </ul>
+          </article>
+
+          <article class="feat-card">
+            <div class="feat-ic"><svg aria-hidden="true" focusable="false"><use href="#i-formula"/></svg></div>
+            <h3 data-i18n="uc3t">Migrating off Feishu / Excel</h3>
+            <ul class="feat-list">
+              <li data-i18n="uc3a">119 Feishu-compatible formulas — existing formula skills carry over</li>
+              <li data-i18n="uc3b">Migration kit (migration/) moves legacy table data with accounts &amp; passwords intact</li>
+            </ul>
+          </article>
+
+          <article class="feat-card">
+            <div class="feat-ic"><svg aria-hidden="true" focusable="false"><use href="#i-light"/></svg></div>
+            <h3 data-i18n="uc4t">Five-minute internal workspace</h3>
+            <ul class="feat-list">
+              <li data-i18n="uc4a">docker compose up -d — one app container plus one MySQL</li>
+              <li data-i18n="uc4b">Accounts, roles and a sample table are seeded on first startup</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="band" id="performance">
       <div class="container">
         <div class="band-head">

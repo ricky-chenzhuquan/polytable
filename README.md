@@ -90,6 +90,13 @@ First startup automatically creates the `ops_*` tables, demo accounts and a samp
 
 Full configuration with inline comments: [src/main/resources/application.yml](src/main/resources/application.yml).
 
+## When to use PolyTable
+
+- **Compliance & data sovereignty** — sensitive ledgers, client lists, and project trackers that must stay inside your network
+- **Tens of thousands of rows** — Excel sharing and DOM-based open-source grids get sluggish at this scale; canvas rendering does not
+- **Migrating off Feishu / Excel** — 119 Feishu-compatible formulas carry over existing skills; the migration kit moves data with accounts intact
+- **A five-minute internal workspace** — `docker compose up -d`, and accounts, roles and a sample table are seeded automatically
+
 ## Feature list
 
 - Tables: create / rename / delete blank tables, managed in a registry (`ops_table_registry`)

@@ -89,6 +89,13 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--DB_USERNAME=root --DB_PASSWOR
 
 完整配置见 [src/main/resources/application.yml](src/main/resources/application.yml)（每项都有注释）。
 
+## 什么时候用 PolyTable
+
+- **合规与数据主权**——台账、客户清单、项目进度等敏感数据必须留在内网
+- **几万行级数据量**——Excel 共享和 DOM 类开源表格在这个量级开始卡顿，Canvas 渲染不会
+- **从飞书 / Excel 迁移**——119 个飞书兼容公式让技能直接沿用，迁移套件连同账户口令整体搬数据
+- **五分钟搭好内部协作台**——`docker compose up -d`，账户、角色与示例表自动就绪
+
 ## 功能清单
 
 - 表格：新建 / 重命名 / 删除空白表，注册表统一管理（`ops_table_registry`）
